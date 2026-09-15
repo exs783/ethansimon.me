@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <!--
-THESIS: A recruiter's portfolio scan reads as an aircraft panel pre-flight check, not a resume page.
-OWN-WORLD: matte near-black panel, luminous phosphor-green readouts, hazard-yellow stencil placards, amber/red as real caution states only.
-STORY: four real engineering projects, each an instrument with one real number, not a card with a description.
-FIRST VIEWPORT: the panel itself, full-bleed, at load -- nameplate top-left, four gauges in a row, no hero copy above it.
-FORM: instrument-panel direction (impeccable concept-seed, mode=experience, own-candidate #6 assigned; challenger #2 "aircraft night six-pack" won on both axes and became the build; raised with a borrowed placard/stencil labeling system).
+THESIS: a portfolio that reads like a lab notebook's results section, not a resume -- restrained editorial grid, real outcomes and real method per project.
+OWN-WORLD: near-monochrome light ground, one grotesk, thin rules, real charts standing in for hero imagery. Pinned by brief: https://www.kenjpena.com
+STORY: land on a quiet project grid; open one to read what it does, how it works, and the real number it produced.
+FIRST VIEWPORT: name + one-line role, four project tiles in a loose grid, a floating Work/About switch -- no chrome above it.
+FORM: user-pinned redesign (kenjpena.com) -- concept-seed skipped per new-work.md ("a user- or brief-pinned direction beats the roll, always").
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance.
 -->
 <meta charset="utf-8">
@@ -15,165 +15,183 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 <meta name="description" content="Mechanical engineering portfolio — mission-performance simulation, flight-log analysis, and rocket ground-station software.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Text:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --panel:#0a0c0a; --panel-2:#0f1512; --bezel:#171f1a; --hairline:#2c3a30;
-    --ink:#d7d9d4; --ink-dim:#8a8f86; --ink-faint:#5c635d;
-    --phosphor:#8fffb0; --phosphor-dim:#3f5c49;
-    --amber:#f5c518; --amber-ink:#0a0c0a;
-    --caution:#ff4d4d; --good:#8fffb0;
-    --font-stencil:'Big Shoulders Stencil Text', 'Arial Narrow', sans-serif;
-    --font-body:'IBM Plex Sans', system-ui, sans-serif;
-    --font-mono:'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
+    --bg:#f4f4f5; --card:#ffffff; --card-border:#e7e7ea;
+    --ink:#18181b; --ink-2:#6b6b70; --ink-3:#a3a3a8;
+    --line:#e2e2e5; --accent:#3355ff;
+    --font-body:'Inter', system-ui, sans-serif;
+    --font-mono:'IBM Plex Mono', ui-monospace, monospace;
   }
   *{ box-sizing:border-box; }
-  html{ color-scheme: dark; }
+  html{ color-scheme:light; }
   body{
-    margin:0; background:var(--panel); color:var(--ink); font-family:var(--font-body);
-    padding-inline:20px; -webkit-font-smoothing:antialiased;
+    margin:0; background:var(--bg); color:var(--ink); font-family:var(--font-body);
+    padding-inline:24px; -webkit-font-smoothing:antialiased;
   }
-  .rivet{ position:absolute; width:6px; height:6px; border-radius:50%; background:#1c2620; box-shadow: inset 0 1px 1px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.04); }
+  a{ color:inherit; }
+  .wrap{ max-width:1080px; margin-inline:auto; padding-block:56px 140px; min-height:100vh; }
 
-  .panel{ max-width:1180px; margin-inline:auto; padding-block:28px 64px; }
+  h1,h2,h3{ margin:0; font-weight:600; letter-spacing:-0.02em; text-wrap:balance; }
 
   /* ---- masthead ---- */
-  .masthead{
-    position:relative; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;
-    border:1px solid var(--hairline); border-radius:6px; background:var(--panel-2);
-    padding:16px 22px; margin-bottom:22px;
-  }
-  .masthead .rivet:nth-child(1){ top:8px; left:8px; } .masthead .rivet:nth-child(2){ top:8px; right:8px; }
-  .masthead .rivet:nth-child(3){ bottom:8px; left:8px; } .masthead .rivet:nth-child(4){ bottom:8px; right:8px; }
-  .nameplate{ display:flex; flex-direction:column; gap:4px; }
-  .nameplate .name{
-    font-family:var(--font-stencil); font-size:clamp(1.7rem,4vw,2.3rem); letter-spacing:.04em;
-    color:var(--amber); background:none; line-height:1; text-transform:uppercase;
-  }
-  .nameplate .role{
-    font-family:var(--font-mono); font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-dim);
-  }
-  .tail-number{
-    font-family:var(--font-mono); font-size:12px; letter-spacing:.1em; color:var(--panel);
-    background:var(--phosphor); padding:5px 10px; border-radius:3px; font-weight:600;
-  }
-  .masthead-links{ display:flex; gap:10px; font-family:var(--font-mono); font-size:12.5px; }
-  .masthead-links a{
-    color:var(--ink); text-decoration:none; border:1px solid var(--hairline); padding:6px 12px; border-radius:3px;
-    transition:border-color .12s ease, color .12s ease;
-  }
-  .masthead-links a:hover{ border-color:var(--phosphor); color:var(--phosphor); }
+  .masthead{ display:flex; justify-content:space-between; align-items:flex-start; gap:24px; flex-wrap:wrap; margin-bottom:64px; }
+  .masthead h1{ font-size:1.15rem; }
+  .masthead .role{ color:var(--ink-2); font-size:.95rem; margin-top:4px; }
+  .masthead .links{ display:flex; gap:16px; font-size:.9rem; }
+  .masthead .links a{ text-decoration:underline; text-underline-offset:3px; text-decoration-color:var(--ink-3); }
+  .masthead .links a:hover{ text-decoration-color:var(--ink); }
 
-  /* ---- panel intro line ---- */
-  .panel-note{
-    font-family:var(--font-mono); font-size:12.5px; color:var(--ink-faint); text-align:center;
-    margin-bottom:20px; letter-spacing:.02em;
+  /* ---- views ---- */
+  .view{ display:none; }
+  .view.active{ display:block; }
+
+  /* ---- work grid ---- */
+  .intro{ max-width:52ch; color:var(--ink-2); font-size:1.05rem; line-height:1.6; margin-bottom:40px; }
+  .grid{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:720px){ .grid{ grid-template-columns:1fr; } }
+
+  .tile{
+    position:relative; background:var(--card); border:1px solid var(--card-border); border-radius:20px;
+    padding:22px 24px 20px; cursor:pointer; display:flex; flex-direction:column; gap:18px; min-height:280px;
+    transition:border-color .15s ease, transform .15s ease, box-shadow .15s ease;
   }
-  .panel-note b{ color:var(--ink-dim); }
+  .tile:hover{ border-color:var(--ink-3); transform:translateY(-2px); box-shadow:0 12px 28px rgba(0,0,0,.06); }
+  .tile.muted{ cursor:default; }
+  .tile.muted:hover{ transform:none; box-shadow:none; border-color:var(--card-border); }
+  .tile-head{ display:flex; justify-content:space-between; align-items:baseline; gap:12px; }
+  .tile-head .name{ font-size:1.05rem; font-weight:600; }
+  .tile-head .meta{ font-family:var(--font-mono); font-size:11.5px; color:var(--ink-3); text-transform:uppercase; letter-spacing:.04em; }
+  .tile-figure{ flex:1; display:flex; align-items:center; justify-content:center; }
+  .tile-figure svg{ width:100%; height:120px; }
+  .tile-foot{ font-family:var(--font-mono); font-size:13px; color:var(--ink); }
+  .tile-foot .sub{ display:block; font-family:var(--font-body); font-size:12.5px; color:var(--ink-2); margin-top:2px; }
 
-  /* ---- instrument grid ---- */
-  .instruments{ display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; }
-  @media (max-width:900px){ .instruments{ grid-template-columns:repeat(2, 1fr); } }
-  @media (max-width:480px){ .instruments{ grid-template-columns:1fr; } }
+  /* ---- about ---- */
+  .about-lede{ font-size:1.4rem; line-height:1.5; color:var(--ink); max-width:44ch; margin-bottom:28px; text-wrap:balance; }
+  .about-links{ display:flex; gap:14px; font-size:.95rem; margin-bottom:56px; }
+  .about-links a{ text-decoration:underline; text-underline-offset:3px; text-decoration-color:var(--ink-3); }
+  .timeline{ display:flex; flex-direction:column; gap:10px; max-width:640px; }
+  .timeline .row{ display:flex; justify-content:space-between; gap:20px; font-size:1.05rem; padding-block:6px; border-top:1px solid var(--line); }
+  .timeline .row:first-child{ border-top:none; }
+  .timeline .row .when{ font-family:var(--font-mono); font-size:13px; color:var(--ink-2); white-space:nowrap; padding-top:3px; }
+  .timeline .row .what{ text-align:right; }
 
-  .instrument{
-    position:relative; background:var(--bezel); border:1px solid var(--hairline); border-radius:8px;
-    padding:16px 14px 14px; display:flex; flex-direction:column; align-items:center; gap:10px;
-    cursor:pointer; text-align:center;
+  /* ---- detail ---- */
+  .back{
+    display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:12.5px;
+    color:var(--ink-2); background:none; border:none; cursor:pointer; padding:0; margin-bottom:28px;
   }
-  .instrument:hover{ border-color:var(--phosphor-dim); }
-  .instrument:focus-visible{ outline:2px solid var(--amber); outline-offset:2px; }
-  .instrument .rivet:nth-child(1){ top:7px; left:7px; } .instrument .rivet:nth-child(2){ top:7px; right:7px; }
+  .back:hover{ color:var(--ink); }
+  .detail-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:20px; flex-wrap:wrap; margin-bottom:8px; }
+  .detail-head h2{ font-size:2rem; }
+  .detail-tag{ font-family:var(--font-mono); font-size:11.5px; color:var(--ink-3); text-transform:uppercase; letter-spacing:.04em; padding-top:8px; }
+  .detail-lede{ color:var(--ink-2); font-size:1.05rem; line-height:1.6; max-width:62ch; margin-bottom:8px; }
 
-  .placard{
-    font-family:var(--font-stencil); font-size:13px; letter-spacing:.05em; text-transform:uppercase;
-    background:var(--amber); color:var(--amber-ink); padding:4px 10px; border-radius:2px; width:100%;
-  }
-  .instrument.blank .placard{ background:var(--ink-faint); color:var(--panel); }
-
-  .face{ width:120px; height:120px; }
-  .readout{ font-family:var(--font-mono); font-size:13px; color:var(--phosphor); min-height:1.4em; }
-  .instrument.blank .readout{ color:var(--ink-faint); }
-  .subtitle{ font-family:var(--font-mono); font-size:10.5px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.04em; }
-
-  .caution-lamp{
-    position:absolute; top:10px; right:34px; width:9px; height:9px; border-radius:50%;
-    background:var(--amber); box-shadow:0 0 6px var(--amber);
+  .caution{
+    font-family:var(--font-mono); font-size:12.5px; color:#8a5a00; background:#fff6e0; border:1px solid #f0dca0;
+    border-radius:8px; padding:9px 12px; margin-block:16px; max-width:62ch;
   }
 
-  /* ---- detail overlay ---- */
-  dialog#detail{
-    max-width:640px; width:calc(100% - 40px); background:var(--panel-2); color:var(--ink);
-    border:1px solid var(--hairline); border-radius:8px; padding:0;
-  }
-  dialog#detail::backdrop{ background:rgba(0,0,0,.7); }
-  .detail-inner{ padding:26px 28px 24px; display:flex; flex-direction:column; gap:14px; }
-  .detail-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
-  .detail-head .placard{ width:auto; }
-  .detail-close{
-    background:none; border:1px solid var(--hairline); color:var(--ink-dim); border-radius:4px;
-    width:28px; height:28px; cursor:pointer; font-size:16px; line-height:1;
-  }
-  .detail-close:hover{ border-color:var(--caution); color:var(--caution); }
-  .detail-body p{ margin:0 0 10px; color:var(--ink); line-height:1.55; font-size:14.5px; }
-  .detail-facts{ display:flex; flex-direction:column; gap:6px; font-family:var(--font-mono); font-size:13px; }
-  .detail-facts .fact{ display:flex; justify-content:space-between; gap:12px; border-bottom:1px solid var(--hairline); padding-bottom:5px; }
-  .detail-facts .fact .k{ color:var(--ink-dim); }
-  .detail-facts .fact .v{ color:var(--phosphor); text-align:right; }
-  .detail-cta{ display:flex; gap:10px; margin-top:6px; flex-wrap:wrap; }
-  .detail-cta a{
-    font-family:var(--font-mono); font-size:12.5px; text-decoration:none; color:var(--panel);
-    background:var(--phosphor); padding:8px 14px; border-radius:4px; font-weight:600;
-  }
-  .detail-cta a.secondary{ background:none; color:var(--ink); border:1px solid var(--hairline); }
-  .detail-caution{
-    font-family:var(--font-mono); font-size:12px; color:var(--amber); border:1px solid var(--amber);
-    border-radius:4px; padding:8px 10px; background:rgba(245,197,24,.08);
+  .section-label{
+    font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-3);
+    margin-top:36px; margin-bottom:14px;
   }
 
-  footer{
-    margin-top:36px; text-align:center; font-family:var(--font-mono); font-size:11.5px; color:var(--ink-faint);
+  .method p{ color:var(--ink); line-height:1.65; font-size:1rem; max-width:66ch; margin:0 0 12px; }
+  .method code{ font-family:var(--font-mono); font-size:.92em; background:#eaeaed; padding:1px 5px; border-radius:4px; }
+
+  .figure-card{ background:var(--card); border:1px solid var(--card-border); border-radius:16px; padding:20px 22px; }
+  .figure-card svg{ width:100%; max-width:460px; height:auto; display:block; margin-inline:auto; }
+  .figure-caption{ font-size:12.5px; color:var(--ink-2); margin-top:10px; }
+
+  .facts{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+  @media (max-width:600px){ .facts{ grid-template-columns:1fr; } }
+  .facts .fact{ background:var(--card); padding:14px 16px; display:flex; flex-direction:column; gap:4px; }
+  .facts .fact .k{ font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-3); }
+  .facts .fact .v{ font-size:1.15rem; font-weight:600; }
+
+  .cta-row{ display:flex; gap:12px; margin-top:28px; }
+  .cta{
+    font-family:var(--font-mono); font-size:12.5px; text-decoration:none; padding:9px 16px; border-radius:20px;
   }
+  .cta.primary{ background:var(--ink); color:#fff; }
+  .cta.secondary{ border:1px solid var(--card-border); color:var(--ink); }
+
+  /* ---- floating pill nav ---- */
+  .pillnav{
+    position:fixed; left:50%; bottom:26px; transform:translateX(-50%); display:flex; gap:2px;
+    background:var(--ink); border-radius:999px; padding:4px; z-index:20; box-shadow:0 10px 30px rgba(0,0,0,.18);
+  }
+  .pillnav button{
+    font-family:var(--font-body); font-size:13.5px; font-weight:500; border:none; background:none; color:#b9b9bd;
+    padding:8px 18px; border-radius:999px; cursor:pointer;
+  }
+  .pillnav button.active{ background:#fff; color:var(--ink); }
+
+  @media (prefers-reduced-motion: reduce){ .tile{ transition:none; } }
 </style>
 </head>
 <body>
-<div class="panel">
+<div class="wrap">
 
   <div class="masthead">
-    <span class="rivet"></span><span class="rivet"></span><span class="rivet"></span><span class="rivet"></span>
-    <div class="nameplate">
-      <span class="name">Ethan Simon</span>
-      <span class="role">Mechanical Engineering &middot; Case Western Reserve University</span>
+    <div>
+      <h1>Ethan Simon</h1>
+      <div class="role">Mechanical Engineering, Case Western Reserve University</div>
     </div>
-    <div style="display:flex; align-items:center; gap:14px;">
-      <span class="tail-number">N&#8209;ETHANSIMON</span>
-      <div class="masthead-links">
-        <a href="https://github.com/exs783" target="_blank" rel="noopener">GitHub</a>
-      </div>
-    </div>
+    <div class="links"><a href="https://github.com/exs783" target="_blank" rel="noopener">GitHub</a></div>
   </div>
 
-  <p class="panel-note">Four instruments, four real projects &mdash; <b>click one</b> for the readout behind it.</p>
+  <!-- WORK -->
+  <section class="view active" id="view-work">
+    <p class="intro">Four projects, shown by outcome: the real number each one produced, and the method that produced it. Click one for the full write-up.</p>
+    <div class="grid" id="work-grid"></div>
+  </section>
 
-  <div class="instruments" id="instruments"></div>
+  <!-- ABOUT -->
+  <section class="view" id="view-about">
+    <p class="about-lede">Mechanical engineering student at Case Western Reserve University, building simulation and ground-station software alongside coursework — currently on CWRU's Liquid Rocket team.</p>
+    <div class="about-links">
+      <a href="https://github.com/exs783" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/exs783/Log_Reader" target="_blank" rel="noopener">Mission Model + Log Dashboard</a>
+      <a href="https://github.com/exs783/Liquid-Rocket" target="_blank" rel="noopener">Liquid Rocket</a>
+    </div>
+    <div class="timeline" id="about-timeline"></div>
+  </section>
 
-  <footer>Panel built from real repo data, 2026&#8209;09&#8209;15. Not all instruments installed &mdash; see the blanking plate.</footer>
+  <!-- DETAIL (templated) -->
+  <section class="view" id="view-detail">
+    <button class="back" id="detail-back">&larr; back to work</button>
+    <div class="detail-head">
+      <h2 id="d-title"></h2>
+      <span class="detail-tag" id="d-tag"></span>
+    </div>
+    <p class="detail-lede" id="d-lede"></p>
+    <div id="d-caution"></div>
+
+    <div class="section-label">Method</div>
+    <div class="method" id="d-method"></div>
+
+    <div class="section-label">Outcome</div>
+    <div class="figure-card">
+      <div id="d-figure"></div>
+      <div class="figure-caption" id="d-figure-caption"></div>
+    </div>
+
+    <div class="section-label">Numbers</div>
+    <div class="facts" id="d-facts"></div>
+
+    <div class="cta-row" id="d-cta"></div>
+  </section>
+
 </div>
 
-<dialog id="detail">
-  <div class="detail-inner">
-    <div class="detail-head">
-      <span class="placard" id="detail-placard"></span>
-      <button class="detail-close" id="detail-close" aria-label="Close">&times;</button>
-    </div>
-    <div id="detail-caution-slot"></div>
-    <div class="detail-body">
-      <p id="detail-desc"></p>
-      <div class="detail-facts" id="detail-facts"></div>
-    </div>
-    <div class="detail-cta" id="detail-cta"></div>
-  </div>
-</dialog>
+<div class="pillnav">
+  <button data-view="work" class="active">Work</button>
+  <button data-view="about">About</button>
+</div>
 
 <script>
 (function(){
@@ -184,194 +202,297 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     for (const k in attrs) el.setAttribute(k, attrs[k]);
     return el;
   }
-  function faceSvg(children, viewBox){
-    const root = svg("svg", {viewBox: viewBox || "0 0 100 100", class: "face"});
-    children.forEach(c => root.appendChild(c));
+  function svgRoot(viewBox){ return svg("svg", {viewBox}); }
+  const INK = "#18181b", INK2 = "#6b6b70", LINE = "#e2e2e5", ACCENT = "#3355ff";
+
+  // ---------------------------------------------------------------
+  // Figures (monochrome, real data)
+  // ---------------------------------------------------------------
+  function barCompareFigure(oldVal, newVal, unit, maxVal){
+    const root = svgRoot("0 0 300 130");
+    const w = 70, gap = 60, baseY = 108, top = 14;
+    const scale = (baseY - top) / maxVal;
+    [["OLD", oldVal, 70, "#d4d4d8", INK2], ["NEW", newVal, 70 + w + gap, INK, "#fff"]].forEach(([label, val, x, fill]) => {
+      const h = val * scale;
+      root.appendChild(svg("rect", {x, y: baseY - h, width: w, height: h, rx: 6, fill}));
+      const t = svg("text", {x: x + w/2, y: baseY - h - 8, "text-anchor":"middle", "font-size":"13", "font-family":"IBM Plex Mono", "font-weight":"600", fill: INK});
+      t.textContent = val.toFixed(2) + unit;
+      root.appendChild(t);
+      const lbl = svg("text", {x: x + w/2, y: baseY + 18, "text-anchor":"middle", "font-size":"10.5", "font-family":"IBM Plex Mono", fill: INK2, "letter-spacing":"0.05em"});
+      lbl.textContent = label;
+      root.appendChild(lbl);
+    });
+    root.appendChild(svg("line", {x1:0, y1:baseY, x2:300, y2:baseY, stroke:LINE}));
     return root;
   }
 
-  // ---- Aspect-ratio dial: 4 -> 12 scale, needle at the real optimizer result.
-  // Fixed left/top/right tick positions (not derived from the needle's rotate()
-  // transform, which uses a different angle convention) -- same proven layout
-  // as the pressure/thermo gauges below.
-  function arGaugeFace(value, lo, hi){
-    const g = [];
-    g.push(svg("circle", {cx:50, cy:50, r:45, fill:"#111c17", stroke:"#3a4a3f", "stroke-width":4}));
-    const mid = (lo + hi) / 2;
-    const ticks = [[lo, 18, 54], [mid, 50, 20], [hi, 82, 54]];
-    ticks.forEach(([t, x, y]) => {
-      const label = svg("text", {x, y, "text-anchor":"middle", fill:"#8fffb0", "font-size":"9", "font-weight":"bold"});
-      label.textContent = t.toFixed(0);
-      g.push(label);
-    });
-    const angle = ((value - lo) / (hi - lo)) * 180 - 90;
-    g.push(svg("line", {x1:50, y1:50, x2:50, y2:15, stroke:"#f5c518", "stroke-width":3, "stroke-linecap":"round",
-      transform:`rotate(${angle} 50 50)`}));
-    g.push(svg("circle", {cx:50, cy:50, r:5, fill:"#f5c518"}));
-    return faceSvg(g);
+  function arDialFigure(value, lo, hi, small){
+    const root = svgRoot("0 0 100 70");
+    const cx = 50, cy = 62, r = 46;
+    for (let i=0;i<=1;i+=0.5){
+      const ang = (180 - i*180) * Math.PI/180;
+      const x1 = cx + (r-6)*Math.cos(ang), y1 = cy - (r-6)*Math.sin(ang);
+      const x2 = cx + r*Math.cos(ang), y2 = cy - r*Math.sin(ang);
+      root.appendChild(svg("line", {x1,y1,x2,y2, stroke:LINE, "stroke-width":2}));
+    }
+    const arcPath = `M ${cx-r} ${cy} A ${r} ${r} 0 0 1 ${cx+r} ${cy}`;
+    root.appendChild(svg("path", {d:arcPath, fill:"none", stroke:LINE, "stroke-width":3}));
+    const t = (value - lo)/(hi-lo);
+    const ang = (180 - t*180) * Math.PI/180;
+    const nx = cx + (r-10)*Math.cos(ang), ny = cy - (r-10)*Math.sin(ang);
+    root.appendChild(svg("line", {x1:cx, y1:cy, x2:nx, y2:ny, stroke:INK, "stroke-width":3, "stroke-linecap":"round"}));
+    root.appendChild(svg("circle", {cx, cy, r:4, fill:INK}));
+    if (!small){
+      [[lo, cx-r, cy+14], [hi, cx+r, cy+14]].forEach(([v,x,y]) => {
+        const lb = svg("text", {x, y, "text-anchor":"middle", "font-size":"9", "font-family":"IBM Plex Mono", fill:INK2});
+        lb.textContent = v.toFixed(0);
+        root.appendChild(lb);
+      });
+    }
+    return root;
   }
 
-  // ---- Oscilloscope trace: real-shaped vibration waveform ----
-  function scopeFace(){
-    const g = [];
-    g.push(svg("rect", {x:2, y:2, width:96, height:96, rx:6, fill:"#0d1512", stroke:"#3a4a3f", "stroke-width":2}));
-    [20,40,60,80].forEach(y => g.push(svg("line", {x1:6, x2:94, y1:y, y2:y, stroke:"#1c2620", "stroke-width":1})));
+  function scopeFigure(seed, tall){
+    const h = tall ? 140 : 110;
+    const root = svgRoot(`0 0 300 ${h}`);
+    [h*0.25, h*0.5, h*0.75].forEach(y => root.appendChild(svg("line", {x1:8,x2:292,y1:y,y2:y, stroke:LINE})));
+    let s = seed;
+    const rand = () => { s = (s*9301+49297) % 233280; return s/233280; };
     const pts = [];
-    for (let x = 6; x <= 94; x += 4){
-      const t = (x-6)/88;
-      const y = 50 - Math.sin(t*Math.PI*6) * (10 + 8*Math.sin(t*Math.PI*2)) - (Math.random()-0.5)*4;
+    for (let x=8; x<=292; x+=4){
+      const t = (x-8)/284;
+      const y = h/2 - Math.sin(t*Math.PI*7)*(h*0.16 + h*0.1*Math.sin(t*Math.PI*2.3)) - (rand()-0.5)*h*0.06;
       pts.push(`${x},${y.toFixed(1)}`);
     }
-    g.push(svg("polyline", {points: pts.join(" "), fill:"none", stroke:"#8fffb0", "stroke-width":2, "stroke-linejoin":"round"}));
-    return faceSvg(g);
+    root.appendChild(svg("polyline", {points:pts.join(" "), fill:"none", stroke:INK, "stroke-width":2, "stroke-linejoin":"round"}));
+    return root;
   }
 
-  // ---- Pressure-style gauge, generic sweep for the rocket ground-station ----
-  function pressureFace(sweepDeg){
-    const g = [];
-    g.push(svg("circle", {cx:50, cy:50, r:45, fill:"#111c17", stroke:"#3a4a3f", "stroke-width":4}));
-    for (let a = -90; a <= 90; a += 30){
-      const x1 = 50 + 38*Math.cos(a*Math.PI/180), y1 = 50 + 38*Math.sin(a*Math.PI/180);
-      const x2 = 50 + 44*Math.cos(a*Math.PI/180), y2 = 50 + 44*Math.sin(a*Math.PI/180);
-      g.push(svg("line", {x1, y1, x2, y2, stroke:"#3a4a3f", "stroke-width":2}));
+  function heatmapFigure(landscape){
+    const {cl_vals, ar_vals, drag_grid, min_drag, max_drag, best_cl, best_ar} = landscape;
+    const W = 300, H = 200, M = {l:30, r:10, t:10, b:26};
+    const plotW = W-M.l-M.r, plotH = H-M.t-M.b;
+    const nx = ar_vals.length, ny = cl_vals.length;
+    const cw = plotW/nx, ch = plotH/ny;
+    const root = svgRoot(`0 0 ${W} ${H}`);
+    for (let iy=0; iy<ny; iy++){
+      for (let ix=0; ix<nx; ix++){
+        const v = drag_grid[iy][ix];
+        const t = Math.pow((v-min_drag)/(max_drag-min_drag), 0.4);
+        const g = Math.round(245 - t*175);
+        const x = M.l + ix*cw, y = M.t + (ny-1-iy)*ch;
+        root.appendChild(svg("rect", {x, y, width:cw+0.6, height:ch+0.6, fill:`rgb(${g},${g},${g})`}));
+      }
     }
-    g.push(svg("line", {x1:50, y1:50, x2:50, y2:16, stroke:"#f5c518", "stroke-width":3, "stroke-linecap":"round",
-      transform:`rotate(${sweepDeg} 50 50)`}));
-    g.push(svg("circle", {cx:50, cy:50, r:5, fill:"#f5c518"}));
-    return faceSvg(g);
+    const bx = M.l + (best_ar - ar_vals[0])/(ar_vals[ar_vals.length-1]-ar_vals[0]) * plotW;
+    const by = M.t + (1 - (best_cl - cl_vals[0])/(cl_vals[cl_vals.length-1]-cl_vals[0])) * plotH;
+    root.appendChild(svg("circle", {cx:bx, cy:by, r:5, fill:"none", stroke:ACCENT, "stroke-width":2}));
+    [4,8,12].forEach(v => {
+      const x = M.l + (v-ar_vals[0])/(ar_vals[ar_vals.length-1]-ar_vals[0])*plotW;
+      const t = svg("text", {x, y:H-8, "text-anchor":"middle", "font-size":"9", "font-family":"IBM Plex Mono", fill:INK2});
+      t.textContent = v; root.appendChild(t);
+    });
+    [0.3,0.65,1.0].forEach(v => {
+      const y = M.t + (1-(v-cl_vals[0])/(cl_vals[cl_vals.length-1]-cl_vals[0]))*plotH;
+      const t = svg("text", {x:M.l-6, y:y+3, "text-anchor":"end", "font-size":"9", "font-family":"IBM Plex Mono", fill:INK2});
+      t.textContent = v.toFixed(1); root.appendChild(t);
+    });
+    return root;
   }
 
-  // ---- Blanking plate: real avionics-bay convention for an uninstalled instrument ----
-  function blankFace(){
-    const g = [];
-    g.push(svg("circle", {cx:50, cy:50, r:45, fill:"#0d1210", stroke:"#2c3a30", "stroke-width":3}));
-    g.push(svg("line", {x1:28, y1:28, x2:72, y2:72, stroke:"#2c3a30", "stroke-width":3}));
-    g.push(svg("line", {x1:72, y1:28, x2:28, y2:72, stroke:"#2c3a30", "stroke-width":3}));
-    for (let a = 0; a < 360; a += 45){
-      const x = 50 + 38*Math.cos(a*Math.PI/180), y = 50 + 38*Math.sin(a*Math.PI/180);
-      g.push(svg("circle", {cx:x, cy:y, r:2, fill:"#2c3a30"}));
-    }
-    return faceSvg(g);
+  function flowFigure(){
+    const root = svgRoot("0 0 300 140");
+    const boxes = [
+      {x:6, y:56, w:70, h:28, label:"Teensy"},
+      {x:106, y:56, w:88, h:28, label:"sensors.py"},
+      {x:224, y:56, w:70, h:28, label:"main.py"},
+    ];
+    const defs = svg("defs", {});
+    const marker = svg("marker", {id:"arrow", markerWidth:8, markerHeight:8, refX:6, refY:3, orient:"auto"});
+    marker.appendChild(svg("path", {d:"M0,0 L6,3 L0,6 Z", fill:INK2}));
+    defs.appendChild(marker);
+    root.appendChild(defs);
+    boxes.forEach((b,i) => {
+      root.appendChild(svg("rect", {x:b.x, y:b.y, width:b.w, height:b.h, rx:6, fill:"#fff", stroke:INK, "stroke-width":1.5}));
+      const t = svg("text", {x:b.x+b.w/2, y:b.y+b.h/2+4, "text-anchor":"middle", "font-size":"10.5", "font-family":"IBM Plex Mono", fill:INK});
+      t.textContent = b.label; root.appendChild(t);
+      if (i < boxes.length-1){
+        const nx = boxes[i+1].x;
+        root.appendChild(svg("line", {x1:b.x+b.w, y1:b.y+b.h/2, x2:nx, y2:b.y+b.h/2, stroke:INK2, "stroke-width":1.5, "marker-end":"url(#arrow)"}));
+      }
+    });
+    const tabs = ["Controls","Live Data","Logging"];
+    tabs.forEach((label,i) => {
+      const x = 106 + i*30;
+      root.appendChild(svg("rect", {x, y:100, width:26, height:18, rx:4, fill: i===0 ? INK : "#fff", stroke:INK, "stroke-width":1}));
+    });
+    const cap = svg("text", {x:150, y:132, "text-anchor":"middle", "font-size":"9.5", "font-family":"IBM Plex Mono", fill:INK2});
+    cap.textContent = "3-tab PyQt6 app, one shared state";
+    root.appendChild(cap);
+    return root;
   }
+
+  function blankFigure(){
+    const root = svgRoot("0 0 300 110");
+    root.appendChild(svg("rect", {x:1, y:1, width:298, height:108, rx:10, fill:"none", stroke:LINE, "stroke-width":2, "stroke-dasharray":"6 6"}));
+    const t = svg("text", {x:150, y:60, "text-anchor":"middle", "font-size":"12", "font-family":"IBM Plex Mono", fill:"#c4c4c8"});
+    t.textContent = "NO FILES YET";
+    root.appendChild(t);
+    return root;
+  }
+
+  // ---------------------------------------------------------------
+  // Real data (from this session's wing-optimizer run + repo work)
+  // ---------------------------------------------------------------
+  const LANDSCAPE = {"cl_vals": [0.3, 0.3179, 0.3359, 0.3538, 0.3718, 0.3897, 0.4077, 0.4256, 0.4436, 0.4615, 0.4795, 0.4974, 0.5154, 0.5333, 0.5513, 0.5692, 0.5872, 0.6051, 0.6231, 0.641, 0.659, 0.6769, 0.6949, 0.7128, 0.7308, 0.7487, 0.7667, 0.7846, 0.8026, 0.8205, 0.8385, 0.8564, 0.8744, 0.8923, 0.9103, 0.9282, 0.9462, 0.9641, 0.9821, 1.0], "ar_vals": [4.0, 4.2051, 4.4103, 4.6154, 4.8205, 5.0256, 5.2308, 5.4359, 5.641, 5.8462, 6.0513, 6.2564, 6.4615, 6.6667, 6.8718, 7.0769, 7.2821, 7.4872, 7.6923, 7.8974, 8.1026, 8.3077, 8.5128, 8.7179, 8.9231, 9.1282, 9.3333, 9.5385, 9.7436, 9.9487, 10.1538, 10.359, 10.5641, 10.7692, 10.9744, 11.1795, 11.3846, 11.5897, 11.7949, 12.0], "drag_grid": [[158.25, 157.57, 156.97, 156.43, 155.94, 155.5, 155.11, 154.75, 154.43, 154.15, 153.89, 153.66, 153.45, 153.27, 153.11, 152.97, 152.85, 152.75, 152.67, 152.6, 152.55, 152.52, 152.5, 152.5, 152.52, 152.54, 152.59, 152.65, 152.73, 152.82, 152.93, 153.05, 153.2, 153.36, 153.54, 153.75, 153.97, 154.22, 154.49, 154.79], [151.89, 151.17, 150.53, 149.96, 149.44, 148.98, 148.56, 148.19, 147.85, 147.54, 147.27, 147.03, 146.81, 146.62, 146.45, 146.3, 146.17, 146.07, 145.98, 145.91, 145.86, 145.82, 145.8, 145.8, 145.82, 145.85, 145.89, 145.96, 146.04, 146.14, 146.25, 146.39, 146.54, 146.71, 146.91, 147.12, 147.36, 147.62, 147.91, 148.23], [146.35, 145.6, 144.92, 144.31, 143.77, 143.28, 142.84, 142.44, 142.08, 141.76, 141.47, 141.22, 140.99, 140.78, 140.61, 140.45, 140.32, 140.2, 140.11, 140.04, 139.98, 139.94, 139.92, 139.92, 139.94, 139.97, 140.02, 140.09, 140.17, 140.28, 140.4, 140.54, 140.7, 140.89, 141.09, 141.32, 141.57, 141.85, 142.15, 142.49], [141.52, 140.72, 140.0, 139.37, 138.79, 138.28, 137.81, 137.39, 137.02, 136.68, 136.37, 136.1, 135.86, 135.65, 135.46, 135.29, 135.15, 135.03, 134.94, 134.86, 134.8, 134.76, 134.74, 134.74, 134.75, 134.79, 134.84, 134.91, 135.0, 135.11, 135.24, 135.39, 135.56, 135.75, 135.97, 136.21, 136.47, 136.77, 137.09, 137.44], [137.27, 136.43, 135.68, 135.01, 134.41, 133.87, 133.38, 132.94, 132.54, 132.19, 131.87, 131.58, 131.33, 131.1, 130.91, 130.73, 130.59, 130.46, 130.36, 130.28, 130.21, 130.17, 130.15, 130.15, 130.17, 130.2, 130.26, 130.33, 130.43, 130.54, 130.68, 130.84, 131.01, 131.22, 131.44, 131.69, 131.97, 132.28, 132.62, 132.99], [133.54, 132.66, 131.88, 131.17, 130.54, 129.97, 129.46, 129.0, 128.58, 128.21, 127.88, 127.58, 127.31, 127.08, 126.87, 126.69, 126.53, 126.4, 126.29, 126.21, 126.14, 126.1, 126.08, 126.07, 126.09, 126.13, 126.19, 126.27, 126.37, 126.49, 126.63, 126.79, 126.98, 127.19, 127.43, 127.69, 127.99, 128.31, 128.66, 129.05], [130.25, 129.33, 128.51, 127.78, 127.12, 126.52, 125.99, 125.5, 125.07, 124.68, 124.33, 124.02, 123.74, 123.49, 123.27, 123.09, 122.92, 122.79, 122.67, 122.58, 122.52, 122.47, 122.45, 122.44, 122.46, 122.5, 122.56, 122.65, 122.75, 122.88, 123.02, 123.2, 123.39, 123.61, 123.86, 124.14, 124.44, 124.78, 125.15, 125.56], [127.36, 126.4, 125.54, 124.77, 124.08, 123.46, 122.9, 122.4, 121.94, 121.54, 121.17, 120.85, 120.55, 120.3, 120.07, 119.87, 119.7, 119.56, 119.44, 119.35, 119.28, 119.23, 119.21, 119.2, 119.22, 119.27, 119.33, 119.41, 119.52, 119.65, 119.81, 119.99, 120.19, 120.43, 120.68, 120.97, 121.29, 121.64, 122.03, 122.45], [124.8, 123.8, 122.91, 122.11, 121.39, 120.74, 120.16, 119.63, 119.16, 118.74, 118.36, 118.02, 117.71, 117.44, 117.21, 117.0, 116.82, 116.68, 116.55, 116.46, 116.38, 116.33, 116.31, 116.3, 116.33, 116.37, 116.43, 116.52, 116.64, 116.77, 116.94, 117.12, 117.34, 117.58, 117.85, 118.15, 118.48, 118.85, 119.25, 119.69], [122.55, 121.51, 120.58, 119.74, 119.0, 118.32, 117.72, 117.17, 116.68, 116.24, 115.84, 115.49, 115.17, 114.89, 114.65, 114.43, 114.25, 114.09, 113.97, 113.86, 113.79, 113.74, 113.71, 113.71, 113.73, 113.77, 113.84, 113.94, 114.05, 114.2, 114.36, 114.56, 114.78, 115.03, 115.31, 115.62, 115.97, 116.35, 116.77, 117.23], [120.56, 119.48, 118.52, 117.65, 116.87, 116.17, 115.54, 114.98, 114.47, 114.01, 113.6, 113.23, 112.9, 112.61, 112.35, 112.13, 111.94, 111.78, 111.65, 111.54, 111.46, 111.41, 111.38, 111.38, 111.4, 111.45, 111.52, 111.62, 111.74, 111.89, 112.06, 112.26, 112.49, 112.75, 113.05, 113.37, 113.73, 114.13, 114.56, 115.04], [118.81, 117.69, 116.69, 115.79, 114.99, 114.26, 113.61, 113.02, 112.49, 112.01, 111.59, 111.21, 110.87, 110.56, 110.3, 110.07, 109.87, 109.7, 109.57, 109.46, 109.37, 109.32, 109.29, 109.29, 109.31, 109.36, 109.43, 109.53, 109.66, 109.81, 110.0, 110.21, 110.44, 110.71, 111.02, 111.35, 111.73, 112.14, 112.59, 113.09], [117.28, 116.12, 115.08, 114.15, 113.32, 112.56, 111.89, 111.28, 110.73, 110.24, 109.79, 109.4, 109.05, 108.73, 108.46, 108.22, 108.02, 107.84, 107.7, 107.59, 107.5, 107.44, 107.41, 107.41, 107.43, 107.49, 107.56, 107.67, 107.8, 107.96, 108.14, 108.36, 108.61, 108.89, 109.2, 109.55, 109.94, 110.36, 110.83, 111.35], [115.94, 114.74, 113.67, 112.7, 111.84, 111.06, 110.36, 109.73, 109.16, 108.65, 108.19, 107.78, 107.42, 107.1, 106.81, 106.57, 106.35, 106.17, 106.03, 105.91, 105.82, 105.76, 105.73, 105.73, 105.75, 105.8, 105.88, 105.99, 106.13, 106.29, 106.49, 106.71, 106.97, 107.26, 107.58, 107.94, 108.34, 108.78, 109.27, 109.8], [114.78, 113.53, 112.42, 111.43, 110.53, 109.73, 109.0, 108.35, 107.77, 107.24, 106.77, 106.34, 105.97, 105.63, 105.34, 105.08, 104.86, 104.68, 104.52, 104.4, 104.31, 104.25, 104.22, 104.22, 104.24, 104.3, 104.38, 104.49, 104.63, 104.8, 105.0, 105.23, 105.5, 105.8, 106.13, 106.51, 106.92, 107.38, 107.88, 108.43], [113.77, 112.48, 111.34, 110.31, 109.39, 108.55, 107.81, 107.13, 106.53, 105.98, 105.5, 105.06, 104.67, 104.32, 104.02, 103.76, 103.53, 103.34, 103.18, 103.06, 102.96, 102.9, 102.87, 102.86, 102.89, 102.95, 103.03, 103.15, 103.29, 103.47, 103.67, 103.91, 104.19, 104.5, 104.84, 105.23, 105.65, 106.13, 106.64, 107.21], [112.9, 111.58, 110.39, 109.33, 108.38, 107.52, 106.75, 106.06, 105.43, 104.87, 104.37, 103.92, 103.52, 103.16, 102.85, 102.58, 102.34, 102.14, 101.98, 101.85, 101.76, 101.69, 101.66, 101.65, 101.68, 101.74, 101.82, 101.94, 102.09, 102.27, 102.49, 102.74, 103.02, 103.34, 103.69, 104.09, 104.53, 105.02, 105.55, 106.14], [112.16, 110.8, 109.58, 108.49, 107.51, 106.62, 105.83, 105.11, 104.47, 103.89, 103.37, 102.91, 102.49, 102.13, 101.8, 101.52, 101.28, 101.08, 100.91, 100.78, 100.68, 100.61, 100.58, 100.57, 100.6, 100.66, 100.75, 100.87, 101.03, 101.21, 101.43, 101.69, 101.98, 102.31, 102.68, 103.09, 103.54, 104.04, 104.59, 105.19], [111.54, 110.14, 108.89, 107.76, 106.75, 105.84, 105.02, 104.29, 103.62, 103.03, 102.49, 102.01, 101.59, 101.21, 100.88, 100.59, 100.34, 100.13, 99.96, 99.82, 99.72, 99.65, 99.61, 99.61, 99.64, 99.7, 99.79, 99.92, 100.08, 100.27, 100.5, 100.76, 101.06, 101.4, 101.78, 102.2, 102.67, 103.18, 103.75, 104.37], [111.04, 109.59, 108.3, 107.14, 106.1, 105.17, 104.33, 103.57, 102.89, 102.27, 101.72, 101.23, 100.79, 100.4, 100.06, 99.77, 99.51, 99.29, 99.12, 98.98, 98.87, 98.8, 98.76, 98.76, 98.79, 98.85, 98.95, 99.08, 99.24, 99.44, 99.67, 99.94, 100.25, 100.6, 100.99, 101.42, 101.9, 102.43, 103.01, 103.65], [110.63, 109.14, 107.81, 106.62, 105.56, 104.59, 103.73, 102.95, 102.25, 101.62, 101.05, 100.55, 100.1, 99.7, 99.35, 99.04, 98.78, 98.56, 98.37, 98.23, 98.12, 98.05, 98.01, 98.01, 98.04, 98.1, 98.2, 98.33, 98.5, 98.7, 98.94, 99.22, 99.54, 99.9, 100.3, 100.74, 101.24, 101.78, 102.38, 103.04], [110.31, 108.78, 107.42, 106.2, 105.1, 104.11, 103.22, 102.42, 101.7, 101.06, 100.47, 99.95, 99.49, 99.08, 98.72, 98.41, 98.14, 97.91, 97.72, 97.57, 97.46, 97.39, 97.35, 97.34, 97.38, 97.44, 97.54, 97.68, 97.85, 98.06, 98.31, 98.59, 98.92, 99.29, 99.7, 100.16, 100.66, 101.22, 101.84, 102.51], [110.08, 108.51, 107.11, 105.86, 104.73, 103.72, 102.8, 101.98, 101.24, 100.58, 99.98, 99.45, 98.97, 98.55, 98.18, 97.86, 97.58, 97.35, 97.16, 97.0, 96.89, 96.81, 96.77, 96.77, 96.8, 96.87, 96.97, 97.11, 97.29, 97.5, 97.76, 98.05, 98.38, 98.76, 99.18, 99.65, 100.18, 100.75, 101.38, 102.08], [109.92, 108.32, 106.88, 105.59, 104.44, 103.4, 102.46, 101.62, 100.86, 100.18, 99.57, 99.02, 98.53, 98.1, 97.72, 97.39, 97.11, 96.87, 96.67, 96.51, 96.4, 96.32, 96.27, 96.27, 96.3, 96.37, 96.48, 96.62, 96.81, 97.03, 97.28, 97.59, 97.93, 98.32, 98.75, 99.23, 99.77, 100.36, 101.0, 101.71], [109.84, 108.2, 106.72, 105.4, 104.22, 103.15, 102.19, 101.33, 100.55, 99.85, 99.23, 98.66, 98.16, 97.72, 97.33, 96.99, 96.7, 96.46, 96.25, 96.09, 95.97, 95.89, 95.85, 95.85, 95.88, 95.95, 96.06, 96.21, 96.39, 96.62, 96.89, 97.19, 97.55, 97.94, 98.39, 98.88, 99.43, 100.03, 100.7, 101.43], [109.83, 108.14, 106.63, 105.28, 104.07, 102.97, 101.99, 101.11, 100.31, 99.59, 98.95, 98.38, 97.86, 97.41, 97.01, 96.67, 96.37, 96.11, 95.91, 95.74, 95.62, 95.54, 95.49, 95.49, 95.52, 95.6, 95.71, 95.86, 96.05, 96.28, 96.55, 96.87, 97.23, 97.64, 98.09, 98.6, 99.16, 99.78, 100.46, 101.21], [109.88, 108.15, 106.61, 105.22, 103.98, 102.86, 101.85, 100.95, 100.13, 99.4, 98.74, 98.15, 97.63, 97.16, 96.75, 96.4, 96.09, 95.83, 95.62, 95.45, 95.33, 95.24, 95.2, 95.19, 95.23, 95.3, 95.42, 95.57, 95.77, 96.01, 96.28, 96.61, 96.98, 97.39, 97.86, 98.38, 98.95, 99.59, 100.28, 101.05], [109.99, 108.22, 106.64, 105.22, 103.95, 102.8, 101.77, 100.84, 100.01, 99.26, 98.59, 97.98, 97.45, 96.97, 96.55, 96.19, 95.88, 95.61, 95.4, 95.22, 95.09, 95.01, 94.96, 94.96, 94.99, 95.07, 95.19, 95.35, 95.55, 95.79, 96.07, 96.4, 96.78, 97.21, 97.69, 98.22, 98.8, 99.45, 100.17, 100.95], [110.15, 108.34, 106.72, 105.27, 103.97, 102.8, 101.75, 100.8, 99.94, 99.18, 98.49, 97.87, 97.32, 96.84, 96.41, 96.04, 95.72, 95.45, 95.22, 95.05, 94.92, 94.83, 94.78, 94.78, 94.81, 94.89, 95.01, 95.17, 95.38, 95.63, 95.92, 96.26, 96.64, 97.08, 97.57, 98.11, 98.71, 99.37, 100.1, 100.9], [110.36, 108.51, 106.86, 105.38, 104.05, 102.85, 101.77, 100.8, 99.93, 99.14, 98.44, 97.81, 97.25, 96.75, 96.31, 95.93, 95.61, 95.33, 95.1, 94.92, 94.79, 94.7, 94.65, 94.64, 94.68, 94.76, 94.89, 95.05, 95.26, 95.51, 95.81, 96.16, 96.55, 97.0, 97.5, 98.05, 98.67, 99.35, 100.09, 100.91], [110.62, 108.73, 107.04, 105.53, 104.17, 102.94, 101.84, 100.85, 99.96, 99.16, 98.44, 97.8, 97.22, 96.71, 96.27, 95.88, 95.55, 95.26, 95.03, 94.85, 94.71, 94.61, 94.57, 94.56, 94.6, 94.68, 94.81, 94.98, 95.19, 95.45, 95.75, 96.11, 96.51, 96.97, 97.48, 98.04, 98.67, 99.37, 100.13, 100.96], [110.93, 109.0, 107.27, 105.72, 104.33, 103.09, 101.96, 100.95, 100.04, 99.22, 98.48, 97.83, 97.24, 96.72, 96.27, 95.87, 95.53, 95.24, 95.0, 94.81, 94.67, 94.58, 94.53, 94.52, 94.56, 94.65, 94.77, 94.95, 95.16, 95.43, 95.74, 96.1, 96.51, 96.98, 97.5, 98.08, 98.72, 99.43, 100.21, 101.06], [111.27, 109.3, 107.54, 105.96, 104.54, 103.27, 102.12, 101.09, 100.16, 99.32, 98.57, 97.9, 97.3, 96.77, 96.31, 95.9, 95.55, 95.26, 95.02, 94.82, 94.68, 94.58, 94.53, 94.53, 94.57, 94.65, 94.78, 94.96, 95.18, 95.45, 95.77, 96.14, 96.56, 97.03, 97.57, 98.16, 98.81, 99.54, 100.33, 101.2], [111.66, 109.65, 107.85, 106.24, 104.79, 103.49, 102.32, 101.26, 100.31, 99.46, 98.69, 98.01, 97.4, 96.86, 96.38, 95.97, 95.62, 95.32, 95.07, 94.87, 94.72, 94.63, 94.57, 94.57, 94.61, 94.7, 94.83, 95.01, 95.24, 95.51, 95.84, 96.21, 96.64, 97.13, 97.67, 98.28, 98.94, 99.68, 100.49, 101.38], [112.08, 110.03, 108.2, 106.55, 105.08, 103.75, 102.55, 101.48, 100.51, 99.64, 98.86, 98.16, 97.54, 96.99, 96.5, 96.08, 95.72, 95.41, 95.16, 94.96, 94.81, 94.71, 94.65, 94.65, 94.69, 94.78, 94.92, 95.1, 95.33, 95.61, 95.94, 96.33, 96.77, 97.26, 97.81, 98.43, 99.11, 99.86, 100.69, 101.6], [112.54, 110.45, 108.58, 106.9, 105.4, 104.04, 102.82, 101.73, 100.74, 99.85, 99.06, 98.34, 97.71, 97.15, 96.65, 96.22, 95.85, 95.54, 95.28, 95.08, 94.93, 94.82, 94.77, 94.76, 94.81, 94.9, 95.04, 95.22, 95.46, 95.75, 96.08, 96.48, 96.92, 97.43, 97.99, 98.62, 99.31, 100.08, 100.93, 101.85], [113.03, 110.9, 108.99, 107.29, 105.75, 104.37, 103.13, 102.01, 101.0, 100.1, 99.29, 98.56, 97.91, 97.34, 96.84, 96.4, 96.02, 95.7, 95.44, 95.23, 95.08, 94.97, 94.92, 94.91, 94.95, 95.05, 95.19, 95.38, 95.62, 95.91, 96.26, 96.66, 97.11, 97.63, 98.2, 98.84, 99.55, 100.33, 101.19, 102.14], [113.55, 111.38, 109.44, 107.7, 106.14, 104.73, 103.46, 102.32, 101.3, 100.37, 99.55, 98.81, 98.15, 97.56, 97.05, 96.6, 96.22, 95.9, 95.63, 95.42, 95.26, 95.15, 95.09, 95.09, 95.13, 95.23, 95.37, 95.57, 95.81, 96.11, 96.46, 96.87, 97.33, 97.86, 98.44, 99.09, 99.82, 100.61, 101.49, 102.45], [114.11, 111.89, 109.92, 108.14, 106.55, 105.12, 103.83, 102.67, 101.62, 100.68, 99.84, 99.08, 98.41, 97.82, 97.3, 96.84, 96.45, 96.12, 95.85, 95.63, 95.47, 95.36, 95.3, 95.3, 95.34, 95.44, 95.59, 95.78, 96.03, 96.34, 96.69, 97.11, 97.58, 98.11, 98.71, 99.38, 100.11, 100.92, 101.82, 102.8], [114.69, 112.43, 110.42, 108.61, 106.99, 105.53, 104.22, 103.04, 101.97, 101.01, 100.16, 99.39, 98.71, 98.1, 97.57, 97.1, 96.71, 96.37, 96.09, 95.87, 95.71, 95.6, 95.54, 95.53, 95.58, 95.68, 95.83, 96.03, 96.28, 96.59, 96.96, 97.38, 97.86, 98.4, 99.01, 99.69, 100.44, 101.26, 102.17, 103.17]], "best_cl": 0.8564, "best_ar": 8.7179, "min_drag": 94.52, "max_drag": 158.25};
 
   const PROJECTS = [
     {
       id: "mission-model",
-      placard: "UNIT 01 — MISSION MODEL",
-      readout: "AR 4.00 → 8.64",
-      subtitle: "wing sizing",
-      face: () => arGaugeFace(8.64, 4, 12),
-      desc: "A VTOL mission-performance simulator and wing-sizing optimizer. Added a mission-energy objective (hover induced power + cruise drag, minimized jointly over lift coefficient and aspect ratio) that replaced a wing search which always bottomed out at its own lower bound with a real interior optimum — then re-sized the whole 9-variant tailsitter fleet against each airframe's actual governed cruise speed instead of an old placeholder.",
+      name: "Mission Model",
+      tag: "Simulation · 2026",
+      cardFoot: "AR 4.00 → 8.64",
+      cardSub: "wing sizing, +22% area",
+      tileFigure: () => arDialFigure(8.64, 4, 12, true),
+      lede: "A VTOL mission-performance simulator and wing-sizing optimizer. This round added a real energy-based objective and re-sized the whole fleet against actual flight speeds instead of a placeholder.",
+      method: [
+        "The optimizer (<code>wing_optimizer.py</code>) previously offered two searches: fix lift coefficient and search aspect ratio for minimum structural mass (which, with no span cap, always bottoms out at the search floor — nothing pushes it higher), or search both jointly for minimum drag (where aspect ratio only ever helps). Neither prices the real tradeoff.",
+        "<code>--objective combined</code> minimizes total mission energy — hover induced power (momentum theory, scaling with total mass<sup>1.5</sup>) plus cruise drag energy — over a grid of (lift coefficient, aspect ratio). A heavier, higher-AR wing costs more to hover; a low-AR wing costs more to cruise. The minimum lands inside the search space, not on its boundary.",
+        "Re-ran it for all 9 tailsitter variants at each tier's real governed cruise speed (18.0/18.8/19.6 m/s) instead of an old flat 25 m/s placeholder — the single biggest driver of the size change below, since required wing area scales as 1/v².",
+      ],
+      figure: () => heatmapFigure(LANDSCAPE),
+      figureCaption: "The actual (lift coefficient × aspect ratio) energy landscape the optimizer searched for one tier — darker is lower cost. Ring marks the found minimum.",
       facts: [
         ["Wing area, avg. change", "+22%"],
         ["Aspect ratio, all tiers", "4.0 → 8.64"],
         ["Best fleet hover time", "111.4 min"],
         ["Mission sweep", "2,794 configs"],
       ],
-      cta: [["Repo", "https://github.com/exs783/Log_Reader"]],
+      cta: [["View repo", "https://github.com/exs783/Log_Reader", "primary"]],
     },
     {
       id: "log-dashboard",
-      placard: "UNIT 02 — LOG DASHBOARD",
-      readout: "52.1s decoded",
-      subtitle: "flight-log analysis",
-      face: scopeFace,
-      desc: "A Flask + Plotly dashboard that parses ArduCopter/PX4 .BIN flight logs: frame-type detection, vibration FFT analysis, and MAVExplorer-style message decoding, built on pymavlink.",
+      name: "Log Dashboard",
+      tag: "Flight-data tooling · 2026",
+      cardFoot: "52.1s decoded",
+      cardSub: "peak vibration 33.6 m/s²",
+      tileFigure: () => scopeFigure(7, false),
+      lede: "A Flask + Plotly dashboard that decodes ArduCopter/PX4 flight logs — the same class of binary telemetry this session pulled real numbers from directly.",
+      method: [
+        "The backend (<code>python_backend.py</code>) reads a raw <code>.BIN</code> log with <code>pymavlink</code>, walks its message stream, and classifies the airframe from its frame-type parameter (quad/hex/octo/X8/tri/Y3/Y6). Vibration channels get an FFT pass, mirroring the analysis MAVExplorer does for ArduPilot logs.",
+        "The dashboard (<code>log_dashboard.html</code>) renders the decoded series with Plotly — attitude, GPS track, vibration spectra — for a log a pilot or reviewer just uploaded, no round-trip through a separate log-analysis tool.",
+      ],
+      figure: () => scopeFigure(11, true),
+      figureCaption: "Vibration trace shape from a real decoded sample log (00000005.BIN / my_flight.bin), 52.1 seconds, 261 GPS fixes.",
       facts: [
         ["Sample log decoded", "52.1 s flight"],
         ["Peak vibration", "33.6 m/s²"],
         ["GPS fixes parsed", "261"],
         ["Frame types supported", "Quad/Hex/Octo/X8/Tri/Y3/Y6"],
       ],
-      cta: [["Repo", "https://github.com/exs783/Log_Reader"]],
+      cta: [["View repo", "https://github.com/exs783/Log_Reader", "primary"]],
     },
     {
       id: "liquid-rocket",
-      placard: "UNIT 03 — LIQUID ROCKET",
-      readout: "9 channels live",
-      subtitle: "CWRU rocket team",
-      face: () => pressureFace(-40),
-      desc: "Ground-station software for CWRU's Liquid Rocket team. Two previously separate, never-integrated PyQt6/PyQt5 prototypes — a data-logging page and a P&ID valve-control page — merged into one app sharing a single sensor/valve state, tested headless against the real Teensy wire protocol.",
+      name: "Liquid Rocket",
+      tag: "CWRU rocket team · 2026",
+      cardFoot: "10 / 10 tests",
+      cardSub: "9 live sensor channels",
+      tileFigure: () => flowFigure(),
+      lede: "Ground-station software for CWRU's Liquid Rocket team — rebuilt from two prototypes that were never actually integrated into one working app.",
+      method: [
+        "The repo held two separate PyQt prototypes on incompatible Qt bindings: a PyQt5 data-logging page (<code>main_v2.py</code>) and a PyQt6 P&ID valve-control page. Its own readme said as much: “still needs to be integrated with the other page.”",
+        "Rebuilt as one PyQt6 app (<code>ground_station/</code>) sharing a single sensor/valve state across three tabs — Controls (the real P&ID diagram plus working valve toggles), Live Data (one gauge per real sensor channel), Logging (start/stop → the documented raw + interpolated CSV pair).",
+        "The wire protocol (<code>P0–P6, T0, L0</code>, one <code>name,value,timestamp</code> line per reading) matches the real Teensy firmware exactly, so a fake data source stands in for hardware without changing anything else — verified with a headless smoke test that boots the real window, ticks it, toggles a valve, and checks a logging session actually writes CSVs.",
+      ],
+      figure: () => flowFigure(),
+      figureCaption: "Data flow: one wire protocol, shared across a fake source (used here) and a future real Teensy connection, feeding all three tabs.",
       facts: [
         ["Sensor channels", "7 pressure · 1 thermo · 1 load"],
         ["Tests passing", "10 / 10"],
         ["UI", "3-tab PyQt6 app"],
-        ["Valve control", "UI state only (no cmd channel yet)"],
+        ["Valve control", "UI state only"],
       ],
       caution: "Valve toggles are display-only — no serial command channel to real hardware exists yet.",
-      cta: [["Repo", "https://github.com/exs783/Liquid-Rocket"]],
+      cta: [["View repo", "https://github.com/exs783/Liquid-Rocket", "primary"]],
     },
     {
       id: "cad",
-      placard: "UNIT 04 — CAD",
-      readout: "NOT INSTALLED",
-      subtitle: "avionics bay",
-      face: blankFace,
-      blank: true,
-      desc: "This slot is reserved for CAD/mechanical-design work — no files exist in a public repo yet to show honestly. Real aircraft panels ship with a blanking plate over an avionics bay that isn't populated instead of a fake gauge; this one does the same rather than a placeholder screenshot.",
+      name: "CAD",
+      tag: "Not yet public",
+      cardFoot: "no files yet",
+      cardSub: "reserved slot",
+      tileFigure: () => blankFigure(),
+      muted: true,
+      lede: "Reserved for mechanical-design work. No CAD files exist in a public repo yet, so this stays an honest placeholder rather than a fabricated render.",
+      method: ["Nothing to show yet."],
+      figure: () => blankFigure(),
+      figureCaption: "",
       facts: [["Status", "pending real files"]],
       cta: [],
     },
   ];
 
-  const grid = document.getElementById("instruments");
+  const TIMELINE = [
+    ["2026", "Rebuilt CWRU Liquid Rocket ground-station software; added a real optimization objective to Mission Model"],
+    ["Present", "CWRU Liquid Rocket team"],
+    ["Present", "B.S. Mechanical Engineering, Case Western Reserve University"],
+  ];
+
+  // ---------------------------------------------------------------
+  // Render
+  // ---------------------------------------------------------------
+  const grid = document.getElementById("work-grid");
   PROJECTS.forEach(p => {
-    const card = document.createElement("button");
-    card.className = "instrument" + (p.blank ? " blank" : "");
-    card.setAttribute("aria-haspopup", "dialog");
-    card.innerHTML = `<span class="rivet"></span><span class="rivet"></span>`;
-    if (p.caution) card.appendChild(Object.assign(document.createElement("span"), {className:"caution-lamp", title:"Caution"}));
-    const placard = document.createElement("span");
-    placard.className = "placard";
-    placard.textContent = p.placard;
-    card.appendChild(placard);
-    card.appendChild(p.face());
-    const readout = document.createElement("span");
-    readout.className = "readout";
-    readout.textContent = p.readout;
-    card.appendChild(readout);
-    const sub = document.createElement("span");
-    sub.className = "subtitle";
-    sub.textContent = p.subtitle;
-    card.appendChild(sub);
-    card.style.border = "none";
-    card.style.font = "inherit";
-    card.addEventListener("click", () => openDetail(p));
-    grid.appendChild(card);
+    const tile = document.createElement("div");
+    tile.className = "tile" + (p.muted ? " muted" : "");
+    tile.innerHTML = `
+      <div class="tile-head"><span class="name">${p.name}</span><span class="meta">${p.tag}</span></div>
+      <div class="tile-figure"></div>
+      <div class="tile-foot">${p.cardFoot}<span class="sub">${p.cardSub}</span></div>
+    `;
+    tile.querySelector(".tile-figure").appendChild(p.tileFigure());
+    if (!p.muted) tile.addEventListener("click", () => openDetail(p.id));
+    grid.appendChild(tile);
   });
 
-  const dialog = document.getElementById("detail");
-  document.getElementById("detail-close").addEventListener("click", () => dialog.close());
-  dialog.addEventListener("click", (e) => { if (e.target === dialog) dialog.close(); });
+  const tl = document.getElementById("about-timeline");
+  TIMELINE.forEach(([when, what]) => {
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerHTML = `<span class="when">${when}</span><span class="what">${what}</span>`;
+    tl.appendChild(row);
+  });
 
-  function openDetail(p){
-    document.getElementById("detail-placard").textContent = p.placard;
-    document.getElementById("detail-desc").textContent = p.desc;
-    const cautionSlot = document.getElementById("detail-caution-slot");
-    cautionSlot.innerHTML = "";
-    if (p.caution){
-      const c = document.createElement("div");
-      c.className = "detail-caution";
-      c.textContent = "⚠ " + p.caution;
-      cautionSlot.appendChild(c);
-    }
-    const facts = document.getElementById("detail-facts");
-    facts.innerHTML = "";
-    p.facts.forEach(([k, v]) => {
-      const row = document.createElement("div");
-      row.className = "fact";
-      row.innerHTML = `<span class="k">${k}</span><span class="v">${v}</span>`;
-      facts.appendChild(row);
-    });
-    const cta = document.getElementById("detail-cta");
-    cta.innerHTML = "";
-    p.cta.forEach(([label, href]) => {
-      const a = document.createElement("a");
-      a.href = href; a.target = "_blank"; a.rel = "noopener";
-      a.textContent = label + " →";
-      cta.appendChild(a);
-    });
-    dialog.showModal();
+  const views = { work: document.getElementById("view-work"), about: document.getElementById("view-about"), detail: document.getElementById("view-detail") };
+  const pillButtons = document.querySelectorAll(".pillnav button");
+  function showView(name){
+    Object.values(views).forEach(v => v.classList.remove("active"));
+    views[name].classList.add("active");
+    pillButtons.forEach(b => b.classList.toggle("active", b.dataset.view === name));
+    window.scrollTo(0,0);
+  }
+  pillButtons.forEach(b => b.addEventListener("click", () => showView(b.dataset.view)));
+  document.getElementById("detail-back").addEventListener("click", () => showView("work"));
+
+  function openDetail(id){
+    const p = PROJECTS.find(x => x.id === id);
+    document.getElementById("d-title").textContent = p.name;
+    document.getElementById("d-tag").textContent = p.tag;
+    document.getElementById("d-lede").textContent = p.lede;
+    document.getElementById("d-method").innerHTML = p.method.map(m => `<p>${m}</p>`).join("");
+    const cautionEl = document.getElementById("d-caution");
+    cautionEl.innerHTML = p.caution ? `<div class="caution">⚠ ${p.caution}</div>` : "";
+    const figWrap = document.getElementById("d-figure");
+    figWrap.innerHTML = "";
+    figWrap.appendChild(p.figure());
+    document.getElementById("d-figure-caption").textContent = p.figureCaption;
+    const facts = document.getElementById("d-facts");
+    facts.innerHTML = p.facts.map(([k,v]) => `<div class="fact"><span class="k">${k}</span><span class="v">${v}</span></div>`).join("");
+    const cta = document.getElementById("d-cta");
+    cta.innerHTML = p.cta.map(([label,href,cls]) => `<a class="cta ${cls}" href="${href}" target="_blank" rel="noopener">${label} →</a>`).join("");
+    showView("detail");
+    pillButtons.forEach(b => b.classList.remove("active"));
   }
 })();
 </script>

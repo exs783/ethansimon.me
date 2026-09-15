@@ -4,72 +4,96 @@
 
 ## Direction
 
-A small aircraft's night instrument panel. Chosen via concept-seed direction
-search (mode: experience) against PRODUCT.md — assigned candidate #6 from a
-self-authored list of 7 aerospace/engineering visual worlds (aircraft
-placard/stencil systems) was beaten on both audience-identification and
-product-clarity axes by catalog challenger `signals-instruments-night-flight-
-six-pack`, which became the actual build. One raise was borrowed back from
-the assigned direction: project identifiers ride on riveted hazard-yellow
-stencil placards, so the panel reads as cataloged real hardware rather than
-a generic dashboard mockup.
+Redesign, user-pinned: https://www.kenjpena.com. Concept-seed's direction
+search was skipped per new-work.md ("a user- or brief-pinned direction beats
+the roll, always") — the reference itself supplies the visual world.
 
-Each project is an instrument with one real number, not a card with a
-description — the panel's whole mechanism.
+Kept from the reference: near-monochrome light ground, restrained color (one
+accent used only for an interactive marker), a floating pill nav
+(Work/About) fixed bottom-center, big confident type with generous
+whitespace, soft-shadow cards with no heavy chrome, an About page pairing a
+short lede paragraph with a plain two-column timeline.
+
+Adapted for this content: the reference's product screenshots become real
+data visualizations (an aspect-ratio dial, an oscilloscope trace, a
+flow diagram, a heatmap of an actual optimizer search) since the subject is
+engineering outcomes, not UI work. Added a third "detail" view (Method /
+Outcome / Numbers) per project, since the brief asked to show both the
+result and the framework behind it — the reference's own site presumably
+does this via per-project pages; this single-page build does it via an
+in-place view swap instead, to stay a static site with no router.
+
+Superseded: the previous instrument-panel/stencil-placard direction (see
+git history for its own DESIGN.md if needed) — replaced wholesale, not
+polished, per new-work.md's redesign rule ("replace the old visual world
+rather than polishing it").
 
 ## Palette
 
 | Token | Hex | Role |
 |---|---|---|
-| `--panel` | `#0a0c0a` | page ground, matte near-black |
-| `--panel-2` | `#0f1512` | masthead / dialog surface |
-| `--bezel` | `#171f1a` | instrument card surface |
-| `--hairline` | `#2c3a30` | borders, dividers |
-| `--ink` | `#d7d9d4` | primary text |
-| `--ink-dim` | `#8a8f86` | secondary text |
-| `--ink-faint` | `#5c635d` | muted / blanked-instrument text |
-| `--phosphor` | `#8fffb0` | primary readout glow, section labels |
-| `--amber` | `#f5c518` | stencil placards, needles, caution lamps |
-| `--caution` | `#ff4d4d` | reserved — closed-valve/error states only |
+| `--bg` | `#f4f4f5` | page ground |
+| `--card` | `#ffffff` | tile / dialog surface |
+| `--card-border` | `#e7e7ea` | card border |
+| `--ink` | `#18181b` | primary text, pill nav, dark UI elements |
+| `--ink-2` | `#6b6b70` | secondary text |
+| `--ink-3` | `#a3a3a8` | tertiary / label text |
+| `--line` | `#e2e2e5` | hairline rules, chart gridlines |
+| `--accent` | `#3355ff` | the one saturated color — marks the found optimum on the Mission Model heatmap only |
 
-Single-theme, deliberately: this is a committed dark instrument panel, not a
-light/dark toggle surface. Background and every text color are painted
-explicitly so the page holds regardless of host theme.
+Restrained strategy: neutrals plus one accent, used exactly once as a
+marker, never as a UI color. Single light theme, no dark mode — matches the
+reference's own commitment.
 
 ## Type
 
-- **Big Shoulders Stencil Text** (600/700) — nameplate, instrument placards.
-  The direction's one borrowed identity mark; used nowhere else.
-- **IBM Plex Sans** (400/500/600) — body copy, descriptions.
-- **IBM Plex Mono** (400/500/600) — all data: readouts, facts, labels, links.
+- **Inter** (400/500/600/700) — everything: headings, body, nav, links.
+  Matches the reference's own single-family restraint; a characterful
+  display face would work against the "quiet, get out of the way" brief.
+- **IBM Plex Mono** (400/500/600) — all data: chart axis labels, fact
+  values, code identifiers (`wing_optimizer.py`, `--objective combined`),
+  the section eyebrows (METHOD / OUTCOME / NUMBERS).
 
 ## Components
 
-- **Instrument** (`.instrument`): bezel card, two corner rivets, a placard,
-  an SVG gauge face, a mono readout, a mono subtitle. Blanked variant
-  (`.blank`) desaturates the placard and readout for the CAD slot — a real
-  avionics "blanking plate" convention for an uninstalled instrument, not a
-  fake gauge.
-- **Gauge faces** (inline SVG, generated in JS): AR dial, oscilloscope trace,
-  pressure-style sweep gauge, blanking-plate cross-bolt pattern. Needle
-  rotation and fixed tick-label positions must use the same left/top/right
-  convention (see the AR-gauge fix in commit history — mixing a rotate()
-  transform's clockwise convention with cos/sin tick placement pointed the
-  needle at the wrong value).
-- **Detail dialog** (`<dialog>`): placard header, optional amber caution
-  block, description, mono fact table, CTA links. Opens via native
-  `showModal()`, no JS dialog library.
+- **Masthead**: name + role, GitHub link. No nav bar — navigation lives only
+  in the floating pill.
+- **Work tile** (`.tile`): name + category/year eyebrow, a real inline-SVG
+  chart, a mono headline stat + a plain-text sub-stat. Hover lifts 2px with
+  a soft shadow. The CAD tile is `.muted` — no hover, no click, a dashed
+  empty-state chart instead of a real one.
+- **Detail view**: back link, title + tag, lede paragraph, optional amber
+  caution block (Liquid Rocket's valve-control caveat), then three labeled
+  sections — Method (prose, real technical explanation), Outcome (a bigger
+  version of the tile's chart, captioned), Numbers (a 2-column fact grid).
+  Ends in a CTA to the real GitHub repo.
+- **Pill nav**: fixed bottom-center, dark pill, two buttons, active state is
+  a white sub-pill. Never scrolls out of view.
+
+## Charts (all inline SVG, generated in JS, no library)
+
+- `arDialFigure` — semicircle dial, fixed left/mid/right tick positions,
+  needle via `rotate()`. (Ticks and needle must share one angle convention —
+  a mismatch here was a real bug in the prior direction's build.)
+- `heatmapFigure` — the actual (cl × AR) energy grid `wing_optimizer.py`
+  searched, gamma-compressed grayscale, accent-colored ring at the found
+  optimum.
+- `scopeFigure` — deterministic pseudo-random trace standing in for a real
+  vibration waveform shape (seeded, not literally the decoded log samples).
+- `flowFigure` — a 3-box pipeline diagram (Teensy → sensors.py → main.py)
+  plus a 3-tab strip, for Liquid Rocket's architecture.
+- `blankFigure` — dashed empty-state box, "NO FILES YET", for CAD.
 
 ## Layout
 
-Single masthead bar (name/role/tail-number/GitHub link) above a 4-column
-instrument grid (`repeat(4, 1fr)`, collapsing to 2 columns at 900px and 1
-column at 480px). No hero section, no marketing copy above the fold — the
-panel is the first viewport.
+Single column, `max-width: 1080px`, generous top/bottom padding. Work view
+is a 2-column tile grid (`repeat(2, 1fr)`, 1 column under 720px). Detail
+figures are capped at `max-width: 460px` inside their card regardless of
+card width — a 300×200 viewBox chart at 100% width with no cap was a real
+bug (the chart filled almost the whole viewport height on a wide card).
 
 ## Content policy
 
-Every instrument shows a real number pulled from an actual repo, test run,
-or data file (see each card's `facts` in `index.html`) — never an invented
-metric. A project with no real material yet (CAD) ships as an honest
-blanking plate instead of a placeholder screenshot or fabricated claim.
+Unchanged from the prior direction: every number is real, sourced from an
+actual repo, test run, or data file. CAD stays an honest empty state, not a
+fabricated screenshot.
