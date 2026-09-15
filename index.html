@@ -1,23 +1,379 @@
 <!doctype html>
 <html lang="en">
 <head>
+<!--
+THESIS: A recruiter's portfolio scan reads as an aircraft panel pre-flight check, not a resume page.
+OWN-WORLD: matte near-black panel, luminous phosphor-green readouts, hazard-yellow stencil placards, amber/red as real caution states only.
+STORY: four real engineering projects, each an instrument with one real number, not a card with a description.
+FIRST VIEWPORT: the panel itself, full-bleed, at load -- nameplate top-left, four gauges in a row, no hero copy above it.
+FORM: instrument-panel direction (impeccable concept-seed, mode=experience, own-candidate #6 assigned; challenger #2 "aircraft night six-pack" won on both axes and became the build; raised with a borrowed placard/stencil labeling system).
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance.
+-->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ethan Simon</title>
+<meta name="description" content="Mechanical engineering portfolio — mission-performance simulation, flight-log analysis, and rocket ground-station software.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Text:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  body{ margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
-        background:#0d0d0d; color:#fff; font-family:system-ui,-apple-system,sans-serif; }
-  main{ max-width:560px; padding:32px; }
-  h1{ font-size:1.8rem; margin:0 0 8px; }
-  p{ color:#c3c2b7; line-height:1.5; }
-  a{ color:#3987e5; }
+  :root{
+    --panel:#0a0c0a; --panel-2:#0f1512; --bezel:#171f1a; --hairline:#2c3a30;
+    --ink:#d7d9d4; --ink-dim:#8a8f86; --ink-faint:#5c635d;
+    --phosphor:#8fffb0; --phosphor-dim:#3f5c49;
+    --amber:#f5c518; --amber-ink:#0a0c0a;
+    --caution:#ff4d4d; --good:#8fffb0;
+    --font-stencil:'Big Shoulders Stencil Text', 'Arial Narrow', sans-serif;
+    --font-body:'IBM Plex Sans', system-ui, sans-serif;
+    --font-mono:'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
+  }
+  *{ box-sizing:border-box; }
+  html{ color-scheme: dark; }
+  body{
+    margin:0; background:var(--panel); color:var(--ink); font-family:var(--font-body);
+    padding-inline:20px; -webkit-font-smoothing:antialiased;
+  }
+  .rivet{ position:absolute; width:6px; height:6px; border-radius:50%; background:#1c2620; box-shadow: inset 0 1px 1px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.04); }
+
+  .panel{ max-width:1180px; margin-inline:auto; padding-block:28px 64px; }
+
+  /* ---- masthead ---- */
+  .masthead{
+    position:relative; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;
+    border:1px solid var(--hairline); border-radius:6px; background:var(--panel-2);
+    padding:16px 22px; margin-bottom:22px;
+  }
+  .masthead .rivet:nth-child(1){ top:8px; left:8px; } .masthead .rivet:nth-child(2){ top:8px; right:8px; }
+  .masthead .rivet:nth-child(3){ bottom:8px; left:8px; } .masthead .rivet:nth-child(4){ bottom:8px; right:8px; }
+  .nameplate{ display:flex; flex-direction:column; gap:4px; }
+  .nameplate .name{
+    font-family:var(--font-stencil); font-size:clamp(1.7rem,4vw,2.3rem); letter-spacing:.04em;
+    color:var(--amber); background:none; line-height:1; text-transform:uppercase;
+  }
+  .nameplate .role{
+    font-family:var(--font-mono); font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-dim);
+  }
+  .tail-number{
+    font-family:var(--font-mono); font-size:12px; letter-spacing:.1em; color:var(--panel);
+    background:var(--phosphor); padding:5px 10px; border-radius:3px; font-weight:600;
+  }
+  .masthead-links{ display:flex; gap:10px; font-family:var(--font-mono); font-size:12.5px; }
+  .masthead-links a{
+    color:var(--ink); text-decoration:none; border:1px solid var(--hairline); padding:6px 12px; border-radius:3px;
+    transition:border-color .12s ease, color .12s ease;
+  }
+  .masthead-links a:hover{ border-color:var(--phosphor); color:var(--phosphor); }
+
+  /* ---- panel intro line ---- */
+  .panel-note{
+    font-family:var(--font-mono); font-size:12.5px; color:var(--ink-faint); text-align:center;
+    margin-bottom:20px; letter-spacing:.02em;
+  }
+  .panel-note b{ color:var(--ink-dim); }
+
+  /* ---- instrument grid ---- */
+  .instruments{ display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; }
+  @media (max-width:900px){ .instruments{ grid-template-columns:repeat(2, 1fr); } }
+  @media (max-width:480px){ .instruments{ grid-template-columns:1fr; } }
+
+  .instrument{
+    position:relative; background:var(--bezel); border:1px solid var(--hairline); border-radius:8px;
+    padding:16px 14px 14px; display:flex; flex-direction:column; align-items:center; gap:10px;
+    cursor:pointer; text-align:center;
+  }
+  .instrument:hover{ border-color:var(--phosphor-dim); }
+  .instrument:focus-visible{ outline:2px solid var(--amber); outline-offset:2px; }
+  .instrument .rivet:nth-child(1){ top:7px; left:7px; } .instrument .rivet:nth-child(2){ top:7px; right:7px; }
+
+  .placard{
+    font-family:var(--font-stencil); font-size:13px; letter-spacing:.05em; text-transform:uppercase;
+    background:var(--amber); color:var(--amber-ink); padding:4px 10px; border-radius:2px; width:100%;
+  }
+  .instrument.blank .placard{ background:var(--ink-faint); color:var(--panel); }
+
+  .face{ width:120px; height:120px; }
+  .readout{ font-family:var(--font-mono); font-size:13px; color:var(--phosphor); min-height:1.4em; }
+  .instrument.blank .readout{ color:var(--ink-faint); }
+  .subtitle{ font-family:var(--font-mono); font-size:10.5px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.04em; }
+
+  .caution-lamp{
+    position:absolute; top:10px; right:34px; width:9px; height:9px; border-radius:50%;
+    background:var(--amber); box-shadow:0 0 6px var(--amber);
+  }
+
+  /* ---- detail overlay ---- */
+  dialog#detail{
+    max-width:640px; width:calc(100% - 40px); background:var(--panel-2); color:var(--ink);
+    border:1px solid var(--hairline); border-radius:8px; padding:0;
+  }
+  dialog#detail::backdrop{ background:rgba(0,0,0,.7); }
+  .detail-inner{ padding:26px 28px 24px; display:flex; flex-direction:column; gap:14px; }
+  .detail-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .detail-head .placard{ width:auto; }
+  .detail-close{
+    background:none; border:1px solid var(--hairline); color:var(--ink-dim); border-radius:4px;
+    width:28px; height:28px; cursor:pointer; font-size:16px; line-height:1;
+  }
+  .detail-close:hover{ border-color:var(--caution); color:var(--caution); }
+  .detail-body p{ margin:0 0 10px; color:var(--ink); line-height:1.55; font-size:14.5px; }
+  .detail-facts{ display:flex; flex-direction:column; gap:6px; font-family:var(--font-mono); font-size:13px; }
+  .detail-facts .fact{ display:flex; justify-content:space-between; gap:12px; border-bottom:1px solid var(--hairline); padding-bottom:5px; }
+  .detail-facts .fact .k{ color:var(--ink-dim); }
+  .detail-facts .fact .v{ color:var(--phosphor); text-align:right; }
+  .detail-cta{ display:flex; gap:10px; margin-top:6px; flex-wrap:wrap; }
+  .detail-cta a{
+    font-family:var(--font-mono); font-size:12.5px; text-decoration:none; color:var(--panel);
+    background:var(--phosphor); padding:8px 14px; border-radius:4px; font-weight:600;
+  }
+  .detail-cta a.secondary{ background:none; color:var(--ink); border:1px solid var(--hairline); }
+  .detail-caution{
+    font-family:var(--font-mono); font-size:12px; color:var(--amber); border:1px solid var(--amber);
+    border-radius:4px; padding:8px 10px; background:rgba(245,197,24,.08);
+  }
+
+  footer{
+    margin-top:36px; text-align:center; font-family:var(--font-mono); font-size:11.5px; color:var(--ink-faint);
+  }
 </style>
 </head>
 <body>
-<main>
-  <h1>Ethan Simon</h1>
-  <p>Mechanical engineering student at Case Western Reserve University.</p>
-  <p><a href="https://github.com/exs783">github.com/exs783</a></p>
-</main>
+<div class="panel">
+
+  <div class="masthead">
+    <span class="rivet"></span><span class="rivet"></span><span class="rivet"></span><span class="rivet"></span>
+    <div class="nameplate">
+      <span class="name">Ethan Simon</span>
+      <span class="role">Mechanical Engineering &middot; Case Western Reserve University</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:14px;">
+      <span class="tail-number">N&#8209;ETHANSIMON</span>
+      <div class="masthead-links">
+        <a href="https://github.com/exs783" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </div>
+
+  <p class="panel-note">Four instruments, four real projects &mdash; <b>click one</b> for the readout behind it.</p>
+
+  <div class="instruments" id="instruments"></div>
+
+  <footer>Panel built from real repo data, 2026&#8209;09&#8209;15. Not all instruments installed &mdash; see the blanking plate.</footer>
+</div>
+
+<dialog id="detail">
+  <div class="detail-inner">
+    <div class="detail-head">
+      <span class="placard" id="detail-placard"></span>
+      <button class="detail-close" id="detail-close" aria-label="Close">&times;</button>
+    </div>
+    <div id="detail-caution-slot"></div>
+    <div class="detail-body">
+      <p id="detail-desc"></p>
+      <div class="detail-facts" id="detail-facts"></div>
+    </div>
+    <div class="detail-cta" id="detail-cta"></div>
+  </div>
+</dialog>
+
+<script>
+(function(){
+  "use strict";
+  const NS = "http://www.w3.org/2000/svg";
+  function svg(tag, attrs){
+    const el = document.createElementNS(NS, tag);
+    for (const k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+  function faceSvg(children, viewBox){
+    const root = svg("svg", {viewBox: viewBox || "0 0 100 100", class: "face"});
+    children.forEach(c => root.appendChild(c));
+    return root;
+  }
+
+  // ---- Aspect-ratio dial: 4 -> 12 scale, needle at the real optimizer result.
+  // Fixed left/top/right tick positions (not derived from the needle's rotate()
+  // transform, which uses a different angle convention) -- same proven layout
+  // as the pressure/thermo gauges below.
+  function arGaugeFace(value, lo, hi){
+    const g = [];
+    g.push(svg("circle", {cx:50, cy:50, r:45, fill:"#111c17", stroke:"#3a4a3f", "stroke-width":4}));
+    const mid = (lo + hi) / 2;
+    const ticks = [[lo, 18, 54], [mid, 50, 20], [hi, 82, 54]];
+    ticks.forEach(([t, x, y]) => {
+      const label = svg("text", {x, y, "text-anchor":"middle", fill:"#8fffb0", "font-size":"9", "font-weight":"bold"});
+      label.textContent = t.toFixed(0);
+      g.push(label);
+    });
+    const angle = ((value - lo) / (hi - lo)) * 180 - 90;
+    g.push(svg("line", {x1:50, y1:50, x2:50, y2:15, stroke:"#f5c518", "stroke-width":3, "stroke-linecap":"round",
+      transform:`rotate(${angle} 50 50)`}));
+    g.push(svg("circle", {cx:50, cy:50, r:5, fill:"#f5c518"}));
+    return faceSvg(g);
+  }
+
+  // ---- Oscilloscope trace: real-shaped vibration waveform ----
+  function scopeFace(){
+    const g = [];
+    g.push(svg("rect", {x:2, y:2, width:96, height:96, rx:6, fill:"#0d1512", stroke:"#3a4a3f", "stroke-width":2}));
+    [20,40,60,80].forEach(y => g.push(svg("line", {x1:6, x2:94, y1:y, y2:y, stroke:"#1c2620", "stroke-width":1})));
+    const pts = [];
+    for (let x = 6; x <= 94; x += 4){
+      const t = (x-6)/88;
+      const y = 50 - Math.sin(t*Math.PI*6) * (10 + 8*Math.sin(t*Math.PI*2)) - (Math.random()-0.5)*4;
+      pts.push(`${x},${y.toFixed(1)}`);
+    }
+    g.push(svg("polyline", {points: pts.join(" "), fill:"none", stroke:"#8fffb0", "stroke-width":2, "stroke-linejoin":"round"}));
+    return faceSvg(g);
+  }
+
+  // ---- Pressure-style gauge, generic sweep for the rocket ground-station ----
+  function pressureFace(sweepDeg){
+    const g = [];
+    g.push(svg("circle", {cx:50, cy:50, r:45, fill:"#111c17", stroke:"#3a4a3f", "stroke-width":4}));
+    for (let a = -90; a <= 90; a += 30){
+      const x1 = 50 + 38*Math.cos(a*Math.PI/180), y1 = 50 + 38*Math.sin(a*Math.PI/180);
+      const x2 = 50 + 44*Math.cos(a*Math.PI/180), y2 = 50 + 44*Math.sin(a*Math.PI/180);
+      g.push(svg("line", {x1, y1, x2, y2, stroke:"#3a4a3f", "stroke-width":2}));
+    }
+    g.push(svg("line", {x1:50, y1:50, x2:50, y2:16, stroke:"#f5c518", "stroke-width":3, "stroke-linecap":"round",
+      transform:`rotate(${sweepDeg} 50 50)`}));
+    g.push(svg("circle", {cx:50, cy:50, r:5, fill:"#f5c518"}));
+    return faceSvg(g);
+  }
+
+  // ---- Blanking plate: real avionics-bay convention for an uninstalled instrument ----
+  function blankFace(){
+    const g = [];
+    g.push(svg("circle", {cx:50, cy:50, r:45, fill:"#0d1210", stroke:"#2c3a30", "stroke-width":3}));
+    g.push(svg("line", {x1:28, y1:28, x2:72, y2:72, stroke:"#2c3a30", "stroke-width":3}));
+    g.push(svg("line", {x1:72, y1:28, x2:28, y2:72, stroke:"#2c3a30", "stroke-width":3}));
+    for (let a = 0; a < 360; a += 45){
+      const x = 50 + 38*Math.cos(a*Math.PI/180), y = 50 + 38*Math.sin(a*Math.PI/180);
+      g.push(svg("circle", {cx:x, cy:y, r:2, fill:"#2c3a30"}));
+    }
+    return faceSvg(g);
+  }
+
+  const PROJECTS = [
+    {
+      id: "mission-model",
+      placard: "UNIT 01 — MISSION MODEL",
+      readout: "AR 4.00 → 8.64",
+      subtitle: "wing sizing",
+      face: () => arGaugeFace(8.64, 4, 12),
+      desc: "A VTOL mission-performance simulator and wing-sizing optimizer. Added a mission-energy objective (hover induced power + cruise drag, minimized jointly over lift coefficient and aspect ratio) that replaced a wing search which always bottomed out at its own lower bound with a real interior optimum — then re-sized the whole 9-variant tailsitter fleet against each airframe's actual governed cruise speed instead of an old placeholder.",
+      facts: [
+        ["Wing area, avg. change", "+22%"],
+        ["Aspect ratio, all tiers", "4.0 → 8.64"],
+        ["Best fleet hover time", "111.4 min"],
+        ["Mission sweep", "2,794 configs"],
+      ],
+      cta: [["Repo", "https://github.com/exs783/Log_Reader"]],
+    },
+    {
+      id: "log-dashboard",
+      placard: "UNIT 02 — LOG DASHBOARD",
+      readout: "52.1s decoded",
+      subtitle: "flight-log analysis",
+      face: scopeFace,
+      desc: "A Flask + Plotly dashboard that parses ArduCopter/PX4 .BIN flight logs: frame-type detection, vibration FFT analysis, and MAVExplorer-style message decoding, built on pymavlink.",
+      facts: [
+        ["Sample log decoded", "52.1 s flight"],
+        ["Peak vibration", "33.6 m/s²"],
+        ["GPS fixes parsed", "261"],
+        ["Frame types supported", "Quad/Hex/Octo/X8/Tri/Y3/Y6"],
+      ],
+      cta: [["Repo", "https://github.com/exs783/Log_Reader"]],
+    },
+    {
+      id: "liquid-rocket",
+      placard: "UNIT 03 — LIQUID ROCKET",
+      readout: "9 channels live",
+      subtitle: "CWRU rocket team",
+      face: () => pressureFace(-40),
+      desc: "Ground-station software for CWRU's Liquid Rocket team. Two previously separate, never-integrated PyQt6/PyQt5 prototypes — a data-logging page and a P&ID valve-control page — merged into one app sharing a single sensor/valve state, tested headless against the real Teensy wire protocol.",
+      facts: [
+        ["Sensor channels", "7 pressure · 1 thermo · 1 load"],
+        ["Tests passing", "10 / 10"],
+        ["UI", "3-tab PyQt6 app"],
+        ["Valve control", "UI state only (no cmd channel yet)"],
+      ],
+      caution: "Valve toggles are display-only — no serial command channel to real hardware exists yet.",
+      cta: [["Repo", "https://github.com/exs783/Liquid-Rocket"]],
+    },
+    {
+      id: "cad",
+      placard: "UNIT 04 — CAD",
+      readout: "NOT INSTALLED",
+      subtitle: "avionics bay",
+      face: blankFace,
+      blank: true,
+      desc: "This slot is reserved for CAD/mechanical-design work — no files exist in a public repo yet to show honestly. Real aircraft panels ship with a blanking plate over an avionics bay that isn't populated instead of a fake gauge; this one does the same rather than a placeholder screenshot.",
+      facts: [["Status", "pending real files"]],
+      cta: [],
+    },
+  ];
+
+  const grid = document.getElementById("instruments");
+  PROJECTS.forEach(p => {
+    const card = document.createElement("button");
+    card.className = "instrument" + (p.blank ? " blank" : "");
+    card.setAttribute("aria-haspopup", "dialog");
+    card.innerHTML = `<span class="rivet"></span><span class="rivet"></span>`;
+    if (p.caution) card.appendChild(Object.assign(document.createElement("span"), {className:"caution-lamp", title:"Caution"}));
+    const placard = document.createElement("span");
+    placard.className = "placard";
+    placard.textContent = p.placard;
+    card.appendChild(placard);
+    card.appendChild(p.face());
+    const readout = document.createElement("span");
+    readout.className = "readout";
+    readout.textContent = p.readout;
+    card.appendChild(readout);
+    const sub = document.createElement("span");
+    sub.className = "subtitle";
+    sub.textContent = p.subtitle;
+    card.appendChild(sub);
+    card.style.border = "none";
+    card.style.font = "inherit";
+    card.addEventListener("click", () => openDetail(p));
+    grid.appendChild(card);
+  });
+
+  const dialog = document.getElementById("detail");
+  document.getElementById("detail-close").addEventListener("click", () => dialog.close());
+  dialog.addEventListener("click", (e) => { if (e.target === dialog) dialog.close(); });
+
+  function openDetail(p){
+    document.getElementById("detail-placard").textContent = p.placard;
+    document.getElementById("detail-desc").textContent = p.desc;
+    const cautionSlot = document.getElementById("detail-caution-slot");
+    cautionSlot.innerHTML = "";
+    if (p.caution){
+      const c = document.createElement("div");
+      c.className = "detail-caution";
+      c.textContent = "⚠ " + p.caution;
+      cautionSlot.appendChild(c);
+    }
+    const facts = document.getElementById("detail-facts");
+    facts.innerHTML = "";
+    p.facts.forEach(([k, v]) => {
+      const row = document.createElement("div");
+      row.className = "fact";
+      row.innerHTML = `<span class="k">${k}</span><span class="v">${v}</span>`;
+      facts.appendChild(row);
+    });
+    const cta = document.getElementById("detail-cta");
+    cta.innerHTML = "";
+    p.cta.forEach(([label, href]) => {
+      const a = document.createElement("a");
+      a.href = href; a.target = "_blank"; a.rel = "noopener";
+      a.textContent = label + " →";
+      cta.appendChild(a);
+    });
+    dialog.showModal();
+  }
+})();
+</script>
 </body>
 </html>
