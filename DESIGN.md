@@ -81,9 +81,11 @@ reference's own commitment.
   caveat), then four labeled sections — Overview (plain-language: what the
   project is and who it's for), Method (prose, real technical explanation
   of how it works), Outcome (one or more real charts, each in its own
-  `.figure-card`, optionally titled — Mission Model has three: the search
-  heatmap, a before/after wing-area bar chart across all 3 tiers, and a
-  12-vehicle fleet hover-time bar chart), Numbers (a 2-column fact grid).
+  `.figure-card`, optionally titled — Mission Model has two (a before/after
+  wing-area bar chart across all 3 tiers, and a 12-vehicle fleet hover-time
+  bar chart); Wing Optimizer has two (the search heatmap, moved here from
+  Mission Model when it became its own project, and a real-geometry wing
+  planform diagram)), Numbers (a 2-column fact grid).
   Ends in a CTA row: a live demo link where one exists, always a link to the
   real GitHub repo.
 - **Routing**: hash-based (`#work`, `#about`, `#project/<id>`), read/written
@@ -112,7 +114,14 @@ reference's own commitment.
 
 - `heatmapFigure` — the actual (cl × AR) energy grid `wing_optimizer.py`
   searched, gamma-compressed grayscale, accent-colored ring at the found
-  optimum.
+  optimum. Lives under the Wing Optimizer project (moved there when it split
+  out of Mission Model).
+- `wingPlanformFigure` — a real half-wing planform (top-down), drawn from an
+  actual `--objective combined --taper-min/--taper-max` run's output
+  geometry: root/tip chord, span, and the reported aerodynamic-center
+  location (dashed quarter-chord line, accent dot at the real MAC/AC point)
+  are all real numbers from that run, not a generic wing glyph. Doubles as
+  the Wing Optimizer tile emblem and a detail-view Outcome figure.
 - `groupedBarFigure` — fixed pair of bars per group (gray=old, black=new)
   plus an accent-colored delta label; used for the 3-tier wing-area
   before/after comparison.
