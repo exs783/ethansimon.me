@@ -62,13 +62,24 @@ reference's own commitment.
   chart, a mono headline stat + a plain-text sub-stat. Hover lifts 2px with
   a soft shadow. The CAD tile is `.muted` — no hover, no click, a dashed
   empty-state chart instead of a real one.
-- **Detail view**: back link, title + tag, lede paragraph, optional amber
-  caution block (Liquid Rocket's valve-control caveat), then four labeled
-  sections — Overview (plain-language: what the project is and who it's
-  for), Method (prose, real technical explanation of how it works), Outcome
-  (a bigger version of the tile's chart, captioned), Numbers (a 2-column
-  fact grid). Ends in a CTA row: a live demo link where one exists, always a
-  link to the real GitHub repo.
+- **Detail view**: a bordered pill "← back to work" button (not a bare text
+  link — it needs to read as clickable at a glance), title + tag, lede
+  paragraph, optional amber caution block (Liquid Rocket's valve-control
+  caveat), then four labeled sections — Overview (plain-language: what the
+  project is and who it's for), Method (prose, real technical explanation
+  of how it works), Outcome (one or more real charts, each in its own
+  `.figure-card`, optionally titled — Mission Model has three: the search
+  heatmap, a before/after wing-area bar chart across all 3 tiers, and a
+  12-vehicle fleet hover-time bar chart), Numbers (a 2-column fact grid).
+  Ends in a CTA row: a live demo link where one exists, always a link to the
+  real GitHub repo.
+- **Routing**: hash-based (`#work`, `#about`, `#project/<id>`), read/written
+  by one `route()` function on `hashchange` plus once on load — so the
+  browser's own back/forward buttons work between the work grid, About, and
+  a project detail, not just the in-page back button. Every nav action
+  (pill click, tile click, back button) sets `location.hash` and lets the
+  hashchange handler do the actual rendering, rather than each control
+  managing view state itself.
 - **Live demos** (`demos/log-dashboard.html`, `demos/liquid-rocket.html`):
   not new builds — the actual project frontends, adapted for static
   hosting. `log-dashboard.html` is the real `log_dashboard.html` with its
@@ -92,6 +103,14 @@ reference's own commitment.
 - `heatmapFigure` — the actual (cl × AR) energy grid `wing_optimizer.py`
   searched, gamma-compressed grayscale, accent-colored ring at the found
   optimum.
+- `groupedBarFigure` — fixed pair of bars per group (gray=old, black=new)
+  plus an accent-colored delta label; used for the 3-tier wing-area
+  before/after comparison.
+- `hbarFigure` — sorted horizontal bars with a value label. The value label
+  is right-anchored to a fixed column (`x = W - 4, text-anchor: end`), not
+  placed just past the bar's own end — anchoring it relative to bar length
+  let the longest bar's label run past the viewBox's right edge, a real
+  clipping bug caught in review.
 - `scopeFigure` — deterministic pseudo-random trace standing in for a real
   vibration waveform shape (seeded, not literally the decoded log samples).
 - `flowFigure` — a 3-box pipeline diagram (Teensy → sensors.py → main.py)
