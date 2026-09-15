@@ -24,25 +24,28 @@ Cross-disciplinary systems work on real hardware: simulation/optimization toolin
 
 ## Operating Context
 
-Mechanical engineering student, Case Western Reserve University. Active on CWRU's Liquid Rocket team. Builds engineering software (simulation, optimization, data dashboards) alongside physical/CAD work.
+Mechanical engineering student, Case Western Reserve University (Michelson-Morley Scholar, B.S. Aug 2024 – May 2028). Confirmed from his resume (`~/Downloads/Ethan_Simon_Resume.docx`):
+
+- **VTOL Mechanical Team Lead, CWRU VTOL Team** (Aug 2024 – Present, current/active role) — frame and payload-mechanism design across Tail Sitter (heavy-lift), Hexacopter, Quadcopter, and Tiltrotor airframes; SolidWorks CAD/simulation; MATLAB/Python scripts to inform design decisions; project planning, safety documents, work instructions.
+- **Mechanical Engineering Co-Op, Tylok International** (Jan – Aug 2026) — designed/built a flexural fatigue test machine to ASTM standards, plus thermal/flow/tensile/pressure test apparatus; Dewesoft data-acquisition integration (DewesoftX + C++).
+- **Liquid Propulsion Team, CWRU** (Aug 2025 – Jan 2026) — designed the solenoid/servo mechanical thrust-control hardware and built the original PyQt5 hot-fire control GUI (`main_v2.py` in `exs783/Liquid-Rocket`) — this is the real origin of the Liquid Rocket project featured on the site.
+- **University of Michigan Battery Lab** (2022–2024) — physical testing + Python analysis (Pandas, scikit-learn, SciPy, hdbscan) of battery cells.
 
 ## Capabilities and Constraints
 
 Featured projects, confirmed in scope (engineering only — explicitly excludes his fintech/software side projects buffer-hedgey, Hedgey, VectOres):
 
-- **Mission Model / wing optimizer** — VTOL mission-performance simulator (`Mission_Model.py`) and a wing-sizing optimizer (`wing_optimizer.py`) with a real combined mass/drag/energy objective. Real evidence on hand: a published write-up artifact (design-search visualization + before/after results) and generated tradespace plots (PNG + interactive Plotly HTML). Lives in the private repo `exs783/Log_Reader`.
-- **Log Dashboard** — a Flask + Plotly dashboard (`log_dashboard.html` / `python_backend.py`) that parses Pixhawk/ArduCopter `.BIN` flight logs: frame-type detection, vibration FFT, MAVExplorer-style analysis. Also lives in `exs783/Log_Reader`. No screenshot exists yet — open item below.
-- **CAD projects** — mentioned by the user as a category to feature, but no CAD files (STL/STEP/SLDPRT) or renders were found in any accessible repo. **Open / unconfirmed**: needs real files or screenshots from the user before this card can show real content; do not fabricate a render.
-- **CWRU Liquid Rocket team** — instrumentation/GUI work in `exs783/Liquid-Rocket` (private): a P&ID control GUI, ball-valve schematic, Teensy-based sensor firmware. Real SVG schematics exist in-repo.
-
-**Open constraint**: `Log_Reader` and `Liquid-Rocket` are currently **private** GitHub repos — a recruiter clicking through hits a 404/no-access page. Needs a decision (make public, or the card links to a write-up/demo instead of the repo) before ship.
+- **Mission Model / wing optimizer** — VTOL mission-performance simulator (`Mission_Model.py`) and a wing-sizing optimizer (`wing_optimizer.py`) with a real combined mass/drag/energy objective. Airframe list (Hexacopter/Quadcopter/x8/Tail Sitter) mirrors his real VTOL-team vehicle classes. Lives in the public repo `exs783/Log_Reader`.
+- **Log Dashboard** — a Flask + Plotly dashboard (`log_dashboard.html` / `python_backend.py`) that parses Pixhawk/ArduCopter `.BIN` flight logs: frame-type detection, vibration FFT, MAVExplorer-style analysis, an overall flight-quality score. Also lives in `exs783/Log_Reader`. Live static demo at `demos/log-dashboard.html`, running the real backend's output against a real sample log.
+- **Liquid Rocket** — ground-station software for the CWRU Liquid Propulsion Team, rebuilt from two prototypes (his own original PyQt5 hot-fire GUI + a separate PyQt6 P&ID valve-control page) into one PyQt6 app. Public repo `exs783/Liquid-Rocket`. Live JS-ported demo at `demos/liquid-rocket.html`.
+- **CAD** — confirmed real (Tylok fatigue-test-machine CAD, VTOL frames/payload mechanisms/jigs — all SolidWorks) but no files live in a public repo. Honest placeholder card, not a fabricated render; overview names the real work and why it's not shown.
 
 ## Evidence on Hand
 
-- Mission Model: `mission_model_best_hover_by_vehicle.png`, `mission_model_best_energy_margin_by_vehicle.png`, `mission_model_hover_vs_mass_tradespace.html` (Plotly), and a published Claude Artifact write-up (search methodology + results) from this session.
-- Liquid Rocket: `Rocket_P&ID_GUI1.svg`, `BallValveSchematic.svg` in the repo.
-- Log Dashboard: no screenshot yet — plan is to capture one live from the running dashboard with the sample flight log already in `uploads/`.
-- CAD: none found. State absence on the page rather than inventing a project.
+- Mission Model: `mission_model_best_hover_by_vehicle.png`, `mission_model_best_energy_margin_by_vehicle.png`, `mission_model_hover_vs_mass_tradespace.html` (Plotly), the real (cl × AR) energy-search grid embedded in `index.html`, and real fleet mission-sweep results (`mission_model_results.csv`).
+- Liquid Rocket: `Rocket_P&ID_GUI1.svg`, `BallValveSchematic.svg` in the repo; a from-scratch JS port of the real Python gauge/valve/sensor logic for the live demo.
+- Log Dashboard: `flight-analysis.json`, the literal output of running the real `python_backend.py` against the real sample flight log (`my_flight.bin`) — 65/100 flight quality score, QUAD frame, 7 stability issues, real vibration/GPS data.
+- CAD: no files. State absence + the real (internal, unpublished) work on the page rather than inventing a project.
 
 ## Product Principles
 
