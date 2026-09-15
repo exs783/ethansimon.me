@@ -28,7 +28,15 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   html{ color-scheme:light; }
   body{
     margin:0; background:var(--bg); color:var(--ink); font-family:var(--font-body);
-    padding-inline:24px; -webkit-font-smoothing:antialiased;
+    padding-inline:24px; -webkit-font-smoothing:antialiased; position:relative;
+  }
+  /* Subtle film-grain texture -- the one thing carried over from the ciridae
+     reference's atmosphere without its dark palette: gives the flat color
+     fields a slight physical, printed-paper feel instead of a flat digital one. */
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:50;
+    opacity:.035; mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
   a{ color:inherit; }
   .wrap{ max-width:1080px; margin-inline:auto; padding-block:56px 140px; min-height:100vh; }
@@ -53,11 +61,14 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   @media (max-width:720px){ .grid{ grid-template-columns:1fr; } }
 
   .tile{
+    --mx:0px; --my:0px; --press:1;
     position:relative; background:var(--card); border:1px solid var(--card-border); border-radius:20px;
     padding:22px 24px 20px; cursor:pointer; display:flex; flex-direction:column; gap:18px; min-height:280px;
-    transition:border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+    transform:translate(var(--mx), var(--my)) scale(var(--press));
+    transition:border-color .15s ease, transform .35s cubic-bezier(.34,1.56,.64,1), box-shadow .35s ease;
   }
-  .tile:hover{ border-color:var(--ink-3); transform:translateY(-2px); box-shadow:0 12px 28px rgba(0,0,0,.06); }
+  .tile:hover{ border-color:var(--ink-3); box-shadow:0 16px 32px rgba(0,0,0,.08); --my:-3px; }
+  .tile:active{ --press:0.98; transition-duration:.08s; }
   .tile.muted .tile-head .name{ color:var(--ink-2); }
   .tile-head{ display:flex; justify-content:space-between; align-items:baseline; gap:12px; }
   .tile-head .name{ font-size:1.05rem; font-weight:600; }
@@ -79,11 +90,15 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 
   /* ---- detail ---- */
   .back{
+    --mx:0px; --my:0px; --press:1;
     display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:12.5px;
     color:var(--ink-2); background:var(--card); border:1px solid var(--card-border); border-radius:20px;
     cursor:pointer; padding:8px 16px; margin-bottom:28px;
+    transform:translate(var(--mx),var(--my)) scale(var(--press));
+    transition:color .15s ease, border-color .15s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
   }
   .back:hover{ color:var(--ink); border-color:var(--ink-3); }
+  .back:active{ --press:0.94; transition-duration:.08s; }
   .detail-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:20px; flex-wrap:wrap; margin-bottom:8px; }
   .detail-head h2{ font-size:2rem; }
   .detail-tag{ font-family:var(--font-mono); font-size:11.5px; color:var(--ink-3); text-transform:uppercase; letter-spacing:.04em; padding-top:8px; }
@@ -116,10 +131,15 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 
   .cta-row{ display:flex; gap:12px; margin-top:28px; }
   .cta{
+    --mx:0px; --my:0px; --press:1;
     font-family:var(--font-mono); font-size:12.5px; text-decoration:none; padding:9px 16px; border-radius:20px;
+    display:inline-block; transform:translate(var(--mx),var(--my)) scale(var(--press));
+    transition:transform .15s cubic-bezier(.34,1.56,.64,1), box-shadow .15s ease;
   }
   .cta.primary{ background:var(--ink); color:#fff; }
+  .cta.primary:hover{ box-shadow:0 6px 16px rgba(0,0,0,.22); }
   .cta.secondary{ border:1px solid var(--card-border); color:var(--ink); }
+  .cta:active{ --press:0.94; transition-duration:.08s; }
 
   /* ---- floating pill nav ---- */
   .pillnav{
@@ -127,12 +147,19 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     background:var(--ink); border-radius:999px; padding:4px; z-index:20; box-shadow:0 10px 30px rgba(0,0,0,.18);
   }
   .pillnav button{
+    --mx:0px; --my:0px; --press:1;
     font-family:var(--font-body); font-size:13.5px; font-weight:500; border:none; background:none; color:#b9b9bd;
     padding:8px 18px; border-radius:999px; cursor:pointer;
+    transform:translate(var(--mx),var(--my)) scale(var(--press));
+    transition:background .2s ease, color .2s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
   }
   .pillnav button.active{ background:#fff; color:var(--ink); }
+  .pillnav button:active{ --press:0.9; transition-duration:.08s; }
 
-  @media (prefers-reduced-motion: reduce){ .tile{ transition:none; } }
+  @media (prefers-reduced-motion: reduce){
+    .tile, .cta, .back, .pillnav button{ transition:none !important; }
+    .tile{ --mx:0px !important; --my:0px !important; }
+  }
 </style>
 </head>
 <body>
@@ -233,29 +260,73 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     return root;
   }
 
-  function arDialFigure(value, lo, hi, small){
-    const root = svgRoot("0 0 100 70");
-    const cx = 50, cy = 62, r = 46;
-    for (let i=0;i<=1;i+=0.5){
-      const ang = (180 - i*180) * Math.PI/180;
-      const x1 = cx + (r-6)*Math.cos(ang), y1 = cy - (r-6)*Math.sin(ang);
-      const x2 = cx + r*Math.cos(ang), y2 = cy - r*Math.sin(ang);
-      root.appendChild(svg("line", {x1,y1,x2,y2, stroke:LINE, "stroke-width":2}));
-    }
-    const arcPath = `M ${cx-r} ${cy} A ${r} ${r} 0 0 1 ${cx+r} ${cy}`;
-    root.appendChild(svg("path", {d:arcPath, fill:"none", stroke:LINE, "stroke-width":3}));
-    const t = (value - lo)/(hi-lo);
-    const ang = (180 - t*180) * Math.PI/180;
-    const nx = cx + (r-10)*Math.cos(ang), ny = cy - (r-10)*Math.sin(ang);
-    root.appendChild(svg("line", {x1:cx, y1:cy, x2:nx, y2:ny, stroke:INK, "stroke-width":3, "stroke-linecap":"round"}));
-    root.appendChild(svg("circle", {cx, cy, r:4, fill:INK}));
-    if (!small){
-      [[lo, cx-r, cy+14], [hi, cx+r, cy+14]].forEach(([v,x,y]) => {
-        const lb = svg("text", {x, y, "text-anchor":"middle", "font-size":"9", "font-family":"IBM Plex Mono", fill:INK2});
-        lb.textContent = v.toFixed(0);
-        root.appendChild(lb);
-      });
-    }
+  // Mission profile: the actual leg sequence Mission_Model.py simulates --
+  // takeoff/100ft, cruise 1nm, land, (pickup), takeoff, cruise 8nm, land,
+  // (dropoff), takeoff, cruise 1nm, land -- as an altitude-vs-distance
+  // silhouette. Representative of the mission itself, not a generic gauge.
+  function missionProfileFigure(){
+    const root = svgRoot("0 0 300 120");
+    const base = 96, top = 20;
+    root.appendChild(svg("line", {x1:6, x2:294, y1:base, y2:base, stroke:LINE}));
+    // three climb/cruise/descend humps: short leg, long leg, short leg
+    const legs = [{w:38, cruiseW:14}, {w:130, cruiseW:76}, {w:38, cruiseW:14}];
+    let x = 14;
+    const pathParts = [`M ${x} ${base}`];
+    legs.forEach(leg => {
+      const climbX = x + (leg.w - leg.cruiseW)/2;
+      const descentX = climbX + leg.cruiseW;
+      const endX = x + leg.w;
+      pathParts.push(`L ${climbX.toFixed(1)} ${top}`);
+      pathParts.push(`L ${descentX.toFixed(1)} ${top}`);
+      pathParts.push(`L ${endX.toFixed(1)} ${base}`);
+      root.appendChild(svg("circle", {cx:endX, cy:base, r:3, fill:INK}));
+      x = endX + 14;
+      if (x < 280) pathParts.push(`M ${x} ${base}`);
+    });
+    root.appendChild(svg("path", {d:pathParts.join(" "), fill:"none", stroke:INK, "stroke-width":2.5, "stroke-linejoin":"round"}));
+    const cap = svg("text", {x:150, y:112, "text-anchor":"middle", "font-size":"9.5", "font-family":"IBM Plex Mono", fill:INK2});
+    cap.textContent = "1nm → 8nm → 1nm cargo run";
+    root.appendChild(cap);
+    return root;
+  }
+
+  // Rocket silhouette + flame: the domain this ground station serves, not
+  // the software architecture (that's flowFigure, still used in the detail
+  // Outcome section below).
+  function rocketFigure(){
+    const root = svgRoot("0 0 300 120");
+    const cx = 150;
+    root.appendChild(svg("path", {
+      d: `M ${cx} 10 L ${cx-16} 46 L ${cx-16} 82 L ${cx+16} 82 L ${cx+16} 46 Z`,
+      fill: "#fff", stroke: INK, "stroke-width": 2.5, "stroke-linejoin":"round",
+    }));
+    root.appendChild(svg("line", {x1:cx, y1:10, x2:cx, y2:82, stroke:LINE, "stroke-width":1}));
+    root.appendChild(svg("path", {d:`M ${cx-16} 66 L ${cx-32} 90 L ${cx-16} 82 Z`, fill:INK}));
+    root.appendChild(svg("path", {d:`M ${cx+16} 66 L ${cx+32} 90 L ${cx+16} 82 Z`, fill:INK}));
+    root.appendChild(svg("circle", {cx, cy:34, r:5, fill:"none", stroke:INK, "stroke-width":1.5}));
+    root.appendChild(svg("path", {
+      d: `M ${cx-9} 82 L ${cx+9} 82 L ${cx+5} 102 L ${cx} 112 L ${cx-5} 102 Z`,
+      fill: ACCENT, opacity: 0.85,
+    }));
+    const cap = svg("text", {x:150, y:112, "text-anchor":"middle", "font-size":"9.5", "font-family":"IBM Plex Mono", fill:INK2});
+    cap.textContent = "hot-fire ground station";
+    root.appendChild(cap);
+    return root;
+  }
+
+  // Small quadcopter glyph riding above the real vibration trace -- names
+  // the subject (a drone flight log) instead of leaving the waveform to
+  // read as a generic signal.
+  function droneScopeFigure(seed){
+    const root = scopeFigure(seed, false);
+    const g = svg("g", {transform:"translate(8,-4) scale(0.55)"});
+    [[-14,-14],[14,-14],[-14,14],[14,14]].forEach(([dx,dy]) => {
+      g.appendChild(svg("circle", {cx:20+dx, cy:16+dy, r:7, fill:"none", stroke:INK2, "stroke-width":2}));
+    });
+    g.appendChild(svg("line", {x1:6, y1:2, x2:34, y2:30, stroke:INK2, "stroke-width":2}));
+    g.appendChild(svg("line", {x1:34, y1:2, x2:6, y2:30, stroke:INK2, "stroke-width":2}));
+    g.appendChild(svg("circle", {cx:20, cy:16, r:4, fill:INK}));
+    root.insertBefore(g, root.firstChild);
     return root;
   }
 
@@ -391,10 +462,21 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     return root;
   }
 
+  // Isometric wireframe block, dashed -- reads as "a CAD model" while the
+  // dashed/unfilled treatment keeps it honestly an empty slot, not a real render.
   function blankFigure(){
     const root = svgRoot("0 0 300 110");
-    root.appendChild(svg("rect", {x:1, y:1, width:298, height:108, rx:10, fill:"none", stroke:LINE, "stroke-width":2, "stroke-dasharray":"6 6"}));
-    const t = svg("text", {x:150, y:60, "text-anchor":"middle", "font-size":"12", "font-family":"IBM Plex Mono", fill:"#c4c4c8"});
+    const cx = 150, cy = 55, s = 34;
+    const top = [[cx,cy-s*0.9],[cx+s,cy-s*0.35],[cx,cy+s*0.2],[cx-s,cy-s*0.35]];
+    const bot = top.map(([x,y]) => [x, y+s*0.9]);
+    const face = (pts) => pts.map(p=>p.join(",")).join(" ");
+    root.appendChild(svg("polygon", {points:face(top), fill:"none", stroke:LINE, "stroke-width":2, "stroke-dasharray":"5 5"}));
+    [0,1,2,3].forEach(i => {
+      root.appendChild(svg("line", {x1:top[i][0], y1:top[i][1], x2:bot[i][0], y2:bot[i][1], stroke:LINE, "stroke-width":2, "stroke-dasharray":"5 5"}));
+    });
+    root.appendChild(svg("line", {x1:bot[2][0], y1:bot[2][1], x2:bot[3][0], y2:bot[3][1], stroke:LINE, "stroke-width":2, "stroke-dasharray":"5 5"}));
+    root.appendChild(svg("line", {x1:bot[2][0], y1:bot[2][1], x2:bot[1][0], y2:bot[1][1], stroke:LINE, "stroke-width":2, "stroke-dasharray":"5 5"}));
+    const t = svg("text", {x:150, y:100, "text-anchor":"middle", "font-size":"11", "font-family":"IBM Plex Mono", fill:"#c4c4c8"});
     t.textContent = "NO FILES YET";
     root.appendChild(t);
     return root;
@@ -425,7 +507,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       tag: "Simulation · 2026",
       cardFoot: "AR 4.00 → 8.64",
       cardSub: "wing sizing, +22% area",
-      tileFigure: () => arDialFigure(8.64, 4, 12, true),
+      tileFigure: () => missionProfileFigure(),
       lede: "A VTOL mission-performance simulator and wing-sizing optimizer for a fleet of cargo tailsitter aircraft. This round added a real energy-based wing objective and re-sized the whole fleet against actual flight speeds instead of a placeholder.",
       overview: [
         "Mission Model simulates a specific cargo run for a family of VTOL (vertical takeoff/landing) airframes: takeoff to 100 ft, cruise 1 nautical mile, land, pick up cargo, takeoff, cruise 8 nm, land, drop cargo, takeoff, cruise 1 nm back, land. For every candidate airframe, it sweeps every motor × propeller × battery combination it has spec data for (thousands of combinations) and reports which one actually completes the mission, how much battery it has left over, and how long it can hover — so 'which motor should this drone use' becomes a search over real thrust-curve data instead of a guess.",
@@ -469,7 +551,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       tag: "Flight-data tooling · 2026",
       cardFoot: "65/100 flight score",
       cardSub: "QUAD frame, 7 issues found",
-      tileFigure: () => scopeFigure(7, false),
+      tileFigure: () => droneScopeFigure(7),
       lede: "A Flask + Plotly dashboard that decodes ArduCopter/PX4 flight logs into a full diagnostic report — the same class of binary telemetry this session pulled real numbers from directly.",
       overview: [
         "Every ArduPilot-based flight controller (Pixhawk and compatibles) writes a binary <code>.BIN</code> log of everything it measured mid-flight — hundreds of message types at up to a few hundred Hz. Reading that raw log to answer \"was this flight okay, and if not, why\" normally means a separate desktop tool (MAVExplorer) and manual digging. This dashboard does that automatically: upload a log, get back attitude tracking, vibration spectra, motor balance, PID tracking, GPS track, battery health, and barometer/magnetometer data across dedicated tabs, plus one overall flight-quality verdict.",
@@ -501,7 +583,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       tag: "CWRU Liquid Propulsion Team · 2026",
       cardFoot: "10 / 10 tests",
       cardSub: "9 live sensor channels",
-      tileFigure: () => flowFigure(),
+      tileFigure: () => rocketFigure(),
       lede: "Ground-station software for CWRU's Liquid Propulsion Team — rebuilt from two prototypes that were never actually integrated into one working app, one of them my own original hot-fire GUI.",
       overview: [
         "On CWRU's Liquid Propulsion Team (Aug 2025 – Jan 2026) I designed the mechanical thrust-control hardware for hot-fire tests — solenoids and servos regulating propellant flow — and built the PyQt5 control GUI that ran the hot-fire sequences against it.",
@@ -558,6 +640,26 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   // ---------------------------------------------------------------
   // Render
   // ---------------------------------------------------------------
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Magnetic hover: the tile eases a few px toward the cursor instead of
+  // sitting dead still under it -- the one "physical weight" cue borrowed
+  // from ciridae's feel, kept subtle so it reads as tactile, not gimmicky.
+  function addMagneticHover(el, strength){
+    if (reduceMotion) return;
+    el.addEventListener("mousemove", (e) => {
+      const r = el.getBoundingClientRect();
+      const mx = (e.clientX - r.left - r.width/2) / (r.width/2);
+      const my = (e.clientY - r.top - r.height/2) / (r.height/2);
+      el.style.setProperty("--mx", (mx*strength).toFixed(1) + "px");
+      el.style.setProperty("--my", (my*strength - strength*0.15).toFixed(1) + "px");
+    });
+    el.addEventListener("mouseleave", () => {
+      el.style.removeProperty("--mx");
+      el.style.removeProperty("--my");
+    });
+  }
+
   const grid = document.getElementById("work-grid");
   PROJECTS.forEach(p => {
     const tile = document.createElement("div");
@@ -569,6 +671,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     `;
     tile.querySelector(".tile-figure").appendChild(p.tileFigure());
     tile.addEventListener("click", () => { location.hash = "#project/" + p.id; });
+    addMagneticHover(tile, 6);
     grid.appendChild(tile);
   });
 
@@ -591,8 +694,10 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   // Hash-based routing (#work, #about, #project/<id>) so the browser's own
   // back/forward buttons work between the work grid, About, and a project
   // detail -- not just the in-page "back to work" button.
-  pillButtons.forEach(b => b.addEventListener("click", () => { location.hash = "#" + b.dataset.view; }));
-  document.getElementById("detail-back").addEventListener("click", () => { location.hash = "#work"; });
+  pillButtons.forEach(b => { b.addEventListener("click", () => { location.hash = "#" + b.dataset.view; }); addMagneticHover(b, 4); });
+  const backBtn = document.getElementById("detail-back");
+  backBtn.addEventListener("click", () => { location.hash = "#work"; });
+  addMagneticHover(backBtn, 4);
 
   function openDetail(id){
     const p = PROJECTS.find(x => x.id === id);
@@ -627,6 +732,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     facts.innerHTML = p.facts.map(([k,v]) => `<div class="fact"><span class="k">${k}</span><span class="v">${v}</span></div>`).join("");
     const cta = document.getElementById("d-cta");
     cta.innerHTML = p.cta.map(([label,href,cls]) => `<a class="cta ${cls}" href="${href}" target="_blank" rel="noopener">${label} →</a>`).join("");
+    cta.querySelectorAll(".cta").forEach(el => addMagneticHover(el, 5));
     showView("detail");
     pillButtons.forEach(b => b.classList.remove("active"));
   }

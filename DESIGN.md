@@ -14,6 +14,19 @@ accent used only for an interactive marker), a floating pill nav
 whitespace, soft-shadow cards with no heavy chrome, an About page pairing a
 short lede paragraph with a plain two-column timeline.
 
+**Haptic pass** (user-pinned reference: ciridae.com, scoped deliberately):
+that reference is dark/cinematic with particle-constellation animation and
+text-scramble reveals — none of that carried over, by explicit user choice
+(asked directly: keep the light kenjpena-era palette, borrow only the
+tactile *feel*). What did carry over: a subtle film-grain texture
+(`body::before`, SVG feTurbulence, 3.5% opacity, multiply blend) so flat
+color fields read as slightly physical instead of flat-digital; a magnetic
+hover pull on tiles/buttons (`addMagneticHover()`, a few px toward the
+cursor via `--mx`/`--my` custom properties); a spring/overshoot easing
+(`cubic-bezier(.34,1.56,.64,1)`) on hover and press transforms instead of
+linear/ease; a `:active` press-down state (`--press` scaled down) on every
+clickable surface. All gated behind `prefers-reduced-motion`.
+
 Adapted for this content: the reference's product screenshots become real
 data visualizations (an aspect-ratio dial, an oscilloscope trace, a
 flow diagram, a heatmap of an actual optimizer search) since the subject is
@@ -97,9 +110,6 @@ reference's own commitment.
 
 ## Charts (all inline SVG, generated in JS, no library)
 
-- `arDialFigure` — semicircle dial, fixed left/mid/right tick positions,
-  needle via `rotate()`. (Ticks and needle must share one angle convention —
-  a mismatch here was a real bug in the prior direction's build.)
 - `heatmapFigure` — the actual (cl × AR) energy grid `wing_optimizer.py`
   searched, gamma-compressed grayscale, accent-colored ring at the found
   optimum.
@@ -113,9 +123,28 @@ reference's own commitment.
   clipping bug caught in review.
 - `scopeFigure` — deterministic pseudo-random trace standing in for a real
   vibration waveform shape (seeded, not literally the decoded log samples).
+  `droneScopeFigure` overlays a small quadcopter glyph on it for the Log
+  Dashboard *tile* emblem, naming the subject (a drone flight log) instead
+  of leaving a generic waveform to speak for itself.
 - `flowFigure` — a 3-box pipeline diagram (Teensy → sensors.py → main.py)
-  plus a 3-tab strip, for Liquid Rocket's architecture.
-- `blankFigure` — dashed empty-state box, "NO FILES YET", for CAD.
+  plus a 3-tab strip, for Liquid Rocket's *architecture* (kept in the
+  detail Outcome section).
+- `missionProfileFigure` — the Mission Model tile emblem: an altitude-vs-
+  distance silhouette of the actual leg sequence `Mission_Model.py`
+  simulates (short/long/short cruise legs with landing dots) — replaced a
+  generic AR gauge that didn't name the mission itself.
+- `rocketFigure` — the Liquid Rocket tile emblem: a rocket silhouette with
+  an accent-colored flame, naming the domain (hot-fire propulsion testing)
+  rather than the code architecture, which `flowFigure` already covers in
+  the detail view.
+- `blankFigure` — the CAD tile/detail emblem: a dashed isometric wireframe
+  block, "NO FILES YET" — reads as "a CAD model" while staying honestly
+  unfilled/dashed, not a fabricated render.
+
+Emblem-vs-chart split: each project's *tile* emblem now names its subject
+(mission profile, rocket, drone) while richer real-data charts (heatmap,
+bar charts, waveform, architecture diagram) live in the detail view's
+Outcome section — the tile is a symbol, the detail page is the evidence.
 
 ## Layout
 
