@@ -171,6 +171,9 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     <p class="detail-lede" id="d-lede"></p>
     <div id="d-caution"></div>
 
+    <div class="section-label">Overview</div>
+    <div class="method" id="d-overview"></div>
+
     <div class="section-label">Method</div>
     <div class="method" id="d-method"></div>
 
@@ -354,11 +357,16 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       cardFoot: "AR 4.00 → 8.64",
       cardSub: "wing sizing, +22% area",
       tileFigure: () => arDialFigure(8.64, 4, 12, true),
-      lede: "A VTOL mission-performance simulator and wing-sizing optimizer. This round added a real energy-based objective and re-sized the whole fleet against actual flight speeds instead of a placeholder.",
+      lede: "A VTOL mission-performance simulator and wing-sizing optimizer for a fleet of cargo tailsitter aircraft. This round added a real energy-based wing objective and re-sized the whole fleet against actual flight speeds instead of a placeholder.",
+      overview: [
+        "Mission Model simulates a specific cargo run for a family of VTOL (vertical takeoff/landing) airframes: takeoff to 100 ft, cruise 1 nautical mile, land, pick up cargo, takeoff, cruise 8 nm, land, drop cargo, takeoff, cruise 1 nm back, land. For every candidate airframe, it sweeps every motor × propeller × battery combination it has spec data for (thousands of combinations) and reports which one actually completes the mission, how much battery it has left over, and how long it can hover — so 'which motor should this drone use' becomes a search over real thrust-curve data instead of a guess.",
+        "<code>wing_optimizer.py</code> is the companion tool: given how much weight a wing needs to carry and how fast the aircraft cruises, it sizes the wing itself (area, aspect ratio, span, structural mass) instead of leaving that as a hand-picked constant.",
+      ],
       method: [
-        "The optimizer (<code>wing_optimizer.py</code>) previously offered two searches: fix lift coefficient and search aspect ratio for minimum structural mass (which, with no span cap, always bottoms out at the search floor — nothing pushes it higher), or search both jointly for minimum drag (where aspect ratio only ever helps). Neither prices the real tradeoff.",
+        "The optimizer previously offered two searches: fix lift coefficient and search aspect ratio for minimum structural mass (which, with no span cap, always bottoms out at the search floor — nothing pushes it higher), or search both jointly for minimum drag (where aspect ratio only ever helps). Neither prices the real tradeoff.",
         "<code>--objective combined</code> minimizes total mission energy — hover induced power (momentum theory, scaling with total mass<sup>1.5</sup>) plus cruise drag energy — over a grid of (lift coefficient, aspect ratio). A heavier, higher-AR wing costs more to hover; a low-AR wing costs more to cruise. The minimum lands inside the search space, not on its boundary.",
         "Re-ran it for all 9 tailsitter variants at each tier's real governed cruise speed (18.0/18.8/19.6 m/s) instead of an old flat 25 m/s placeholder — the single biggest driver of the size change below, since required wing area scales as 1/v².",
+        "The mission simulation itself uses closed-form kinematics (exact solution of thrust vs. quadratic drag) for wingless multirotors, but a winged tailsitter's accel phase needs a numerical ODE solve instead — as the wing builds lift with airspeed, the rotors' thrust tilts and the required forward thrust keeps changing, so there's no closed form.",
       ],
       figure: () => heatmapFigure(LANDSCAPE),
       figureCaption: "The actual (lift coefficient × aspect ratio) energy landscape the optimizer searched for one tier — darker is lower cost. Ring marks the found minimum.",
@@ -374,23 +382,31 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       id: "log-dashboard",
       name: "Log Dashboard",
       tag: "Flight-data tooling · 2026",
-      cardFoot: "52.1s decoded",
-      cardSub: "peak vibration 33.6 m/s²",
+      cardFoot: "65/100 flight score",
+      cardSub: "QUAD frame, 7 issues found",
       tileFigure: () => scopeFigure(7, false),
-      lede: "A Flask + Plotly dashboard that decodes ArduCopter/PX4 flight logs — the same class of binary telemetry this session pulled real numbers from directly.",
+      lede: "A Flask + Plotly dashboard that decodes ArduCopter/PX4 flight logs into a full diagnostic report — the same class of binary telemetry this session pulled real numbers from directly.",
+      overview: [
+        "Every ArduPilot-based flight controller (Pixhawk and compatibles) writes a binary <code>.BIN</code> log of everything it measured mid-flight — hundreds of message types at up to a few hundred Hz. Reading that raw log to answer \"was this flight okay, and if not, why\" normally means a separate desktop tool (MAVExplorer) and manual digging. This dashboard does that automatically: upload a log, get back attitude tracking, vibration spectra, motor balance, PID tracking, GPS track, battery health, and barometer/magnetometer data across dedicated tabs, plus one overall flight-quality verdict.",
+        "It's built for the same audience Mission Model is: someone who just flew a real airframe and needs to know whether the motors, frame, or tuning are actually behaving before flying again — not a generic telemetry viewer.",
+      ],
       method: [
         "The backend (<code>python_backend.py</code>) reads a raw <code>.BIN</code> log with <code>pymavlink</code>, walks its message stream, and classifies the airframe from its frame-type parameter (quad/hex/octo/X8/tri/Y3/Y6). Vibration channels get an FFT pass, mirroring the analysis MAVExplorer does for ArduPilot logs.",
-        "The dashboard (<code>log_dashboard.html</code>) renders the decoded series with Plotly — attitude, GPS track, vibration spectra — for a log a pilot or reviewer just uploaded, no round-trip through a separate log-analysis tool.",
+        "Ten analysis passes run per log — IMU, vibration, attitude, battery, motors, PID/rate controller, GPS, barometer, magnetometer, and discrete flight events (mode changes, arming, errors) — each producing its own stats block. A summary pass then scores the flight 0–100 and lists specific issues (e.g. \"poor roll stability,\" \"motor sync issues\") instead of just dumping charts and leaving the reader to spot problems.",
+        "The dashboard (<code>log_dashboard.html</code>) renders the decoded series with Plotly, plus a Custom Plot tab that lets you overlay any two decoded variables against time regardless of category — useful for correlating, say, vibration against throttle.",
       ],
       figure: () => scopeFigure(11, true),
-      figureCaption: "Vibration trace shape from a real decoded sample log (00000005.BIN / my_flight.bin), 52.1 seconds, 261 GPS fixes.",
+      figureCaption: "Vibration trace shape from a real decoded sample log (my_flight.bin), 52.1 seconds, 261 GPS fixes.",
       facts: [
-        ["Sample log decoded", "52.1 s flight"],
+        ["Flight quality score", "65 / 100 (Fair)"],
+        ["Frame detected", "QUAD, 4 motors"],
         ["Peak vibration", "33.6 m/s²"],
-        ["GPS fixes parsed", "261"],
-        ["Frame types supported", "Quad/Hex/Octo/X8/Tri/Y3/Y6"],
+        ["Stability issues found", "7 (roll/pitch/yaw + motor sync)"],
       ],
-      cta: [["View repo", "https://github.com/exs783/Log_Reader", "primary"]],
+      cta: [
+        ["Live demo", "demos/log-dashboard.html", "primary"],
+        ["View repo", "https://github.com/exs783/Log_Reader", "secondary"],
+      ],
     },
     {
       id: "liquid-rocket",
@@ -400,10 +416,15 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       cardSub: "9 live sensor channels",
       tileFigure: () => flowFigure(),
       lede: "Ground-station software for CWRU's Liquid Rocket team — rebuilt from two prototypes that were never actually integrated into one working app.",
+      overview: [
+        "A liquid rocket static test (or hot-fire test) needs a ground station: software running on a laptop near the test stand that shows the person running the test what's happening in real time — tank and chamber pressures, temperatures, thrust (via a load cell) — and lets them open or close valves and fire the igniter without touching the hardware directly. Every reading also needs to be logged, since post-test analysis (did the chamber pressure spike, did a valve stick) depends on having the full data, not just what was visible live.",
+        "This app is that ground station: a P&ID (piping-and-instrumentation diagram) view for valve control, a live-gauge view for the 9 real sensor channels, and a logging view that records a full test session to CSV.",
+      ],
       method: [
         "The repo held two separate PyQt prototypes on incompatible Qt bindings: a PyQt5 data-logging page (<code>main_v2.py</code>) and a PyQt6 P&ID valve-control page. Its own readme said as much: “still needs to be integrated with the other page.”",
         "Rebuilt as one PyQt6 app (<code>ground_station/</code>) sharing a single sensor/valve state across three tabs — Controls (the real P&ID diagram plus working valve toggles), Live Data (one gauge per real sensor channel), Logging (start/stop → the documented raw + interpolated CSV pair).",
         "The wire protocol (<code>P0–P6, T0, L0</code>, one <code>name,value,timestamp</code> line per reading) matches the real Teensy firmware exactly, so a fake data source stands in for hardware without changing anything else — verified with a headless smoke test that boots the real window, ticks it, toggles a valve, and checks a logging session actually writes CSVs.",
+        "The live demo linked below is a from-scratch JavaScript port of that same protocol and gauge math (not a screen recording) — it runs the identical random-walk sensor simulation and the identical SVG gauge/valve drawing code the Python app uses, so what you click there is what the desktop app actually does with no hardware attached.",
       ],
       figure: () => flowFigure(),
       figureCaption: "Data flow: one wire protocol, shared across a fake source (used here) and a future real Teensy connection, feeding all three tabs.",
@@ -414,7 +435,10 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
         ["Valve control", "UI state only"],
       ],
       caution: "Valve toggles are display-only — no serial command channel to real hardware exists yet.",
-      cta: [["View repo", "https://github.com/exs783/Liquid-Rocket", "primary"]],
+      cta: [
+        ["Live demo", "demos/liquid-rocket.html", "primary"],
+        ["View repo", "https://github.com/exs783/Liquid-Rocket", "secondary"],
+      ],
     },
     {
       id: "cad",
@@ -425,6 +449,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       tileFigure: () => blankFigure(),
       muted: true,
       lede: "Reserved for mechanical-design work. No CAD files exist in a public repo yet, so this stays an honest placeholder rather than a fabricated render.",
+      overview: ["Nothing to show yet — this slot exists so the site's structure doesn't hide the gap. It'll get real content once actual CAD/mechanical-design files are pushed to a public repo, not a stand-in render."],
       method: ["Nothing to show yet."],
       figure: () => blankFigure(),
       figureCaption: "",
@@ -480,6 +505,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     document.getElementById("d-title").textContent = p.name;
     document.getElementById("d-tag").textContent = p.tag;
     document.getElementById("d-lede").textContent = p.lede;
+    document.getElementById("d-overview").innerHTML = p.overview.map(m => `<p>${m}</p>`).join("");
     document.getElementById("d-method").innerHTML = p.method.map(m => `<p>${m}</p>`).join("");
     const cautionEl = document.getElementById("d-caution");
     cautionEl.innerHTML = p.caution ? `<div class="caution">⚠ ${p.caution}</div>` : "";

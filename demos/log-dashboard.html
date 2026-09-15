@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixhawk Log Reader Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:        #f6f7f9;
+            --surface:   #ffffff;
+            --surface-2: #f0f2f5;
+            --border:    #e3e6eb;
+            --border-2:  #d3d8e0;
+            --text:      #1a2130;
+            --text-dim:  #667085;
+            --text-faint:#5b6472;
+            --accent:    #2f6fed;
+            --accent-dim:#eaf0fe;
+            --green:     #16a34a;
+            --green-dim: #eaf7ee;
+            --amber:     #d97706;
+            --amber-dim: #fdf3e3;
+            --red:       #dc2626;
+            --red-dim:   #fdecec;
+            --teal:      #0f9488;
+            --purple:    #7c6ff0;
+            --pink:      #db2777;
+            --cyan:      #0891b2;
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --shadow-sm: 0 1px 2px rgba(16,24,40,0.05);
+            --shadow-md: 0 4px 16px rgba(16,24,40,0.08);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg:        #0f1420;
+                --surface:   #171d2b;
+                --surface-2: #1e2534;
+                --border:    #2a3244;
+                --border-2:  #384156;
+                --text:      #e7eaf0;
+                --text-dim:  #9aa4b6;
+                --text-faint:#a3adbe;
+                --accent:    #5b8cf7;
+                --accent-dim:#1b2740;
+                --green:     #3fbd6c;
+                --green-dim: #103322;
+                --amber:     #e29a3d;
+                --amber-dim: #3a2a10;
+                --red:       #f0625f;
+                --red-dim:   #3a1616;
+                --teal:      #2bb8a8;
+                --purple:    #9c93f5;
+                --pink:      #ec5c9a;
+                --cyan:      #33b3d1;
+                --shadow-sm: 0 1px 2px rgba(0,0,0,0.24);
+                --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+            }
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px; height: 1px;
+            padding: 0; margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::-webkit-scrollbar { width:10px; height:10px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-2); border-radius:6px; border: 2px solid var(--bg); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
+
+        header {
+            background: var(--surface);
+            padding: 0 32px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .header-mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: var(--accent-dim);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .header-titles { display: flex; flex-direction: column; line-height: 1.25; }
+        .header-logo {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.01em;
+        }
+        .header-sub {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .header-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-dim);
+            background: var(--surface-2);
+            padding: 6px 12px;
+            border-radius: 999px;
+        }
+        .status-dot {
+            display: inline-block;
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--text-faint);
+        }
+        .status-dot.online { background: var(--green); }
+        .status-dot.offline { background: var(--red); }
+
+        .upload-section {
+            background: var(--surface);
+            padding: 14px 32px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+        .file-input-label {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 44px;
+            padding: 9px 18px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.15s;
+        }
+        .file-input-label:hover { background: #2258c9; }
+        .file-input-label.is-uploading { opacity: 0.6; cursor: not-allowed; }
+        /* The real input sits off-screen for styling; forward its focus ring to the visible label. */
+        .file-input-wrapper:focus-within .file-input-label {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+        .upload-info {
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+        .upload-info.loading { color: var(--accent); }
+
+        nav {
+            background: var(--surface);
+            display: flex;
+            gap: 4px;
+            padding: 0 28px;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            position: sticky;
+            top: 64px;
+            z-index: 19;
+        }
+        nav::-webkit-scrollbar { height: 4px; }
+        .nav-divider {
+            flex-shrink: 0;
+            align-self: center;
+            width: 1px;
+            height: 20px;
+            background: var(--border-2);
+            margin: 0 4px;
+        }
+        .nav-btn {
+            flex-shrink: 0;
+            min-height: 44px;
+            padding: 13px 16px;
+            background: transparent;
+            color: var(--text-dim);
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            font-family: var(--font);
+            font-size: 13px;
+            font-weight: 500;
+            transition: color 0.15s, border-color 0.15s;
+        }
+        .nav-btn:hover:not(:disabled) { color: var(--text); }
+        .nav-btn.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            font-weight: 600;
+        }
+        .nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .nav-btn:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: -2px;
+        }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 28px 28px 60px;
+        }
+
+        .page { display: none; animation: pageIn 0.25s ease; }
+        .page.active { display: block; }
+        @keyframes pageIn {
+            from { opacity:0; transform: translateY(4px); }
+            to   { opacity:1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 20px;
+            letter-spacing: -0.01em;
+        }
+
+        .card {
+            background: var(--surface);
+            padding: 20px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow 0.15s;
+        }
+        .card:hover { box-shadow: var(--shadow-md); }
+        .card h3 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 14px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(500px, 100%), 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .full-width { grid-column: 1 / -1; }
+
+        .customplot-layout {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .customplot-vars-card {
+            flex: 0 0 280px;
+            max-height: 640px;
+            overflow-y: auto;
+        }
+        .customplot-plot-card {
+            flex: 1;
+            min-width: 0;
+        }
+        @media (max-width: 768px) {
+            .customplot-layout { flex-direction: column; }
+            .customplot-vars-card { flex-basis: auto; width: 100%; max-height: 320px; }
+        }
+
+        .plot-container {
+            width: 100%;
+            height: 400px;
+            overflow: hidden;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .stat-box {
+            background: var(--surface);
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+        .stat-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            color: var(--text-faint);
+            margin-bottom: 8px;
+        }
+        .stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text);
+            font-variant-numeric: tabular-nums;
+        }
+        .stat-unit {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-dim);
+            margin-left: 4px;
+        }
+
+        .info-panel {
+            background: var(--accent-dim);
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .info-panel h2 {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+        .info-panel p {
+            font-size: 13px;
+            color: var(--text-dim);
+            line-height: 1.55;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .summary-item {
+            background: var(--surface);
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+        .summary-item h4 {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            color: var(--text-faint);
+            margin-bottom: 6px;
+        }
+        .summary-item p {
+            font-size: 13px;
+            color: var(--text);
+            margin: 3px 0;
+            line-height: 1.5;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .alert-warning  { background: var(--amber-dim); color: #92450a; }
+        .alert-success  { background: var(--green-dim); color: #0f6b32; }
+        .alert-danger   { background: var(--red-dim);   color: #9c1c1c; }
+        .alert-info     { background: var(--accent-dim);color: #1d4ba8; }
+
+        .no-data {
+            text-align: center;
+            padding: 60px 40px;
+            color: var(--text-faint);
+            background: var(--surface);
+            border: 1px dashed var(--border-2);
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .event-item {
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 13px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 24px 20px;
+            color: var(--text-faint);
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <div class="header-mark">PX</div>
+            <div class="header-titles">
+                <div class="header-logo">Pixhawk Log Analyzer</div>
+                <div class="header-sub">Flight log analysis</div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="header-status" id="backend-status"><span class="status-dot online"></span><span>Live demo &mdash; real decoded flight</span></div>
+        </div>
+    </header>
+
+    <div class="upload-section">
+        <div class="upload-info" id="upload-status" role="status" aria-live="polite">
+            Showing <code>my_flight.bin</code> &mdash; a real ArduCopter QUAD flight, decoded by the actual
+            <code>python_backend.py</code> in this repo (not reimplemented for this page). Upload isn't wired up in
+            this static build &mdash; <a href="https://github.com/exs783/Log_Reader" target="_blank" rel="noopener">clone the repo</a>
+            to run the Flask backend against your own log.
+        </div>
+    </div>
+    <div id="upload-alert" class="alert alert-danger" style="display:none; margin:0 32px;" role="alert"></div>
+
+    <nav role="tablist" aria-label="Log analysis sections">
+        <button id="tab-overview" class="nav-btn" role="tab" aria-selected="false" aria-controls="overview" onclick="showPage('overview', event)" disabled>Overview</button>
+        <div class="nav-divider" role="separator"></div>
+        <button id="tab-imu" class="nav-btn" role="tab" aria-selected="false" aria-controls="imu" onclick="showPage('imu', event)" disabled>IMU Analysis</button>
+        <button id="tab-vibration" class="nav-btn" role="tab" aria-selected="false" aria-controls="vibration" onclick="showPage('vibration', event)" disabled>Vibration</button>
+        <button id="tab-attitude" class="nav-btn" role="tab" aria-selected="false" aria-controls="attitude" onclick="showPage('attitude', event)" disabled>Attitude Control</button>
+        <button id="tab-pid" class="nav-btn" role="tab" aria-selected="false" aria-controls="pid" onclick="showPage('pid', event)" disabled>PID Tuning</button>
+        <div class="nav-divider" role="separator"></div>
+        <button id="tab-battery" class="nav-btn" role="tab" aria-selected="false" aria-controls="battery" onclick="showPage('battery', event)" disabled>Battery Health</button>
+        <button id="tab-motors" class="nav-btn" role="tab" aria-selected="false" aria-controls="motors" onclick="showPage('motors', event)" disabled>Motor Performance</button>
+        <button id="tab-magnetometer" class="nav-btn" role="tab" aria-selected="false" aria-controls="magnetometer" onclick="showPage('magnetometer', event)" disabled>Magnetometer</button>
+        <button id="tab-barometer" class="nav-btn" role="tab" aria-selected="false" aria-controls="barometer" onclick="showPage('barometer', event)" disabled>Barometer</button>
+        <div class="nav-divider" role="separator"></div>
+        <button id="tab-gps" class="nav-btn" role="tab" aria-selected="false" aria-controls="gps" onclick="showPage('gps', event)" disabled>GPS & Navigation</button>
+        <button id="tab-events" class="nav-btn" role="tab" aria-selected="false" aria-controls="events" onclick="showPage('events', event)" disabled>Events</button>
+        <div class="nav-divider" role="separator"></div>
+        <button id="tab-customplot" class="nav-btn" role="tab" aria-selected="false" aria-controls="customplot" onclick="showPage('customplot', event)" disabled>Custom Plot</button>
+    </nav>
+
+    <div class="container">
+        <div id="global-alert" class="alert alert-warning" style="display:none;" role="alert"></div>
+
+        <!-- OVERVIEW PAGE -->
+        <div id="overview" class="page active" role="tabpanel" aria-labelledby="tab-overview" tabindex="0">
+            <h2 class="section-title">Flight Summary</h2>
+            <div class="no-data">Load a .bin or .log file to begin</div>
+        </div>
+
+        <!-- IMU ANALYSIS PAGE -->
+        <div id="imu" class="page" role="tabpanel" aria-labelledby="tab-imu" tabindex="0">
+            <h2 class="section-title">IMU Analysis</h2>
+            <div class="info-panel">
+                <h2>Inertial Measurement Unit</h2>
+                <p>Raw accelerometer and gyroscope readings. Excessive noise indicates vibration issues or mechanical problems.</p>
+            </div>
+            <div class="stats-container" id="imu-stats"></div>
+            <div class="dashboard-grid">
+                <div class="card full-width">
+                    <h3>Accelerometer Data (X, Y, Z)</h3>
+                    <p class="sr-only" id="imu-summary"></p>
+                    <div class="plot-container" id="imu-plot" role="img" aria-describedby="imu-summary"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIBRATION PAGE -->
+        <div id="vibration" class="page" role="tabpanel" aria-labelledby="tab-vibration" tabindex="0">
+            <h2 class="section-title">Vibration Analysis</h2>
+            <div class="info-panel">
+                <h2>Frequency & Magnitude Analysis</h2>
+                <p>Vibration analysis via FFT frequency domain. Identifies propeller imbalance, bearing wear, or resonance.</p>
+            </div>
+            <div class="stats-container" id="vibration-stats"></div>
+            <div class="dashboard-grid">
+                <div class="card full-width">
+                    <h3>Vibration Magnitude Over Time</h3>
+                    <p class="sr-only" id="vibration-summary"></p>
+                    <div class="plot-container" id="vibration-plot" role="img" aria-describedby="vibration-summary"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ATTITUDE CONTROL PAGE -->
+        <div id="attitude" class="page" role="tabpanel" aria-labelledby="tab-attitude" tabindex="0">
+            <h2 class="section-title">Attitude Control Analysis</h2>
+            <div class="info-panel">
+                <h2>Aircraft Attitude Tracking</h2>
+                <p>Desired vs actual roll, pitch, yaw. Errors indicate tuning issues or external disturbances.</p>
+            </div>
+            <div class="stats-container" id="attitude-stats"></div>
+            <div class="dashboard-grid">
+                <div class="card full-width">
+                    <h3>Roll, Pitch, Yaw Tracking (Desired vs Actual)</h3>
+                    <p class="sr-only" id="attitude-summary"></p>
+                    <div class="plot-container" id="attitude-plot" role="img" aria-describedby="attitude-summary"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BATTERY HEALTH PAGE -->
+        <div id="battery" class="page" role="tabpanel" aria-labelledby="tab-battery" tabindex="0">
+            <h2 class="section-title">Battery Performance Analysis</h2>
+            <div class="info-panel">
+                <h2>Battery Management System</h2>
+                <p>Monitor voltage sag, current draw, and power consumption throughout the flight.</p>
+            </div>
+            <div class="stats-container" id="battery-stats"></div>
+            <div class="dashboard-grid">
+                <div class="card full-width">
+                    <h3>Voltage & Current Over Time</h3>
+                    <p class="sr-only" id="battery-summary"></p>
+                    <div class="plot-container" id="battery-plot" role="img" aria-describedby="battery-summary"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MOTOR PERFORMANCE PAGE -->
+        <div id="motors" class="page" role="tabpanel" aria-labelledby="tab-motors" tabindex="0">
+            <h2 class="section-title">Motor Performance Analysis</h2>
+            <div class="info-panel">
+                <h2>Motor Output Balance & Efficiency</h2>
+                <p>Monitor motor output balance, sync, and correlation across all motors.</p>
+            </div>
+            <div class="stats-container" id="motors-stats"></div>
+            <div class="dashboard-grid">
+                <div class="card full-width">
+                    <h3>Motor Output Balance (All Motors)</h3>
+                    <p class="sr-only" id="motors-summary"></p>
+                    <div class="plot-container" id="motors-plot" role="img" aria-describedby="motors-summary"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PID TUNING PAGE -->
+        <div id="pid" class="page" role="tabpanel" aria-labelledby="tab-pid" tabindex="0">
+            <h2 class="section-title">PID Controller Analysis</h2>
+            <div class="info-panel">
+                <h2>PID Tuning & Rate Control</h2>
+                <p>Rate controller performance. Identify overshoot, lag, oscillation, or tuning drift.</p>
+            </div>
+            <div class="stats-container" id="pid-stats"></div>
+            <div class="dashboard-grid">
+                <div class="card full-width">
+                    <h3>Rate Controller Performance (Desired vs Actual)</h3>
+                    <p class="sr-only" id="pid-summary"></p>
+                    <div class="plot-container" id="pid-plot" role="img" aria-describedby="pid-summary"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GPS & NAVIGATION PAGE -->
+        <div id="gps" class="page" role="tabpanel" aria-labelledby="tab-gps" tabindex="0">
+            <h2 class="section-title">GPS & Navigation</h2>
+            <div class="info-panel">
+                <h2>Global Positioning System</h2>
+                <p>Satellite count, accuracy (HDOP/VDOP), altitude gain, and position tracking.</p>
+            </div>
+            <div class="stats-container" id="gps-stats"></div>
+            <div class="dashboard-grid">
+                <div class="card full-width">
+                    <h3>Altitude & Satellite Count</h3>
+                    <p class="sr-only" id="gps-summary"></p>
+                    <div class="plot-container" id="gps-plot" role="img" aria-describedby="gps-summary"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BAROMETER PAGE -->
+        <div id="barometer" class="page" role="tabpanel" aria-labelledby="tab-barometer" tabindex="0">
+            <h2 class="section-title">Barometer & Altitude Hold</h2>
+            <div class="info-panel">
+                <h2>Pressure Altitude System</h2>
+                <p>Barometer readings and altitude stability during altitude hold mode.</p>
+            </div>
+            <div class="stats-container" id="barometer-stats"></div>
+            <div class="dashboard-grid">
+                <div class="card full-width">
+                    <h3>Altitude Over Time</h3>
+                    <p class="sr-only" id="barometer-summary"></p>
+                    <div class="plot-container" id="barometer-plot" role="img" aria-describedby="barometer-summary"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EVENTS PAGE -->
+        <div id="events" class="page" role="tabpanel" aria-labelledby="tab-events" tabindex="0">
+            <h2 class="section-title">Flight Events & Errors</h2>
+            <div class="info-panel">
+                <h2>Flight Timeline</h2>
+                <p>Mode changes, errors, and failsafe events detected during flight.</p>
+            </div>
+            <div id="events-list"></div>
+        </div>
+
+        <!-- MAGNETOMETER PAGE -->
+        <div id="magnetometer" class="page" role="tabpanel" aria-labelledby="tab-magnetometer" tabindex="0">
+            <h2 class="section-title">Magnetometer & Compass</h2>
+            <div class="info-panel">
+                <h2>Magnetic Field Analysis</h2>
+                <p>Compass health and electromagnetic interference detection.</p>
+            </div>
+            <div class="stats-container" id="magnetometer-stats"></div>
+            <div class="dashboard-grid">
+                <div class="card full-width">
+                    <h3>Magnetic Field Magnitude</h3>
+                    <p class="sr-only" id="magnetometer-summary"></p>
+                    <div class="plot-container" id="magnetometer-plot" role="img" aria-describedby="magnetometer-summary"></div>
+                </div>
+            </div>
+        </div>
+        <!-- CUSTOM PLOT PAGE -->
+        <div id="customplot" class="page" role="tabpanel" aria-labelledby="tab-customplot" tabindex="0">
+            <h2 class="section-title">Custom Plot</h2>
+            <div class="info-panel">
+                <h2>Any Variable vs Time</h2>
+                <p>Pick any number of variables from the loaded log and plot them together over time.</p>
+            </div>
+            <div id="customplot-alert" class="alert alert-warning" style="display:none;" role="alert"></div>
+            <div class="customplot-layout">
+                <div class="card customplot-vars-card">
+                    <h3>Variables</h3>
+                    <div id="customplot-vars" style="display:flex; flex-direction:column; gap:14px;"></div>
+                    <button class="file-input-label" style="border:none; margin-top:16px;" onclick="generateCustomPlot()">Plot Selected</button>
+                </div>
+                <div class="card customplot-plot-card">
+                    <h3>Selected Variables Over Time</h3>
+                    <p class="sr-only" id="customplot-summary"></p>
+                    <div class="plot-container" id="customplot-plot" role="img" aria-describedby="customplot-summary"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>&copy; 2026 &mdash; Pixhawk Log Analyzer &mdash; Drone Flight Intelligence</footer>
+
+    <script>
+        let currentData = null;
+        let currentSummary = null;
+
+        // Chart colors are resolved from CSS custom properties at render time so
+        // charts follow the active theme (including prefers-color-scheme: dark).
+        function cssVar(name) {
+            return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        }
+
+        function hexToRgba(hex, alpha) {
+            const h = hex.replace('#', '');
+            const r = parseInt(h.substring(0, 2), 16);
+            const g = parseInt(h.substring(2, 4), 16);
+            const b = parseInt(h.substring(4, 6), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+
+        function chartTheme() {
+            return {
+                red: cssVar('--red'), green: cssVar('--green'), amber: cssVar('--amber'),
+                accent: cssVar('--accent'), teal: cssVar('--teal'), purple: cssVar('--purple'),
+                pink: cssVar('--pink'), cyan: cssVar('--cyan'),
+                text: cssVar('--text'), textDim: cssVar('--text-dim'), border: cssVar('--border'),
+                surface: cssVar('--surface'),
+            };
+        }
+
+        function chartAxis(theme) {
+            return { color: theme.textDim, gridcolor: theme.border, zeroline: false };
+        }
+
+        function chartLayoutBase(theme) {
+            return {
+                font: { color: theme.text, family: 'Inter, sans-serif' },
+                plot_bgcolor: theme.surface,
+                paper_bgcolor: theme.surface,
+            };
+        }
+
+        function chartPalette(theme) {
+            return [theme.red, theme.teal, theme.accent, theme.green, theme.amber, theme.purple, theme.pink, theme.cyan];
+        }
+
+        // All timestamps in currentData are microseconds; every plot converts to seconds
+        // for the x-axis so units match across tabs (Custom Plot already did this).
+        function toSeconds(timestamps) {
+            return timestamps.map(t => t / 1e6);
+        }
+
+        function showAlert(elId, message) {
+            const el = document.getElementById(elId);
+            el.textContent = message;
+            el.style.display = 'block';
+        }
+
+        function hideAlert(elId) {
+            document.getElementById(elId).style.display = 'none';
+        }
+
+        // Static build for the portfolio site: no Flask backend here, so this
+        // loads the real backend's output (pre-computed by actually running
+        // python_backend.py's run_analysis() against my_flight.bin) instead of
+        // POSTing a file to /api/upload. Same currentData/currentSummary shape,
+        // same rendering code below — only the data source changed.
+        (async function loadStaticDemo() {
+            const statusEl = document.getElementById('upload-status');
+            try {
+                const response = await fetch('flight-analysis.json');
+                if (!response.ok) throw new Error(`${response.status}`);
+                const data = await response.json();
+                if (!data.success) throw new Error(data.error || 'analysis failed');
+
+                currentData = data.analyses;
+                currentSummary = data.summary;
+                document.querySelectorAll('.nav-btn').forEach(btn => btn.disabled = false);
+                showOverviewPage();
+            } catch (error) {
+                statusEl.textContent = `Couldn't load the static demo data: ${error.message}`;
+                showAlert('upload-alert', `Demo data error: ${error.message}`);
+            }
+        })();
+
+        // Page navigation
+        function showPage(pageId, evt) {
+            if (!currentData) {
+                showAlert('global-alert', 'Please upload a log file first');
+                return;
+            }
+            hideAlert('global-alert');
+
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-selected', 'false');
+            });
+
+            document.getElementById(pageId).classList.add('active');
+            const tabBtn = (evt || window.event).target;
+            tabBtn.classList.add('active');
+            tabBtn.setAttribute('aria-selected', 'true');
+
+            // Generate plots
+            if (pageId === 'overview') showOverviewPage();
+            else if (pageId === 'imu') generateIMUPlot();
+            else if (pageId === 'vibration') generateVibrationPlot();
+            else if (pageId === 'attitude') generateAttitudePlot();
+            else if (pageId === 'battery') generateBatteryPlot();
+            else if (pageId === 'motors') generateMotorsPlot();
+            else if (pageId === 'pid') generatePIDPlot();
+            else if (pageId === 'gps') generateGPSPlot();
+            else if (pageId === 'barometer') generateBarometerPlot();
+            else if (pageId === 'events') generateEventsPage();
+            else if (pageId === 'magnetometer') generateMagnetometerPlot();
+            else if (pageId === 'customplot') generateCustomPlotOptions();
+        }
+
+        // Custom plot: any number of variables vs time
+        const CATEGORY_LABELS = {
+            imu: 'IMU', vibration: 'Vibration', attitude: 'Attitude', battery: 'Battery',
+            motors: 'Motors', pid: 'PID', gps: 'GPS', barometer: 'Barometer', magnetometer: 'Magnetometer',
+        };
+
+        function getCustomPlotSeries() {
+            const series = [];
+            for (const [category, obj] of Object.entries(currentData || {})) {
+                if (!obj || !Array.isArray(obj.timestamps) || obj.timestamps.length === 0) continue;
+                const n = obj.timestamps.length;
+                for (const [field, value] of Object.entries(obj)) {
+                    if (field === 'timestamps' || field === 'stats' || field === 'motors') continue;
+                    if (!Array.isArray(value) || value.length !== n || typeof value[0] !== 'number') continue;
+                    series.push({
+                        id: `${category}.${field}`,
+                        label: `${CATEGORY_LABELS[category] || category}: ${field}`,
+                        timestamps: obj.timestamps,
+                        values: value,
+                    });
+                }
+            }
+            return series;
+        }
+
+        // Persists across tab revisits so re-opening Custom Plot doesn't wipe a
+        // half-built comparison the user was constructing.
+        const customPlotSelection = new Set();
+        let customPlotHasRendered = false;
+
+        function generateCustomPlotOptions() {
+            const series = getCustomPlotSeries();
+            const container = document.getElementById('customplot-vars');
+            hideAlert('customplot-alert');
+            if (!customPlotHasRendered) {
+                document.getElementById('customplot-plot').innerHTML =
+                    '<div class="no-data">Select variables, then click "Plot Selected" to see them here.</div>';
+            }
+            if (series.length === 0) {
+                container.innerHTML = '<div class="no-data">No plottable variables found.</div>';
+                return;
+            }
+            container.innerHTML = series.map(s => `
+                <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer; min-height:24px; padding:4px 0;">
+                    <input type="checkbox" value="${s.id}" class="customplot-checkbox" ${customPlotSelection.has(s.id) ? 'checked' : ''}>
+                    ${s.label}
+                </label>
+            `).join('');
+            container.querySelectorAll('.customplot-checkbox').forEach(cb => {
+                cb.addEventListener('change', () => {
+                    if (cb.checked) customPlotSelection.add(cb.value);
+                    else customPlotSelection.delete(cb.value);
+                });
+            });
+        }
+
+        function generateCustomPlot() {
+            const series = getCustomPlotSeries();
+            const seriesById = Object.fromEntries(series.map(s => [s.id, s]));
+            const selected = Array.from(document.querySelectorAll('.customplot-checkbox:checked')).map(cb => cb.value);
+
+            if (selected.length === 0) {
+                showAlert('customplot-alert', 'Select at least one variable to plot');
+                return;
+            }
+            hideAlert('customplot-alert');
+
+            const theme = chartTheme();
+            const colors = chartPalette(theme);
+            const traces = selected.map((id, i) => {
+                const s = seriesById[id];
+                return {
+                    x: s.timestamps.map(t => t / 1e6),
+                    y: s.values,
+                    name: s.label,
+                    line: { color: colors[i % colors.length] },
+                };
+            });
+
+            const layout = {
+                title: '',
+                xaxis: { title: 'Time (s)', ...chartAxis(theme) },
+                yaxis: { title: 'Value', color: theme.textDim },
+                hovermode: 'x unified',
+                ...chartLayoutBase(theme),
+                margin: { l: 60, r: 20, t: 20, b: 60 },
+            };
+
+            Plotly.newPlot('customplot-plot', traces, layout, { responsive: true });
+            customPlotHasRendered = true;
+
+            const summary = selected.map(id => {
+                const s = seriesById[id];
+                const min = Math.min(...s.values);
+                const max = Math.max(...s.values);
+                return `${s.label} ranged ${min.toFixed(2)} to ${max.toFixed(2)}`;
+            }).join('. ');
+            document.getElementById('customplot-summary').textContent = `Custom time-series plot. ${summary}.`;
+        }
+
+        // Overview page
+        function showOverviewPage() {
+            const overview = document.getElementById('overview');
+            if (!currentSummary) return;
+
+            const summary = currentSummary;
+            const theme = chartTheme();
+            const scoreColor = summary.flight_quality_score >= 80 ? theme.green :
+                             summary.flight_quality_score >= 60 ? theme.amber : theme.red;
+
+            overview.innerHTML = `
+                <h2 class="section-title">Flight Summary</h2>
+
+                <div class="info-panel">
+                    <h2>Flight Overview</h2>
+                    <p>Analysis completed: ${new Date(summary.timestamp).toLocaleString()}</p>
+                </div>
+
+                ${summary.issues.length > 0 ? `<div class="alert alert-${summary.flight_quality_score >= 80 ? 'success' : 'warning'}">
+                    <strong>Issues Detected:</strong> ${summary.issues.join(', ')}
+                </div>` : ''}
+
+                <div class="card full-width" style="text-align: center; padding: 40px;">
+                    <h3>Flight Quality Score</h3>
+                    <div style="font-size: 56px; color: ${scoreColor}; font-weight: 800; margin: 16px 0; font-variant-numeric: tabular-nums;">
+                        ${summary.flight_quality_score}/100
+                    </div>
+                    <div style="font-size: 20px; font-weight: 600; color: var(--text); margin-bottom: 12px;">
+                        ${summary.verdict}
+                    </div>
+                    <p style="color: var(--text-dim);">${getVerdictDescription(summary.verdict)}</p>
+                </div>
+
+                <h3 class="section-title">Messages Loaded</h3>
+                <div class="summary-grid">
+                    ${Object.entries(summary.messages_loaded).map(([msg, count]) => `
+                        <div class="summary-item">
+                            <h4>${msg}</h4>
+                            <p>${count} records</p>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <h3 class="section-title">Frame Configuration</h3>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <h4>Frame Type</h4>
+                        <p>${summary.frame.name}</p>
+                    </div>
+                    <div class="summary-item">
+                        <h4>Motor Count</h4>
+                        <p>${summary.frame.motor_count}</p>
+                    </div>
+                    <div class="summary-item">
+                        <h4>Frame Layout</h4>
+                        <p>${summary.frame.layout}</p>
+                    </div>
+                    <div class="summary-item">
+                        <h4>Detection Source</h4>
+                        <p>${summary.frame.source}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getVerdictDescription(verdict) {
+            const descriptions = {
+                'Excellent': 'Outstanding flight with minimal issues. No action needed.',
+                'Good': 'Good flight performance. Minor tuning opportunities available.',
+                'Fair': 'Acceptable performance but review logs for potential improvements.',
+                'Poor': 'Multiple issues detected. Recommend parameter review and testing.',
+                'Critical': 'Significant problems found. Do not fly until resolved.',
+            };
+            return descriptions[verdict] || 'Analysis complete.';
+        }
+
+        // Plot generators
+        function generateIMUPlot() {
+            if (!currentData.imu || !currentData.imu.timestamps) return;
+
+            const imu = currentData.imu;
+            const theme = chartTheme();
+            const ts = toSeconds(imu.timestamps);
+            const traces = [
+                {x: ts, y: imu.accX, name: 'AccX', line: {color: theme.red}},
+                {x: ts, y: imu.accY, name: 'AccY', line: {color: theme.teal}},
+                {x: ts, y: imu.accZ, name: 'AccZ', line: {color: theme.accent}},
+            ];
+
+            const layout = {
+                title: '',
+                xaxis: {title: 'Time (s)', ...chartAxis(theme)},
+                yaxis: {title: 'Acceleration (m/s²)', color: theme.textDim},
+                hovermode: 'x unified',
+                ...chartLayoutBase(theme),
+                margin: {l: 60, r: 20, t: 20, b: 60}
+            };
+
+            Plotly.newPlot('imu-plot', traces, layout, {responsive: true});
+
+            if (imu.stats) {
+                const statsHtml = `
+                    <div class="stat-box">
+                        <div class="stat-label">Max AccX</div>
+                        <div class="stat-value">${imu.stats.accX_max.toFixed(2)}<span class="stat-unit">m/s²</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Max AccY</div>
+                        <div class="stat-value">${imu.stats.accY_max.toFixed(2)}<span class="stat-unit">m/s²</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Max AccZ</div>
+                        <div class="stat-value">${imu.stats.accZ_max.toFixed(2)}<span class="stat-unit">m/s²</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">AccX RMS</div>
+                        <div class="stat-value">${imu.stats.accX_rms.toFixed(2)}<span class="stat-unit">m/s²</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">AccY RMS</div>
+                        <div class="stat-value">${imu.stats.accY_rms.toFixed(2)}<span class="stat-unit">m/s²</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">AccZ RMS</div>
+                        <div class="stat-value">${imu.stats.accZ_rms.toFixed(2)}<span class="stat-unit">m/s²</span></div>
+                    </div>
+                `;
+                document.getElementById('imu-stats').innerHTML = statsHtml;
+                document.getElementById('imu-summary').textContent =
+                    `Accelerometer over time. Max magnitude X ${imu.stats.accX_max.toFixed(2)}, Y ${imu.stats.accY_max.toFixed(2)}, Z ${imu.stats.accZ_max.toFixed(2)} meters per second squared. RMS noise X ${imu.stats.accX_rms.toFixed(2)}, Y ${imu.stats.accY_rms.toFixed(2)}, Z ${imu.stats.accZ_rms.toFixed(2)}.`;
+            }
+        }
+
+        function generateVibrationPlot() {
+            if (!currentData.vibration || !currentData.vibration.timestamps) return;
+
+            const vib = currentData.vibration;
+            const theme = chartTheme();
+            const traces = [{
+                x: toSeconds(vib.timestamps),
+                y: vib.vibration_magnitude,
+                name: 'Vibration Magnitude',
+                fill: 'tozeroy',
+                line: {color: theme.red},
+                fillcolor: hexToRgba(theme.red, 0.12)
+            }];
+
+            const layout = {
+                title: '',
+                xaxis: {title: 'Time (s)', ...chartAxis(theme)},
+                yaxis: {title: 'Magnitude (m/s²)', color: theme.textDim},
+                hovermode: 'x unified',
+                ...chartLayoutBase(theme),
+                margin: {l: 60, r: 20, t: 20, b: 60}
+            };
+
+            Plotly.newPlot('vibration-plot', traces, layout, {responsive: true});
+
+            if (vib.stats) {
+                const statsHtml = `
+                    <div class="stat-box">
+                        <div class="stat-label">Vibration Max</div>
+                        <div class="stat-value">${vib.stats.vibration_max.toFixed(2)}<span class="stat-unit">m/s²</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Vibration Mean</div>
+                        <div class="stat-value">${vib.stats.vibration_mean.toFixed(2)}<span class="stat-unit">m/s²</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Vibration RMS</div>
+                        <div class="stat-value">${vib.stats.vibration_rms.toFixed(2)}<span class="stat-unit">m/s²</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Severity</div>
+                        <div class="stat-value">${vib.stats.severity}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Dominant Freq Z</div>
+                        <div class="stat-value">${vib.stats.dominant_freq_z ? vib.stats.dominant_freq_z.toFixed(0) : 'N/A'}<span class="stat-unit">Hz</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Sample Rate</div>
+                        <div class="stat-value">${vib.stats.sample_rate.toFixed(0)}<span class="stat-unit">Hz</span></div>
+                    </div>
+                `;
+                document.getElementById('vibration-stats').innerHTML = statsHtml;
+                document.getElementById('vibration-summary').textContent =
+                    `Vibration magnitude over time. Max ${vib.stats.vibration_max.toFixed(2)}, mean ${vib.stats.vibration_mean.toFixed(2)}, RMS ${vib.stats.vibration_rms.toFixed(2)} meters per second squared. Severity ${vib.stats.severity}.`;
+            }
+        }
+
+        function generateAttitudePlot() {
+            if (!currentData.attitude || !currentData.attitude.timestamps) return;
+
+            const att = currentData.attitude;
+            const theme = chartTheme();
+            const ts = toSeconds(att.timestamps);
+            const traces = [
+                {x: ts, y: att.desRoll, name: 'Desired Roll', line: {color: theme.amber, dash: 'dash'}},
+                {x: ts, y: att.roll, name: 'Actual Roll', line: {color: theme.green}},
+                {x: ts, y: att.desPitch, name: 'Desired Pitch', line: {color: theme.red, dash: 'dash'}},
+                {x: ts, y: att.pitch, name: 'Actual Pitch', line: {color: theme.accent}},
+            ];
+
+            const layout = {
+                title: '',
+                xaxis: {title: 'Time (s)', ...chartAxis(theme)},
+                yaxis: {title: 'Angle (degrees)', color: theme.textDim},
+                hovermode: 'x unified',
+                ...chartLayoutBase(theme),
+                margin: {l: 60, r: 20, t: 20, b: 60}
+            };
+
+            Plotly.newPlot('attitude-plot', traces, layout, {responsive: true});
+
+            if (att.stats) {
+                const statsHtml = `
+                    <div class="stat-box">
+                        <div class="stat-label">Roll Error RMS</div>
+                        <div class="stat-value">${att.stats.roll_error_rms.toFixed(2)}<span class="stat-unit">°</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Pitch Error RMS</div>
+                        <div class="stat-value">${att.stats.pitch_error_rms.toFixed(2)}<span class="stat-unit">°</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Yaw Error RMS</div>
+                        <div class="stat-value">${att.stats.yaw_error_rms.toFixed(2)}<span class="stat-unit">°</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Roll Error Max</div>
+                        <div class="stat-value">${att.stats.roll_error_max.toFixed(2)}<span class="stat-unit">°</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Pitch Error Max</div>
+                        <div class="stat-value">${att.stats.pitch_error_max.toFixed(2)}<span class="stat-unit">°</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Yaw Error Max</div>
+                        <div class="stat-value">${att.stats.yaw_error_max.toFixed(2)}<span class="stat-unit">°</span></div>
+                    </div>
+                `;
+                document.getElementById('attitude-stats').innerHTML = statsHtml;
+                document.getElementById('attitude-summary').textContent =
+                    `Desired versus actual roll, pitch, and yaw over time. RMS error roll ${att.stats.roll_error_rms.toFixed(2)}, pitch ${att.stats.pitch_error_rms.toFixed(2)}, yaw ${att.stats.yaw_error_rms.toFixed(2)} degrees.`;
+            }
+        }
+
+        function generateBatteryPlot() {
+            if (!currentData.battery || !currentData.battery.timestamps) return;
+
+            const bat = currentData.battery;
+            const theme = chartTheme();
+            const ts = toSeconds(bat.timestamps);
+            const traces = [
+                {x: ts, y: bat.voltage, name: 'Voltage', yaxis: 'y1', line: {color: theme.red}},
+                {x: ts, y: bat.current, name: 'Current', yaxis: 'y2', line: {color: theme.teal}},
+            ];
+
+            const layout = {
+                title: '',
+                xaxis: {title: 'Time (s)', ...chartAxis(theme)},
+                yaxis: {title: 'Voltage (V)', color: theme.textDim},
+                yaxis2: {title: 'Current (A)', overlaying: 'y', side: 'right', color: theme.textDim},
+                hovermode: 'x unified',
+                ...chartLayoutBase(theme),
+                margin: {l: 60, r: 60, t: 20, b: 60}
+            };
+
+            Plotly.newPlot('battery-plot', traces, layout, {responsive: true});
+
+            if (bat.stats) {
+                const statsHtml = `
+                    <div class="stat-box">
+                        <div class="stat-label">Voltage Min</div>
+                        <div class="stat-value">${bat.stats.voltage_min.toFixed(2)}<span class="stat-unit">V</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Voltage Max</div>
+                        <div class="stat-value">${bat.stats.voltage_max.toFixed(2)}<span class="stat-unit">V</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Voltage Sag</div>
+                        <div class="stat-value">${bat.stats.voltage_sag.toFixed(2)}<span class="stat-unit">V</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Current Max</div>
+                        <div class="stat-value">${bat.stats.current_max.toFixed(2)}<span class="stat-unit">A</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Power Max</div>
+                        <div class="stat-value">${bat.stats.power_max.toFixed(0)}<span class="stat-unit">W</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Power Avg</div>
+                        <div class="stat-value">${bat.stats.power_avg.toFixed(0)}<span class="stat-unit">W</span></div>
+                    </div>
+                `;
+                document.getElementById('battery-stats').innerHTML = statsHtml;
+                document.getElementById('battery-summary').textContent =
+                    `Voltage and current over time. Voltage ranged ${bat.stats.voltage_min.toFixed(2)} to ${bat.stats.voltage_max.toFixed(2)} volts, sag ${bat.stats.voltage_sag.toFixed(2)} volts. Max current ${bat.stats.current_max.toFixed(2)} amps.`;
+            }
+        }
+
+        function generateMotorsPlot() {
+            if (!currentData.motors || !currentData.motors.timestamps) return;
+
+            const mot = currentData.motors;
+            const theme = chartTheme();
+            const colors = chartPalette(theme);
+            const ts = toSeconds(mot.timestamps);
+            const traces = [];
+
+            for (let i = 1; i <= mot.motor_count; i++) {
+                const key = `motor${i}`;
+                if (mot[key]) {
+                    traces.push({
+                        x: ts,
+                        y: mot[key],
+                        name: `Motor ${i}`,
+                        line: {color: colors[(i-1) % colors.length]}
+                    });
+                }
+            }
+
+            const layout = {
+                title: '',
+                xaxis: {title: 'Time (s)', ...chartAxis(theme)},
+                yaxis: {title: 'Output (PWM)', color: theme.textDim},
+                hovermode: 'x unified',
+                ...chartLayoutBase(theme),
+                margin: {l: 60, r: 20, t: 20, b: 60}
+            };
+
+            Plotly.newPlot('motors-plot', traces, layout, {responsive: true});
+
+            if (mot.stats) {
+                const statsHtml = `
+                    <div class="stat-box">
+                        <div class="stat-label">Motor Count</div>
+                        <div class="stat-value">${mot.stats.motor_count}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Frame Type</div>
+                        <div class="stat-value">${mot.stats.frame_name}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Imbalance</div>
+                        <div class="stat-value">${mot.stats.imbalance_pct.toFixed(1)}<span class="stat-unit">%</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Sync Error</div>
+                        <div class="stat-value">${mot.stats.sync_error.toFixed(2)}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Motor Correlation</div>
+                        <div class="stat-value">${mot.stats.motor_correlation.toFixed(3)}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Data Source</div>
+                        <div class="stat-value">${mot.stats.source}</div>
+                    </div>
+                `;
+                document.getElementById('motors-stats').innerHTML = statsHtml;
+                document.getElementById('motors-summary').textContent =
+                    `Output of ${mot.stats.motor_count} motors (${mot.stats.frame_name} frame) over time. Imbalance ${mot.stats.imbalance_pct.toFixed(1)} percent, motor correlation ${mot.stats.motor_correlation.toFixed(3)}.`;
+            }
+        }
+
+        function generatePIDPlot() {
+            if (!currentData.pid || !currentData.pid.timestamps) return;
+
+            const pid = currentData.pid;
+            const theme = chartTheme();
+            const ts = toSeconds(pid.timestamps);
+            const traces = [
+                {x: ts, y: pid.desRoll, name: 'Desired Roll Rate', line: {color: theme.amber, dash: 'dash'}},
+                {x: ts, y: pid.roll, name: 'Actual Roll Rate', line: {color: theme.green}},
+                {x: ts, y: pid.desPitch, name: 'Desired Pitch Rate', line: {color: theme.red, dash: 'dash'}},
+                {x: ts, y: pid.pitch, name: 'Actual Pitch Rate', line: {color: theme.accent}},
+            ];
+
+            const layout = {
+                title: '',
+                xaxis: {title: 'Time (s)', ...chartAxis(theme)},
+                yaxis: {title: 'Rate (deg/s)', color: theme.textDim},
+                hovermode: 'x unified',
+                ...chartLayoutBase(theme),
+                margin: {l: 60, r: 20, t: 20, b: 60}
+            };
+
+            Plotly.newPlot('pid-plot', traces, layout, {responsive: true});
+
+            if (pid.stats) {
+                const statsHtml = `
+                    <div class="stat-box">
+                        <div class="stat-label">Roll Rate Error RMS</div>
+                        <div class="stat-value">${pid.stats.roll_rate_error_rms.toFixed(2)}<span class="stat-unit">°/s</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Pitch Rate Error RMS</div>
+                        <div class="stat-value">${pid.stats.pitch_rate_error_rms.toFixed(2)}<span class="stat-unit">°/s</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Yaw Rate Error RMS</div>
+                        <div class="stat-value">${pid.stats.yaw_rate_error_rms.toFixed(2)}<span class="stat-unit">°/s</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Roll Rate Error Max</div>
+                        <div class="stat-value">${pid.stats.roll_rate_error_max.toFixed(2)}<span class="stat-unit">°/s</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Pitch Rate Error Max</div>
+                        <div class="stat-value">${pid.stats.pitch_rate_error_max.toFixed(2)}<span class="stat-unit">°/s</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Yaw Rate Error Max</div>
+                        <div class="stat-value">${pid.stats.yaw_rate_error_max.toFixed(2)}<span class="stat-unit">°/s</span></div>
+                    </div>
+                `;
+                document.getElementById('pid-stats').innerHTML = statsHtml;
+                document.getElementById('pid-summary').textContent =
+                    `Desired versus actual rate controller output over time. RMS error roll rate ${pid.stats.roll_rate_error_rms.toFixed(2)}, pitch rate ${pid.stats.pitch_rate_error_rms.toFixed(2)} degrees per second.`;
+            }
+        }
+
+        function generateGPSPlot() {
+            if (!currentData.gps || !currentData.gps.timestamps) return;
+
+            const gps = currentData.gps;
+            const theme = chartTheme();
+            const traces = [];
+
+            if (gps.altitude && gps.num_satellites) {
+                const ts = toSeconds(gps.timestamps);
+                traces.push({
+                    x: ts,
+                    y: gps.altitude,
+                    name: 'Altitude',
+                    yaxis: 'y1',
+                    line: {color: theme.red}
+                });
+                traces.push({
+                    x: ts,
+                    y: gps.num_satellites,
+                    name: 'Satellites',
+                    yaxis: 'y2',
+                    line: {color: theme.teal}
+                });
+            }
+
+            const layout = {
+                title: '',
+                xaxis: {title: 'Time (s)', ...chartAxis(theme)},
+                yaxis: {title: 'Altitude (m)', color: theme.textDim},
+                yaxis2: {title: 'Satellite Count', overlaying: 'y', side: 'right', color: theme.textDim},
+                hovermode: 'x unified',
+                ...chartLayoutBase(theme),
+                margin: {l: 60, r: 60, t: 20, b: 60}
+            };
+
+            Plotly.newPlot('gps-plot', traces, layout, {responsive: true});
+
+            if (gps.stats) {
+                const statsHtml = `
+                    <div class="stat-box">
+                        <div class="stat-label">Altitude Min</div>
+                        <div class="stat-value">${gps.stats.alt_min.toFixed(0)}<span class="stat-unit">m</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Altitude Max</div>
+                        <div class="stat-value">${gps.stats.alt_max.toFixed(0)}<span class="stat-unit">m</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Altitude Gain</div>
+                        <div class="stat-value">${gps.stats.alt_gain.toFixed(0)}<span class="stat-unit">m</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Avg Satellites</div>
+                        <div class="stat-value">${gps.stats.avg_satellites.toFixed(0)}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Min Satellites</div>
+                        <div class="stat-value">${gps.stats.min_satellites}</div>
+                    </div>
+                `;
+                document.getElementById('gps-stats').innerHTML = statsHtml;
+                document.getElementById('gps-summary').textContent =
+                    `Altitude and satellite count over time. Altitude gain ${gps.stats.alt_gain.toFixed(0)} meters, average ${gps.stats.avg_satellites.toFixed(0)} satellites, minimum ${gps.stats.min_satellites}.`;
+            }
+        }
+
+        function generateBarometerPlot() {
+            if (!currentData.barometer || !currentData.barometer.timestamps) return;
+
+            const baro = currentData.barometer;
+            const theme = chartTheme();
+            const traces = [{
+                x: toSeconds(baro.timestamps),
+                y: baro.altitude,
+                name: 'Barometer Altitude',
+                fill: 'tozeroy',
+                line: {color: theme.accent},
+                fillcolor: hexToRgba(theme.accent, 0.12)
+            }];
+
+            const layout = {
+                title: '',
+                xaxis: {title: 'Time (s)', ...chartAxis(theme)},
+                yaxis: {title: 'Altitude (m)', color: theme.textDim},
+                hovermode: 'x unified',
+                ...chartLayoutBase(theme),
+                margin: {l: 60, r: 20, t: 20, b: 60}
+            };
+
+            Plotly.newPlot('barometer-plot', traces, layout, {responsive: true});
+
+            if (baro.stats) {
+                const statsHtml = `
+                    <div class="stat-box">
+                        <div class="stat-label">Altitude Min</div>
+                        <div class="stat-value">${baro.stats.alt_min.toFixed(0)}<span class="stat-unit">m</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Altitude Max</div>
+                        <div class="stat-value">${baro.stats.alt_max.toFixed(0)}<span class="stat-unit">m</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Altitude Mean</div>
+                        <div class="stat-value">${baro.stats.alt_mean.toFixed(0)}<span class="stat-unit">m</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Altitude Std Dev</div>
+                        <div class="stat-value">${baro.stats.alt_std.toFixed(1)}<span class="stat-unit">m</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Altitude Range</div>
+                        <div class="stat-value">${baro.stats.alt_range.toFixed(0)}<span class="stat-unit">m</span></div>
+                    </div>
+                `;
+                document.getElementById('barometer-stats').innerHTML = statsHtml;
+                document.getElementById('barometer-summary').textContent =
+                    `Barometric altitude over time. Ranged ${baro.stats.alt_min.toFixed(0)} to ${baro.stats.alt_max.toFixed(0)} meters, mean ${baro.stats.alt_mean.toFixed(0)} meters.`;
+            }
+        }
+
+        function generateEventsPage() {
+            if (!currentData.events) return;
+
+            const events = currentData.events;
+            let html = '';
+
+            if (events.events.length === 0) {
+                html = '<div class="no-data">No events recorded during flight.</div>';
+            } else {
+                html = events.events.map(evt => {
+                    let content = '';
+                    if (evt.type === 'MODE_CHANGE') {
+                        content = `<strong>Mode Change:</strong> ${evt.value} at ${(evt.timestamp/1e6).toFixed(2)}s`;
+                    } else if (evt.type === 'ERROR') {
+                        content = `<strong>Error:</strong> Subsys ${evt.subsystem}, Code ${evt.error_code} at ${(evt.timestamp/1e6).toFixed(2)}s`;
+                    } else if (evt.type === 'FAILSAFE') {
+                        content = `<strong>Failsafe:</strong> ${evt.message} at ${(evt.timestamp/1e6).toFixed(2)}s`;
+                    } else {
+                        content = `<strong>${evt.type}:</strong> at ${(evt.timestamp/1e6).toFixed(2)}s`;
+                    }
+                    return `<div class="event-item">${content}</div>`;
+                }).join('');
+            }
+
+            document.getElementById('events-list').innerHTML = html;
+        }
+
+        function generateMagnetometerPlot() {
+            if (!currentData.magnetometer || !currentData.magnetometer.timestamps) return;
+
+            const mag = currentData.magnetometer;
+            const theme = chartTheme();
+            const traces = [{
+                x: toSeconds(mag.timestamps),
+                y: mag.magnitude,
+                name: 'Magnetic Field Magnitude',
+                fill: 'tozeroy',
+                line: {color: theme.green},
+                fillcolor: hexToRgba(theme.green, 0.12)
+            }];
+
+            const layout = {
+                title: '',
+                xaxis: {title: 'Time (s)', ...chartAxis(theme)},
+                yaxis: {title: 'Magnitude (gauss)', color: theme.textDim},
+                hovermode: 'x unified',
+                ...chartLayoutBase(theme),
+                margin: {l: 60, r: 20, t: 20, b: 60}
+            };
+
+            Plotly.newPlot('magnetometer-plot', traces, layout, {responsive: true});
+
+            if (mag.stats) {
+                const statsHtml = `
+                    <div class="stat-box">
+                        <div class="stat-label">MagX Mean</div>
+                        <div class="stat-value">${mag.stats.magx_mean.toFixed(0)}<span class="stat-unit">G</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">MagY Mean</div>
+                        <div class="stat-value">${mag.stats.magy_mean.toFixed(0)}<span class="stat-unit">G</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">MagZ Mean</div>
+                        <div class="stat-value">${mag.stats.magz_mean.toFixed(0)}<span class="stat-unit">G</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Magnitude Mean</div>
+                        <div class="stat-value">${mag.stats.magnitude_mean.toFixed(0)}<span class="stat-unit">G</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Magnitude Std Dev</div>
+                        <div class="stat-value">${mag.stats.magnitude_std.toFixed(1)}<span class="stat-unit">G</span></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Interference</div>
+                        <div class="stat-value">${mag.stats.interference_level}</div>
+                    </div>
+                `;
+                document.getElementById('magnetometer-stats').innerHTML = statsHtml;
+                document.getElementById('magnetometer-summary').textContent =
+                    `Magnetic field magnitude over time. Mean ${mag.stats.magnitude_mean.toFixed(0)} gauss, standard deviation ${mag.stats.magnitude_std.toFixed(1)}. Interference level ${mag.stats.interference_level}.`;
+            }
+        }
+    </script>
+</body>
+</html>

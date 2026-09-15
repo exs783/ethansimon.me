@@ -63,10 +63,24 @@ reference's own commitment.
   a soft shadow. The CAD tile is `.muted` — no hover, no click, a dashed
   empty-state chart instead of a real one.
 - **Detail view**: back link, title + tag, lede paragraph, optional amber
-  caution block (Liquid Rocket's valve-control caveat), then three labeled
-  sections — Method (prose, real technical explanation), Outcome (a bigger
-  version of the tile's chart, captioned), Numbers (a 2-column fact grid).
-  Ends in a CTA to the real GitHub repo.
+  caution block (Liquid Rocket's valve-control caveat), then four labeled
+  sections — Overview (plain-language: what the project is and who it's
+  for), Method (prose, real technical explanation of how it works), Outcome
+  (a bigger version of the tile's chart, captioned), Numbers (a 2-column
+  fact grid). Ends in a CTA row: a live demo link where one exists, always a
+  link to the real GitHub repo.
+- **Live demos** (`demos/log-dashboard.html`, `demos/liquid-rocket.html`):
+  not new builds — the actual project frontends, adapted for static
+  hosting. `log-dashboard.html` is the real `log_dashboard.html` with its
+  Flask `/api/upload` call replaced by a `fetch()` of `flight-analysis.json`,
+  which is the literal output of running the real `python_backend.py`'s
+  `run_analysis()` against the real sample flight log — same charts, same
+  flight-quality verdict, no reimplementation. `liquid-rocket.html` is a
+  from-scratch JS port of `ground_station/`'s `sensors.py` (wire protocol +
+  fake-source random walk), `svg_widgets.py` (gauge/valve SVG generation),
+  and `main.py`'s three-tab structure, since a PyQt6 desktop app can't run
+  in a browser at all — this one had no static-adaptation shortcut
+  available, so fidelity to the real Python logic was the goal instead.
 - **Pill nav**: fixed bottom-center, dark pill, two buttons, active state is
   a white sub-pill. Never scrolls out of view.
 
