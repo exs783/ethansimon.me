@@ -137,14 +137,37 @@ reference's own commitment.
   an accent-colored flame, naming the domain (hot-fire propulsion testing)
   rather than the code architecture, which `flowFigure` already covers in
   the detail view.
-- `blankFigure` — the CAD tile/detail emblem: a dashed isometric wireframe
-  block, "NO FILES YET" — reads as "a CAD model" while staying honestly
-  unfilled/dashed, not a fabricated render.
+- `imgFigure` / `modelFigure` — not generated SVG, real media: a `<img>`
+  and a Google `<model-viewer>` element respectively. CAD's tile emblem and
+  both detail-view Outcome cards use these once real assets existed (see
+  below) — the dashed-wireframe placeholder these replaced is retired along
+  with the "no files yet" state it stood in for.
 
 Emblem-vs-chart split: each project's *tile* emblem now names its subject
-(mission profile, rocket, drone) while richer real-data charts (heatmap,
+(mission profile, rocket, drone, or — for CAD, once real assets existed — an
+actual product photo) while richer real-data charts (heatmap,
 bar charts, waveform, architecture diagram) live in the detail view's
 Outcome section — the tile is a symbol, the detail page is the evidence.
+
+## CAD assets (real media, not generated)
+
+CAD is the one project whose evidence is real photos/models instead of
+SVG generated from real data — `assets/`:
+
+- `compdrone2025.glb` — the actual CompDrone2025 SolidWorks assembly
+  (7 subassemblies), exported to glTF. As delivered this was 192MB;
+  `npx @gltf-transform/cli optimize --compress draco --texture-compress webp`
+  brought it to ~2.2MB with no visible loss of the assembly's real
+  geometry (verified by rendering it before and after). Displayed live via
+  Google's `<model-viewer>` web component (`camera-controls auto-rotate`),
+  loaded from jsdelivr in `<head>` — the only external script this site
+  depends on besides Google Fonts.
+- `compdrone2025-render.png` — a real product render (not this session's
+  work) of the same assembly, used as the Work-grid tile thumbnail since a
+  full `<model-viewer>` is too heavy for a grid of four tiles.
+- `tylok-fatigue-machine.jpg` — a real photo of the actual ASTM F1387 A6
+  flexural fatigue machine, converted from HEIC and downsized (1800px,
+  JPEG q82) for web weight.
 
 ## Layout
 

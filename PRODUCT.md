@@ -38,14 +38,14 @@ Featured projects, confirmed in scope (engineering only — explicitly excludes 
 - **Mission Model / wing optimizer** — VTOL mission-performance simulator (`Mission_Model.py`) and a wing-sizing optimizer (`wing_optimizer.py`) with a real combined mass/drag/energy objective. Airframe list (Hexacopter/Quadcopter/x8/Tail Sitter) mirrors his real VTOL-team vehicle classes. Lives in the public repo `exs783/Log_Reader`.
 - **Log Dashboard** — a Flask + Plotly dashboard (`log_dashboard.html` / `python_backend.py`) that parses Pixhawk/ArduCopter `.BIN` flight logs: frame-type detection, vibration FFT, MAVExplorer-style analysis, an overall flight-quality score. Also lives in `exs783/Log_Reader`. Live static demo at `demos/log-dashboard.html`, running the real backend's output against a real sample log.
 - **Liquid Rocket** — ground-station software for the CWRU Liquid Propulsion Team, rebuilt from two prototypes (his own original PyQt5 hot-fire GUI + a separate PyQt6 P&ID valve-control page) into one PyQt6 app. Public repo `exs783/Liquid-Rocket`. Live JS-ported demo at `demos/liquid-rocket.html`.
-- **CAD** — confirmed real (Tylok fatigue-test-machine CAD, VTOL frames/payload mechanisms/jigs — all SolidWorks) but no files live in a public repo. Honest placeholder card, not a fabricated render; overview names the real work and why it's not shown.
+- **CAD** — real files now on hand from `~/Desktop/Projects` (Tylok and VTOL folders): the full CompDrone2025 SolidWorks assembly (7 subassemblies: ARM/FRM/LGR/BATT/CAM/PAYLOAD/ELEC) and a real photo of the Tylok ASTM F1387 A6 flexural fatigue test machine. The `.glb` export of CompDrone2025 was 192MB as delivered — compressed via `gltf-transform optimize` (Draco geometry + WebP textures) to ~2MB and embedded live via `<model-viewer>` (real, rotatable, not a static render). No public repo for either (SolidWorks files stay local, GitHub Pages only serves the exported assets), so no CTA link — the card is the evidence.
 
 ## Evidence on Hand
 
 - Mission Model: `mission_model_best_hover_by_vehicle.png`, `mission_model_best_energy_margin_by_vehicle.png`, `mission_model_hover_vs_mass_tradespace.html` (Plotly), the real (cl × AR) energy-search grid embedded in `index.html`, and real fleet mission-sweep results (`mission_model_results.csv`).
 - Liquid Rocket: `Rocket_P&ID_GUI1.svg`, `BallValveSchematic.svg` in the repo; a from-scratch JS port of the real Python gauge/valve/sensor logic for the live demo.
 - Log Dashboard: `flight-analysis.json`, the literal output of running the real `python_backend.py` against the real sample flight log (`my_flight.bin`) — 65/100 flight quality score, QUAD frame, 7 stability issues, real vibration/GPS data.
-- CAD: no files. State absence + the real (internal, unpublished) work on the page rather than inventing a project.
+- CAD: `assets/compdrone2025.glb` (2.2MB, compressed from a 192MB SolidWorks export), `assets/compdrone2025-render.png` (real product render), `assets/tylok-fatigue-machine.jpg` (real photo of the actual machine, HEIC→JPEG, resized).
 
 ## Product Principles
 

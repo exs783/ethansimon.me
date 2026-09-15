@@ -16,6 +16,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
 <style>
   :root{
     --bg:#f4f4f5; --card:#ffffff; --card-border:#e7e7ea;
@@ -75,6 +76,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   .tile-head .meta{ font-family:var(--font-mono); font-size:11.5px; color:var(--ink-3); text-transform:uppercase; letter-spacing:.04em; }
   .tile-figure{ flex:1; display:flex; align-items:center; justify-content:center; }
   .tile-figure svg{ width:100%; height:120px; }
+  .tile-figure img{ width:auto; max-width:100%; height:120px; object-fit:contain; }
   .tile-foot{ font-family:var(--font-mono); font-size:13px; color:var(--ink); }
   .tile-foot .sub{ display:block; font-family:var(--font-body); font-size:12.5px; color:var(--ink-2); margin-top:2px; }
 
@@ -120,6 +122,8 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   .figures{ display:flex; flex-direction:column; gap:16px; }
   .figure-card{ background:var(--card); border:1px solid var(--card-border); border-radius:16px; padding:20px 22px; }
   .figure-card svg{ width:100%; max-width:460px; height:auto; display:block; margin-inline:auto; }
+  .figure-card img{ width:100%; max-width:520px; height:auto; display:block; margin-inline:auto; border-radius:8px; }
+  .figure-card model-viewer{ width:100%; height:380px; display:block; --poster-color:transparent; }
   .figure-card .figure-title{ font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-3); margin-bottom:12px; }
   .figure-caption{ font-size:12.5px; color:var(--ink-2); margin-top:10px; }
 
@@ -464,22 +468,26 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 
   // Isometric wireframe block, dashed -- reads as "a CAD model" while the
   // dashed/unfilled treatment keeps it honestly an empty slot, not a real render.
-  function blankFigure(){
-    const root = svgRoot("0 0 300 110");
-    const cx = 150, cy = 55, s = 34;
-    const top = [[cx,cy-s*0.9],[cx+s,cy-s*0.35],[cx,cy+s*0.2],[cx-s,cy-s*0.35]];
-    const bot = top.map(([x,y]) => [x, y+s*0.9]);
-    const face = (pts) => pts.map(p=>p.join(",")).join(" ");
-    root.appendChild(svg("polygon", {points:face(top), fill:"none", stroke:LINE, "stroke-width":2, "stroke-dasharray":"5 5"}));
-    [0,1,2,3].forEach(i => {
-      root.appendChild(svg("line", {x1:top[i][0], y1:top[i][1], x2:bot[i][0], y2:bot[i][1], stroke:LINE, "stroke-width":2, "stroke-dasharray":"5 5"}));
-    });
-    root.appendChild(svg("line", {x1:bot[2][0], y1:bot[2][1], x2:bot[3][0], y2:bot[3][1], stroke:LINE, "stroke-width":2, "stroke-dasharray":"5 5"}));
-    root.appendChild(svg("line", {x1:bot[2][0], y1:bot[2][1], x2:bot[1][0], y2:bot[1][1], stroke:LINE, "stroke-width":2, "stroke-dasharray":"5 5"}));
-    const t = svg("text", {x:150, y:100, "text-anchor":"middle", "font-size":"11", "font-family":"IBM Plex Mono", fill:"#c4c4c8"});
-    t.textContent = "NO FILES YET";
-    root.appendChild(t);
-    return root;
+  function imgFigure(src, alt){
+    const img = document.createElement("img");
+    img.src = src; img.alt = alt; img.loading = "lazy";
+    return img;
+  }
+
+  // Real, interactive glTF viewer (Google's <model-viewer>) -- not a static
+  // render. The source .glb is the actual CompDrone2025 SolidWorks assembly,
+  // exported and compressed (Draco geometry + WebP textures) from 192MB down
+  // to ~2MB so it's actually loadable on a portfolio page.
+  function modelFigure(src, alt){
+    const mv = document.createElement("model-viewer");
+    mv.setAttribute("src", src);
+    mv.setAttribute("alt", alt);
+    mv.setAttribute("camera-controls", "");
+    mv.setAttribute("auto-rotate", "");
+    mv.setAttribute("shadow-intensity", "1");
+    mv.setAttribute("exposure", "1");
+    mv.setAttribute("style", "background-color:#f4f4f5; border-radius:8px;");
+    return mv;
   }
 
   // ---------------------------------------------------------------
@@ -615,16 +623,37 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     {
       id: "cad",
       name: "CAD",
-      tag: "Not yet public",
-      cardFoot: "no files yet",
-      cardSub: "real work, internal only",
-      tileFigure: () => blankFigure(),
-      muted: true,
-      lede: "Real CAD work exists — drone frames and payload mechanisms, a flexural fatigue test machine, assembly jigs — it just isn't in a public repo yet, so this stays an honest placeholder rather than a fabricated render.",
-      overview: ["SolidWorks CAD and simulation work spans a Tylok International co-op (a flexural fatigue test machine built to ASTM standards, plus thermal/flow/tensile/pressure test apparatus) and CWRU's VTOL team (frames, payload mechanisms, and assembly jigs for Tail Sitter, Hexacopter, Quadcopter, and Tiltrotor airframes). Both live in team/company-internal files, not something publishable here yet — this slot will get real files instead of this note once something can be shared."],
-      method: ["Nothing to show yet."],
-      figures: [{ render: () => blankFigure(), caption: "" }],
-      facts: [["Status", "real work, not yet public"]],
+      tag: "SolidWorks CAD · 2025–2026",
+      cardFoot: "7 subassemblies",
+      cardSub: "CompDrone2025 hexacopter",
+      tileFigure: () => imgFigure("assets/compdrone2025-render.png", "CompDrone2025 hexacopter, SolidWorks render"),
+      lede: "Two real SolidWorks projects: a competition hexacopter for CWRU's VTOL team, and a flexural fatigue test machine built at Tylok International to an ASTM standard.",
+      overview: [
+        "CompDrone2025 is a full hexacopter assembly modeled for competition — carbon-fiber tube arms, a machined frame, RTK GPS and Pixhawk avionics mounts, a servo-actuated payload-drop mechanism, and folding landing gear, all as real mated SolidWorks assemblies (not a single dumb part). The model below is the actual assembly, exported to glTF so it's something you can rotate rather than a fixed render.",
+        "The Tylok fatigue rig tests parts to ASTM F1387 (flexural fatigue of plastic pipe fittings) — a pneumatic actuator cycles a clamped specimen while a cycle counter and a HiP pressure fitting log the test. I designed, built, and implemented the full machine for internal use.",
+      ],
+      method: [
+        "CompDrone2025's assembly is organized the way a real drone build actually breaks down: <code>ARM</code> (carbon-fiber tube, motor mount plate/ring, prop), <code>FRM</code> (top/bottom plates, payload mount, protective dome), <code>LGR</code> (landing-gear struts, TPU feet), <code>BATT</code> (battery + velcro strap + printed mount), <code>CAM</code>, <code>PAYLOAD</code> (servo, horn, clamp body, water-bottle attachment), and <code>ELEC</code> (Pixhawk 6X, RTK GPS, baseboard) — seven subassemblies mated into one top-level <code>.SLDASM</code>, each with real vendor parts (T-Motor, Amass, Pixhawk) modeled or imported alongside the machined/printed parts.",
+        "The fatigue machine follows ASTM F1387 A6: a pneumatic cylinder flexes a clamped specimen at a set rate while a second cylinder and a HiP pressure transducer hold and monitor line pressure, with a cycle-count readout on the control box. Built and implemented end to end during the Tylok co-op.",
+      ],
+      figures: [
+        {
+          title: "CompDrone2025 — interactive model",
+          render: () => modelFigure("assets/compdrone2025.glb", "CompDrone2025 hexacopter SolidWorks assembly"),
+          caption: "Drag to orbit. The real 7-subassembly SolidWorks model, exported to glTF and compressed (Draco + WebP) from 192MB to ~2MB.",
+        },
+        {
+          title: "Tylok flexural fatigue test machine",
+          render: () => imgFigure("assets/tylok-fatigue-machine.jpg", "Tylok ASTM F1387 A6 flexural fatigue test machine"),
+          caption: "The actual machine — pneumatic actuator, clamped specimen fixture, HiP pressure fitting, and the ASTM F1387 A6 control/readout box.",
+        },
+      ],
+      facts: [
+        ["CompDrone2025 subassemblies", "7 (ARM/FRM/LGR/BATT/CAM/PAYLOAD/ELEC)"],
+        ["Fatigue rig standard", "ASTM F1387 A6"],
+        ["CAD tool", "SolidWorks"],
+        ["Model format here", "glTF (Draco + WebP, ~2 MB)"],
+      ],
       cta: [],
     },
   ];
