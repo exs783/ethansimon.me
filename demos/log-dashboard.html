@@ -301,7 +301,13 @@
         .customplot-vars-card {
             flex: 0 0 280px;
             max-height: 640px;
+            display: flex;
+            flex-direction: column;
+        }
+        .customplot-vars-scroll {
+            flex: 1 1 auto;
             overflow-y: auto;
+            min-height: 0;
         }
         .customplot-plot-card {
             flex: 1;
@@ -448,17 +454,16 @@
             </div>
         </div>
         <div class="header-right">
-            <div class="header-status" id="backend-status"><span class="status-dot online"></span><span>Live demo &mdash; real decoded flight</span></div>
+            <div class="header-status" id="backend-status"><span class="status-dot" id="backend-status-dot"></span><span id="backend-status-text">Checking backend&hellip;</span></div>
         </div>
     </header>
 
     <div class="upload-section">
-        <div class="upload-info" id="upload-status" role="status" aria-live="polite">
-            Showing <code>my_flight.bin</code> &mdash; a real ArduCopter QUAD flight, decoded by the actual
-            <code>python_backend.py</code> in this repo (not reimplemented for this page). Upload isn't wired up in
-            this static build &mdash; <a href="https://github.com/exs783/Log_Reader" target="_blank" rel="noopener">clone the repo</a>
-            to run the Flask backend against your own log.
+        <div class="file-input-wrapper">
+            <label class="file-input-label" for="log-file">Load log file</label>
+            <input type="file" id="log-file" accept=".bin,.log" />
         </div>
+        <div class="upload-info" id="upload-status" role="status" aria-live="polite">Awaiting input &mdash; .bin / .log</div>
     </div>
     <div id="upload-alert" class="alert alert-danger" style="display:none; margin:0 32px;" role="alert"></div>
 
@@ -663,7 +668,9 @@
             <div class="customplot-layout">
                 <div class="card customplot-vars-card">
                     <h3>Variables</h3>
-                    <div id="customplot-vars" style="display:flex; flex-direction:column; gap:14px;"></div>
+                    <div class="customplot-vars-scroll">
+                        <div id="customplot-vars" style="display:flex; flex-direction:column; gap:14px;"></div>
+                    </div>
                     <button class="file-input-label" style="border:none; margin-top:16px;" onclick="generateCustomPlot()">Plot Selected</button>
                 </div>
                 <div class="card customplot-plot-card">
@@ -678,6 +685,7 @@
     <footer>&copy; 2026 &mdash; Pixhawk Log Analyzer &mdash; Drone Flight Intelligence</footer>
 
     <script>
+        const API_URL = 'https://vtollogs.williserdman.com/api';
         let currentData = null;
         let currentSummary = null;
 
@@ -737,28 +745,98 @@
             document.getElementById(elId).style.display = 'none';
         }
 
-        // Static build for the portfolio site: no Flask backend here, so this
-        // loads the real backend's output (pre-computed by actually running
-        // python_backend.py's run_analysis() against my_flight.bin) instead of
-        // POSTing a file to /api/upload. Same currentData/currentSummary shape,
-        // same rendering code below — only the data source changed.
-        (async function loadStaticDemo() {
-            const statusEl = document.getElementById('upload-status');
+        // Real backend health check, replacing the old hardcoded "connected" badge.
+        async function checkBackendHealth() {
+            const dot = document.getElementById('backend-status-dot');
+            const text = document.getElementById('backend-status-text');
             try {
-                const response = await fetch('flight-analysis.json');
-                if (!response.ok) throw new Error(`${response.status}`);
+                const response = await fetch(`${API_URL}/health`);
+                if (!response.ok) throw new Error();
+                dot.className = 'status-dot online';
+                text.textContent = 'Backend connected';
+            } catch {
+                dot.className = 'status-dot offline';
+                text.textContent = 'Backend unreachable';
+            }
+        }
+        checkBackendHealth();
+        setInterval(checkBackendHealth, 15000);
+
+        // File upload handler
+        document.getElementById('log-file').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const fileInput = e.target;
+            const uploadLabel = document.querySelector('.file-input-label');
+            const statusEl = document.getElementById('upload-status');
+            hideAlert('upload-alert');
+            statusEl.textContent = `Uploading ${file.name}...`;
+            statusEl.classList.add('loading');
+            // Block a second upload from racing this one while it's in flight.
+            fileInput.disabled = true;
+            uploadLabel.classList.add('is-uploading');
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch(`${API_URL}/upload`, {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) throw new Error(`Upload failed: ${response.status}`);
+
                 const data = await response.json();
-                if (!data.success) throw new Error(data.error || 'analysis failed');
+                if (!data.success) throw new Error(data.error || 'Upload failed');
 
                 currentData = data.analyses;
                 currentSummary = data.summary;
+
+                statusEl.textContent = `Loaded: ${file.name}`;
+                statusEl.classList.remove('loading');
+
+                // Enable nav buttons
                 document.querySelectorAll('.nav-btn').forEach(btn => btn.disabled = false);
+                hideAlert('global-alert');
+
+                // Show overview
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.setAttribute('aria-selected', 'false');
+                });
+                document.getElementById('overview').classList.add('active');
+                const overviewTab = document.getElementById('tab-overview');
+                overviewTab.classList.add('active');
+                overviewTab.setAttribute('aria-selected', 'true');
                 showOverviewPage();
             } catch (error) {
-                statusEl.textContent = `Couldn't load the static demo data: ${error.message}`;
-                showAlert('upload-alert', `Demo data error: ${error.message}`);
+                // A failed upload must not leave the previous flight's data on screen
+                // looking current — clear it and lock the nav back to the pre-upload state.
+                currentData = null;
+                currentSummary = null;
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.disabled = true;
+                    btn.classList.remove('active');
+                    btn.setAttribute('aria-selected', 'false');
+                });
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById('overview').classList.add('active');
+                document.getElementById('overview').innerHTML =
+                    '<h2 class="section-title">Flight Summary</h2><div class="no-data">Load a .bin or .log file to begin</div>';
+
+                statusEl.textContent = `Error: ${error.message}`;
+                statusEl.classList.remove('loading');
+                showAlert('upload-alert', `Upload error: ${error.message}`);
+            } finally {
+                fileInput.disabled = false;
+                uploadLabel.classList.remove('is-uploading');
+                // Clear so re-selecting the same filename (e.g. retrying after a fix) fires 'change' again.
+                fileInput.value = '';
             }
-        })();
+        });
 
         // Page navigation
         function showPage(pageId, evt) {
