@@ -441,6 +441,45 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     return root;
   }
 
+  // The actual bending-relief curve, eta_bend = (1+2*lambda)/3, that taper
+  // search weighs against induced drag -- computed live over the full
+  // [0,1] taper range, with the real found taper (0.30) marked, instead of
+  // stating the equation in prose and leaving its shape to the imagination.
+  function bendingReliefFigure(){
+    const W = 300, H = 150, M = {l:36, r:10, t:14, b:34};
+    const plotW = W-M.l-M.r, plotH = H-M.t-M.b;
+    const root = svgRoot(`0 0 ${W} ${H}`);
+    const etaAt = lam => (1 + 2*lam) / 3;
+    const toX = lam => M.l + lam*plotW;
+    const toY = eta => M.t + plotH - ((eta - 1/3) / (2/3)) * plotH;
+    const n = 40, pts = [];
+    for (let i = 0; i <= n; i++){ const lam = i/n; pts.push(`${toX(lam).toFixed(1)},${toY(etaAt(lam)).toFixed(1)}`); }
+    root.appendChild(svg("line", {x1:M.l, x2:W-M.r, y1:M.t+plotH, y2:M.t+plotH, stroke:LINE}));
+    root.appendChild(svg("polyline", {points:pts.join(" "), fill:"none", stroke:INK, "stroke-width":2}));
+    const markLam = 0.30, mx = toX(markLam), my = toY(etaAt(markLam));
+    root.appendChild(svg("line", {x1:mx, x2:mx, y1:M.t, y2:M.t+plotH, stroke:LINE, "stroke-dasharray":"2,3"}));
+    root.appendChild(svg("circle", {cx:mx, cy:my, r:4, fill:ACCENT}));
+    const lbl = svg("text", {x:mx+8, y:my-6, "font-size":"9.5", "font-family":"IBM Plex Mono", fill:ACCENT, "font-weight":"600"});
+    lbl.textContent = `λ=0.30 → η=${etaAt(markLam).toFixed(2)}`;
+    root.appendChild(lbl);
+    [0, 0.5, 1.0].forEach(lam => {
+      const x = toX(lam);
+      const t = svg("text", {x, y:M.t+plotH+16, "text-anchor":"middle", "font-size":"9", "font-family":"IBM Plex Mono", fill:INK2});
+      t.textContent = lam.toFixed(1);
+      root.appendChild(t);
+    });
+    [1/3, 2/3, 1].forEach(eta => {
+      const y = toY(eta);
+      const t = svg("text", {x:M.l-6, y:y+3, "text-anchor":"end", "font-size":"8.5", "font-family":"IBM Plex Mono", fill:INK2});
+      t.textContent = eta.toFixed(2);
+      root.appendChild(t);
+    });
+    const cap = svg("text", {x:W/2, y:H-6, "text-anchor":"middle", "font-size":"9.5", "font-family":"IBM Plex Mono", fill:INK2});
+    cap.textContent = "taper ratio λ  →  bending-relief factor η_bend";
+    root.appendChild(cap);
+    return root;
+  }
+
   // Small quadcopter glyph riding above the real vibration trace -- names
   // the subject (a drone flight log) instead of leaving the waveform to
   // read as a generic signal.
@@ -726,17 +765,17 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       cardFoot: "111.4 min hover",
       cardSub: "2,794 configs swept",
       tileFigure: () => missionProfileFigure(),
-      lede: "A mission-performance simulator I built to pick the best airframe, motor, propeller, and battery for a specific mission. This round I re-sized the whole fleet's wings against real flight speeds instead of a placeholder, and rebuilt the tailsitter transition as a real quaternion 6DOF rigid-body simulation instead of an angle approximation.",
+      lede: "A mission-performance simulator that sweeps every motor, propeller, and battery combination it has data for against a fixed cargo mission and reports which ones actually complete it — including, for winged tailsitter airframes, a real quaternion 6DOF rigid-body simulation of the hover-to-cruise transition instead of a simplified angle approximation.",
       overview: [
         "Mission Model simulates a specific cargo run for a family of VTOL (vertical takeoff/landing) airframes: takeoff to 100 ft, cruise 1 nautical mile, land, pick up cargo, takeoff, cruise 8 nm, land, drop cargo, takeoff, cruise 1 nm back, land. For every candidate airframe, it sweeps every motor × propeller × battery combination it has spec data for (thousands of combinations) and reports which one actually completes the mission, how much battery it has left over, and how long it can hover — so 'which motor should this drone use' becomes a search over real thrust-curve data instead of a guess.",
-        "Wing sizing for the winged tailsitter variants comes from a separate standalone tool, <code>wing_optimizer.py</code> — its own project below — which this round re-sized all 9 real TailSitter configs.",
+        "Wing sizing for the winged tailsitter variants comes from a separate standalone tool, <code>wing_optimizer.py</code> — its own project below — which sizes every TailSitter config against the fleet's real governed cruise speeds.",
         "The airframe list (Hexacopter, Quadcopter, x8, Tail Sitter) matches the real vehicle classes I work on as VTOL Mechanical Team Lead — this is the same kind of simulation-to-inform-design work as the MATLAB/Python scripts I write for the team, built out as a standalone public tool.",
       ],
       method: [
-        "Every one of the 9 real TailSitter vehicle configs was re-sized this round using Wing Optimizer's energy-based (hover + cruise) objective at each tier's real governed cruise speed (18.0/18.8/19.6 m/s) instead of an old flat 25 m/s placeholder — the single biggest driver of the size change below, since required wing area scales as 1/v².",
+        "Every TailSitter vehicle config is sized using Wing Optimizer's energy-based (hover + cruise) objective, evaluated at each tier's real governed cruise speed (18.0/18.8/19.6 m/s). Required wing area scales as 1/v², so getting the real cruise speed right — not a flat placeholder — is the single biggest lever on the sizing result.",
         "The mission simulation uses closed-form kinematics for wingless multirotors — thrust against quadratic drag, <code>v̇ = a₀ − k·v²</code>, has an exact tanh solution, so every accel/decel leg is solved in one evaluation instead of stepped through a simulation loop.",
-        "A winged tailsitter's hover-to-cruise transition can't take that shortcut. The rotor thrust has to physically rotate from vertical to horizontal as the wing builds lift with airspeed, so the required thrust angle and the drag area both keep changing through the maneuver. I now integrate that leg as a full quaternion 6DOF rigid body — position, velocity, attitude, and angular rate together — instead of the old tilt-angle approximation. Attitude kinematics: <code>q̇ = ½ q ⊗ [0, ω]</code> (Hamilton, scalar-first), alongside the rotational dynamics <code>I ω̇ = τ − ω × (Iω)</code>. I picked quaternions specifically because Euler angles hit a gimbal-lock singularity right at the 90° pitch-over a tailsitter transition goes through — the one attitude this model actually has to fly through on every single leg.",
-        "Lift now points along the wing's own body-fixed axis and scales with the velocity component perpendicular to it, instead of always pointing straight up and scaling with raw airspeed. That distinction matters most mid-transition, when the vehicle is neither purely hovering nor purely cruising and a fixed lift direction just isn't a safe approximation anymore.",
+        "A winged tailsitter's hover-to-cruise transition can't take that shortcut. The rotor thrust has to physically rotate from vertical to horizontal as the wing builds lift with airspeed, so the required thrust angle and the drag area both keep changing through the maneuver. I integrate that leg as a full quaternion 6DOF rigid body — position, velocity, attitude, and angular rate together. Attitude kinematics: <code>q̇ = ½ q ⊗ [0, ω]</code> (Hamilton, scalar-first), alongside the rotational dynamics <code>I ω̇ = τ − ω × (Iω)</code>. I use quaternions specifically because Euler angles hit a gimbal-lock singularity right at the 90° pitch-over a tailsitter transition goes through — the one attitude this model actually has to fly through on every single leg.",
+        "Lift points along the wing's own body-fixed axis and scales with the velocity component perpendicular to it, rather than pointing straight up and scaling with raw airspeed the way a simpler model would. That distinction matters most mid-transition, when the vehicle is neither purely hovering nor purely cruising and a fixed lift direction isn't a safe approximation.",
       ],
       figures: [
         {
@@ -745,19 +784,19 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
           caption: "Every candidate flies the same course: takeoff to 100 ft, cruise 1 nm, land, pick up cargo, takeoff, cruise 8 nm, land, drop cargo, takeoff, cruise 1 nm back, land — the actual MISSION_LEGS sequence, cargo carried outbound only.",
         },
         {
-          title: "Wing area, before vs. after — all 3 tiers",
+          title: "Wing area: fixed heuristic vs. energy-optimized sizing",
           render: () => groupedBarFigure(TIER_COMPARE, "old_area", "new_area"),
-          caption: "Gray = old fixed-cl/min-AR sizing (25 m/s placeholder cruise). Black = the new combined-objective sizing at each tier's real governed cruise speed. All 3 tiers grew, driven mostly by the slower real cruise speed (area scales as 1/v²).",
+          caption: "Gray = a fixed lift-coefficient/minimum-aspect-ratio heuristic. Black = the energy-based (hover + cruise) objective evaluated at each tier's real governed cruise speed. Required wing area scales as 1/v², so the physics-based objective sizes every tier noticeably larger than the simpler heuristic would.",
         },
         {
           title: "Fleet hover time, all 12 vehicle configs",
           render: () => hbarFigure(FLEET_HOVER, "hover", "min", v => v.toFixed(1) + " min"),
-          caption: "Best-case hover time per vehicle from the refreshed mission sweep (2,794 motor × prop × battery combinations), sorted descending. The four TailSitter tiers at 111.4 min lead the two reference multirotors (Hexacopter 73.2, x_8 59.2).",
+          caption: "Best-case hover time per vehicle from the mission sweep (2,794 motor × prop × battery combinations), sorted descending. The four TailSitter tiers lead the two reference multirotors, 111.4 min vs. 73.2 and 59.2.",
         },
       ],
       facts: [
-        ["Wing area, avg. change", "+22%"],
-        ["Aspect ratio, all tiers", "4.0 → 8.64"],
+        ["Wing loading, by tier", "17.5–20.8 kg/m²"],
+        ["Aspect ratio, example wing", "8.64"],
         ["Best fleet hover time", "111.4 min"],
         ["Mission sweep", "2,794 configs"],
       ],
@@ -767,24 +806,29 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       id: "wing-optimizer",
       name: "Wing Optimizer",
       tag: "Optimization tool · 2026",
-      cardFoot: "Taper 1.0 → 0.30",
+      cardFoot: "Taper ratio 0.30",
       cardSub: "joint cl/AR/taper search",
       tileFigure: () => wingPlanformFigure(),
-      lede: "The standalone wing-sizing tool behind Mission Model's fleet. I extended it this round with three additions, each scoped from one real aerostructural optimization paper's core finding — I'm not claiming to replicate methods (RANS CFD, nonlinear FE, flight test) a standalone script can't actually run.",
+      lede: "A wing-sizing tool that searches lift coefficient, aspect ratio, and taper ratio for whichever combination minimizes structural mass, cruise drag, or total mission energy. Three of its search objectives are grounded in real aerostructural optimization papers — not a claim to replicate methods (RANS CFD, nonlinear FE, flight test) a standalone script can't actually run.",
       overview: [
-        "<code>wing_optimizer.py</code> sizes a wing from mission requirements alone. Given how much weight it has to lift and how fast the aircraft cruises, it searches lift coefficient, aspect ratio, and (for the energy objective) taper ratio for whichever combination minimizes structural mass, cruise drag, or total mission energy. Once it's done, it emits the winning geometry as SolidWorks-ready NACA equations or point-cloud curves, plus a <code>vehicle_configs</code>-style JSON entry Mission Model can load directly.",
-        "This round's three additions are each based on one recent paper. Method below covers exactly what carried over from each one, and what I deliberately left out of scope.",
+        "<code>wing_optimizer.py</code> sizes a wing from mission requirements alone. Given how much weight it has to lift and how fast the aircraft cruises, it searches lift coefficient, aspect ratio, and (for the energy objective) taper ratio for whichever combination minimizes structural mass, cruise drag, or total mission energy, then emits the winning geometry as SolidWorks-ready NACA equations or point-cloud curves, plus a <code>vehicle_configs</code>-style JSON entry Mission Model can load directly.",
+        "Three of its objectives are each grounded in one real aerostructural optimization paper. Method below covers exactly what carried over from each one, and what I deliberately left out of scope.",
       ],
       method: [
-        "<strong>Aerodynamic-center reporting</strong>, inspired by Grimm, Price &amp; Ahmad's flight-tested flying-wing optimization (<em>Aerospace Systems</em>, 2026), which treats longitudinal stability as the primary design objective. <code>wing_mac_and_ac()</code> reports the wing's own mean aerodynamic chord and where its aerodynamic center sits relative to the root leading edge. I derived these directly from closed-form wing-theory integrals for both the linear-taper and elliptical planform, rather than quoting them from a table: <code>c̄ = (2/3)c_root(1+λ+λ²)/(1+λ)</code>, <code>x_AC = ȳ·tan(Λ) + 0.25c̄</code>. This only covers the wing's own half of a stability check — a real static margin also needs the aircraft's CG and any tail, which is out of scope for a wing-only script.",
-        "<strong>A second wing-mass model</strong>, inspired by Zhao et al.'s finite-element model updating for a composite flying-wing (AIAA SciTech 2019, 2019-1814), which calibrates mass and stiffness against real vibration-test data — far more rigorous than my original single fitted AR exponent. <code>--mass-model beam</code> adds two real structural drivers that heuristic couldn't see: ultimate load factor and airfoil thickness ratio, through a first-order beam-bending scaling, <code>m ∝ (AR/AR_ref)^1.5 · (n/n_ref) · (t/c_ref ÷ t/c)^0.5</code>. The AR penalty gets steeper, load factor enters linearly, and thinner airfoils cost more mass. It's a physically-derived scaling rather than one specific named curve fit, so I'm not accidentally borrowing someone else's exact coefficients.",
-        "<strong>Joint taper search</strong>, inspired by Bombardieri et al.'s coupled aerostructural wing optimization (<em>Structural and Multidisciplinary Optimization</em>, 2021). Their central finding: optimizing aerodynamics and structure separately misses real gains that a coupled search finds. <code>--objective combined</code> now accepts <code>--taper-min</code>/<code>--taper-max</code> to search taper jointly with cl and aspect ratio instead of fixing it upfront. Taper's only channel into this model is bending relief → wing mass → hover energy, <code>η_bend = (1+2λ)/3</code>, weighed against induced drag from the Oswald-efficiency estimate, <code>e₀ = 4.61(1−0.045·AR^0.68)cos(Λ)^0.15 − 3.1</code>, <code>C_Di = C_L²/(π·AR·e₀)</code>. That's a narrower coupling than the paper's full aero-structural one, but it's real: a taper that trades structural weight for nothing in cruise drag now gets evaluated by the same objective as cl and AR, instead of being decided in a separate step.",
+        "<strong>Aerodynamic-center reporting</strong>, inspired by Grimm, Price &amp; Ahmad's flight-tested flying-wing optimization (<em>Aerospace Systems</em>, 2026), which treats longitudinal stability as the primary design objective. <code>wing_mac_and_ac()</code> reports the wing's own mean aerodynamic chord and where its aerodynamic center sits relative to the root leading edge, derived directly from closed-form wing-theory integrals for both the linear-taper and elliptical planform rather than quoted from a table: <code>c̄ = (2/3)c_root(1+λ+λ²)/(1+λ)</code>, <code>x_AC = ȳ·tan(Λ) + 0.25c̄</code>. This only covers the wing's own half of a stability check — a real static margin also needs the aircraft's CG and any tail, which is out of scope for a wing-only script.",
+        "<strong>Two wing-mass models.</strong> <code>--mass-model empirical</code> is a single fitted AR^0.5 exponent. <code>--mass-model beam</code>, inspired by Zhao et al.'s finite-element model updating for a composite flying-wing (AIAA SciTech 2019, 2019-1814) which calibrates mass and stiffness against real vibration-test data, makes two real structural drivers explicit instead: ultimate load factor and airfoil thickness ratio, through a first-order beam-bending scaling, <code>m ∝ (AR/AR_ref)^1.5 · (n/n_ref) · (t/c_ref ÷ t/c)^0.5</code>. The AR penalty is steeper, load factor enters linearly, and thinner airfoils cost more mass — a physically-derived scaling rather than a named curve fit, so it isn't borrowing anyone else's exact coefficients.",
+        "<strong>Joint taper search.</strong> <code>--objective combined</code> searches taper jointly with cl and aspect ratio, inspired by Bombardieri et al.'s coupled aerostructural wing optimization (<em>Structural and Multidisciplinary Optimization</em>, 2021) — their central finding is that optimizing aerodynamics and structure separately misses real gains a coupled search finds. Taper's only channel into this model is bending relief → wing mass → hover energy, <code>η_bend = (1+2λ)/3</code>, weighed against induced drag from the Oswald-efficiency estimate, <code>e₀ = 4.61(1−0.045·AR^0.68)cos(Λ)^0.15 − 3.1</code>, <code>C_Di = C_L²/(π·AR·e₀)</code>. That's a narrower coupling than the paper's full aero-structural one, but it's real: a taper that trades structural weight for nothing in cruise drag gets evaluated by the same objective as cl and AR, not decided in a separate step.",
       ],
       figures: [
         {
           title: "Search landscape",
           render: () => heatmapFigure(LANDSCAPE),
           caption: "The actual (lift coefficient × aspect ratio) energy landscape the optimizer searched for one tier — darker is lower cost. Ring marks the found minimum.",
+        },
+        {
+          title: "Bending relief vs. taper ratio",
+          render: () => bendingReliefFigure(),
+          caption: "η_bend = (1+2λ)/3, computed over the full taper range — this is the one number taper actually moves in the model, weighed against induced drag to find the joint optimum. Marker is the search's real result for this tier, λ = 0.30.",
         },
         {
           title: "Example wing with joint taper search",
@@ -799,7 +843,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       ],
       facts: [
         ["Mass models", "empirical (AR^0.5) or beam (AR^1.5, load factor, t/c)"],
-        ["Taper search example", "0.3–1.0 range → 0.30 chosen"],
+        ["Taper ratio found", "0.30, searched 0.3–1.0"],
         ["MAC, example wing", "0.222 m"],
         ["x_ac from root LE", "0.056 m"],
       ],
