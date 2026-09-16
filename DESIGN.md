@@ -4,190 +4,131 @@
 
 ## Direction
 
-Redesign, user-pinned: https://www.kenjpena.com. Concept-seed's direction
-search was skipped per new-work.md ("a user- or brief-pinned direction beats
-the roll, always") — the reference itself supplies the visual world.
+Redesign, user-pinned: a "Modernist" design system pulled from a Claude
+Design canvas project (`claude.ai/design`, project
+`db6ac8f0-9726-460b-adf8-af38389fa281`, file `Personal Website.dc.html`).
+The user asked to match that canvas's style while keeping this site's own
+real content — not the canvas's fictional "J. Rivera" placeholder bio and
+projects.
 
-Kept from the reference: near-monochrome light ground, restrained color (one
-accent used only for an interactive marker), a floating pill nav
-(Work/About) fixed bottom-center, big confident type with generous
-whitespace, soft-shadow cards with no heavy chrome, an About page pairing a
-short lede paragraph with a plain two-column timeline.
+Flat, architectural, set entirely in Archivo: a near-mono red accent on a
+warm off-white ground, a visible modular grid, zero corner radius anywhere,
+strong 2px divider rules, flush-left labels (never centered, even inside
+wide buttons), and grayscale-only photography. Nothing floats and nothing
+is decorated — alignment and the strength of the dividers do the
+organizing.
 
-**Haptic pass** (user-pinned reference: ciridae.com, scoped deliberately):
-that reference is dark/cinematic with particle-constellation animation and
-text-scramble reveals — none of that carried over, by explicit user choice
-(asked directly: keep the light kenjpena-era palette, borrow only the
-tactile *feel*). What did carry over: a subtle film-grain texture
-(`body::before`, SVG feTurbulence, 3.5% opacity, multiply blend) so flat
-color fields read as slightly physical instead of flat-digital; a magnetic
-hover pull on tiles/buttons (`addMagneticHover()`, a few px toward the
-cursor via `--mx`/`--my` custom properties); a spring/overshoot easing
-(`cubic-bezier(.34,1.56,.64,1)`) on hover and press transforms instead of
-linear/ease; a `:active` press-down state (`--press` scaled down) on every
-clickable surface. All gated behind `prefers-reduced-motion`.
+Kept from the reference canvas: sticky top nav, a big bold hero statement,
+a scroll-driven horizontal "reel" of project frames pinned full-viewport
+while the track shifts sideways, per-project detail sections below the
+reel, a dark near-black résumé/contact CTA band, zero-radius flat buttons
+and tags.
 
-Adapted for this content: the reference's product screenshots become real
-data visualizations (an aspect-ratio dial, an oscilloscope trace, a
-flow diagram, a heatmap of an actual optimizer search) since the subject is
-engineering outcomes, not UI work. Added a third "detail" view (Method /
-Outcome / Numbers) per project, since the brief asked to show both the
-result and the framework behind it — the reference's own site presumably
-does this via per-project pages; this single-page build does it via an
-in-place view swap instead, to stay a static site with no router.
+Not kept: the canvas's own fictional content (bio, project list, headshot)
+and its Design-Canvas-editor-specific templating (`{{ }}` expressions,
+`sc-for` loops, `<image-slot>`, the `DCLogic` component framework,
+`support.js`/`image-slot.js`) — none of that is deployable to a static
+host, so the whole page was rebuilt as plain dependency-free HTML/CSS/JS.
+Also dropped: the reference's non-functional mock contact form, replaced
+with real mailto/LinkedIn/GitHub links, per this site's own content policy
+of never showing a control that doesn't actually do anything.
 
-Superseded: the previous instrument-panel/stencil-placard direction (see
-git history for its own DESIGN.md if needed) — replaced wholesale, not
-polished, per new-work.md's redesign rule ("replace the old visual world
-rather than polishing it").
+Superseded: the previous kenjpena.com-pinned near-monochrome direction
+(pill nav, soft-shadow cards, Inter/IBM Plex Mono, blue accent — see git
+history for its DESIGN.md) — replaced wholesale, not polished, per
+new-work.md's redesign rule.
 
 ## Palette
 
 | Token | Hex | Role |
 |---|---|---|
-| `--bg` | `#f4f4f5` | page ground |
-| `--card` | `#ffffff` | tile / dialog surface |
-| `--card-border` | `#e7e7ea` | card border |
-| `--ink` | `#18181b` | primary text, pill nav, dark UI elements |
-| `--ink-2` | `#6b6b70` | secondary text |
-| `--ink-3` | `#a3a3a8` | tertiary / label text |
-| `--line` | `#e2e2e5` | hairline rules, chart gridlines |
-| `--accent` | `#3355ff` | the one saturated color — marks the found optimum on the Mission Model heatmap only |
+| `--color-bg` | `#f3f2f2` | page ground |
+| `--color-surface` | `#eae9e9` | card / figure-card fill |
+| `--color-text` | `#201e1d` | primary text |
+| `--color-accent` | `#ec3013` | the one accent — category tags, focus ring, chart accent marks; used sparingly |
+| `--color-divider` | `color-mix(in srgb, #201e1d 40%, transparent)` | 2px section rules, card borders |
+| `--color-neutral-100…900` | OKLCH tonal ramp | tag fills, muted text, the dark résumé band (`--color-neutral-900`) |
 
-Restrained strategy: neutrals plus one accent, used exactly once as a
-marker, never as a UI color. Single light theme, no dark mode — matches the
-reference's own commitment.
+Mono scheme: one accent, used sparingly (tags, focus rings, a handful of
+chart marker dots) — primary CTA buttons deliberately use ink
+(`--color-neutral-900`) rather than the accent, matching the reference
+canvas's own local override of the design system's default red-fill
+primary button. Single light theme, zero radius everywhere
+(`--radius-md: 0`), matching the reference exactly.
+
+Legacy alias tokens `--ink`/`--ink-2`/`--line`/`--accent` map onto this
+palette so every existing chart-generation function (`missionProfileFigure`,
+`attitudeTrackFigure`, etc. — all of which read colors live via
+`getComputedStyle` rather than hardcoding hex) repaints correctly with zero
+changes to their drawing code.
 
 ## Type
 
-- **Inter** (400/500/600/700) — everything: headings, body, nav, links.
-  Matches the reference's own single-family restraint; a characterful
-  display face would work against the "quiet, get out of the way" brief.
-- **IBM Plex Mono** (400/500/600) — all data: chart axis labels, fact
-  values, code identifiers (`wing_optimizer.py`, `--objective combined`),
-  the section eyebrows (METHOD / OUTCOME / NUMBERS).
+- **Archivo** (400/600/800) — everything, heading and body alike, per the
+  Modernist system. Weight 800 for all headings, 400 for body.
 
 ## Components
 
-- **Masthead**: name + role, GitHub link. No nav bar — navigation lives only
-  in the floating pill.
-- **Work tile** (`.tile`): name + category/year eyebrow, a real inline-SVG
-  chart, a mono headline stat + a plain-text sub-stat. Hover lifts 2px with
-  a soft shadow. The CAD tile is `.muted` — no hover, no click, a dashed
-  empty-state chart instead of a real one.
-- **Detail view**: a bordered pill "← back to work" button (not a bare text
-  link — it needs to read as clickable at a glance), title + tag, lede
-  paragraph, optional amber caution block (Liquid Rocket's valve-control
-  caveat), then four labeled sections — Overview (plain-language: what the
-  project is and who it's for), Method (prose, real technical explanation
-  of how it works), Outcome (one or more real charts, each in its own
-  `.figure-card`, optionally titled — Mission Model has two (a before/after
-  wing-area bar chart across all 3 tiers, and a 12-vehicle fleet hover-time
-  bar chart); Wing Optimizer has two (the search heatmap, moved here from
-  Mission Model when it became its own project, and a real-geometry wing
-  planform diagram)), Numbers (a 2-column fact grid).
-  Ends in a CTA row: a live demo link where one exists, always a link to the
-  real GitHub repo.
-- **Routing**: hash-based (`#work`, `#about`, `#project/<id>`), read/written
-  by one `route()` function on `hashchange` plus once on load — so the
-  browser's own back/forward buttons work between the work grid, About, and
-  a project detail, not just the in-page back button. Every nav action
-  (pill click, tile click, back button) sets `location.hash` and lets the
-  hashchange handler do the actual rendering, rather than each control
-  managing view state itself.
-- **Live demos** (`demos/log-dashboard.html`, `demos/liquid-rocket.html`):
-  not new builds — the actual project frontends, adapted for static
-  hosting. `log-dashboard.html` is the real `log_dashboard.html` with its
-  Flask `/api/upload` call replaced by a `fetch()` of `flight-analysis.json`,
-  which is the literal output of running the real `python_backend.py`'s
-  `run_analysis()` against the real sample flight log — same charts, same
-  flight-quality verdict, no reimplementation. `liquid-rocket.html` is a
-  from-scratch JS port of `ground_station/`'s `sensors.py` (wire protocol +
-  fake-source random walk), `svg_widgets.py` (gauge/valve SVG generation),
-  and `main.py`'s three-tab structure, since a PyQt6 desktop app can't run
-  in a browser at all — this one had no static-adaptation shortcut
-  available, so fidelity to the real Python logic was the goal instead.
-- **Pill nav**: fixed bottom-center, dark pill, two buttons, active state is
-  a white sub-pill. Never scrolls out of view.
+- **Nav**: sticky top, brand wordmark left, text links (Projects/About/
+  Skills/Contact) plus one outlined LinkedIn button, 2px bottom divider.
+- **Hero**: large bold headline + tagline, two CTAs (primary ink button to
+  the reel, secondary outlined GitHub link), an honest dashed-border
+  headshot placeholder ("Photo on request") instead of a fake photo.
+- **Reel**: `#reel` is a tall (260vh) scroll track; `.reel-sticky` pins at
+  `position: sticky; top:0; height:100vh` while JS (`onReelScroll`)
+  computes scroll progress through that tall track and applies
+  `translateX` to `.reel-track`, hand-ported from the reference canvas's
+  own `componentDidMount()`/`onScroll` logic (no framework). Sprocket-hole
+  bars (`radial-gradient` repeating background) top and bottom of the dark
+  reel body, matching the canvas's film-reel conceit. 5 real project
+  frames (down from the canvas's 8 fictional ones), each linking to its
+  detail section anchor and reusing that project's existing tile-emblem
+  chart function as its thumbnail.
+- **Detail sections**: one per project, `scroll-margin-top` so the sticky
+  nav doesn't cover the anchor target. Same Overview/Method/Outcome/Numbers
+  structure as the prior direction, restyled flush-left with the
+  Modernist figure-card/eqn-block/factgrid components instead of the prior
+  soft-shadow cards.
+- **About / Skills / Résumé band / Contact / Footer**: new sections not
+  present in the prior direction's IA, matching the reference canvas's page
+  structure. Résumé band and contact deliberately do not offer a résumé PDF
+  download — no such file exists in this repo, and a dead download link
+  would violate the site's honesty-first content policy — so the band
+  links to real LinkedIn/GitHub/email instead of a fabricated download.
 
-## Charts (all inline SVG, generated in JS, no library)
+## Charts
 
-- `heatmapFigure` — the actual (cl × AR) energy grid `wing_optimizer.py`
-  searched, gamma-compressed grayscale, accent-colored ring at the found
-  optimum. Lives under the Wing Optimizer project (moved there when it split
-  out of Mission Model).
-- `wingPlanformFigure` — a real half-wing planform (top-down), drawn from an
-  actual `--objective combined --taper-min/--taper-max` run's output
-  geometry: root/tip chord, span, and the reported aerodynamic-center
-  location (dashed quarter-chord line, accent dot at the real MAC/AC point)
-  are all real numbers from that run, not a generic wing glyph. Doubles as
-  the Wing Optimizer tile emblem and a detail-view Outcome figure.
-- `groupedBarFigure` — fixed pair of bars per group (gray=old, black=new)
-  plus an accent-colored delta label; used for the 3-tier wing-area
-  before/after comparison.
-- `hbarFigure` — sorted horizontal bars with a value label. The value label
-  is right-anchored to a fixed column (`x = W - 4, text-anchor: end`), not
-  placed just past the bar's own end — anchoring it relative to bar length
-  let the longest bar's label run past the viewBox's right edge, a real
-  clipping bug caught in review.
-- `scopeFigure` — deterministic pseudo-random trace standing in for a real
-  vibration waveform shape (seeded, not literally the decoded log samples).
-  `droneScopeFigure` overlays a small quadcopter glyph on it for the Log
-  Dashboard *tile* emblem, naming the subject (a drone flight log) instead
-  of leaving a generic waveform to speak for itself.
-- `flowFigure` — a 3-box pipeline diagram (Teensy → sensors.py → main.py)
-  plus a 3-tab strip, for Liquid Rocket's *architecture* (kept in the
-  detail Outcome section).
-- `missionProfileFigure` — the Mission Model tile emblem: an altitude-vs-
-  distance silhouette of the actual leg sequence `Mission_Model.py`
-  simulates (short/long/short cruise legs with landing dots) — replaced a
-  generic AR gauge that didn't name the mission itself.
-- `rocketFigure` — the Liquid Rocket tile emblem: a rocket silhouette with
-  an accent-colored flame, naming the domain (hot-fire propulsion testing)
-  rather than the code architecture, which `flowFigure` already covers in
-  the detail view.
-- `imgFigure` / `modelFigure` — not generated SVG, real media: a `<img>`
-  and a Google `<model-viewer>` element respectively. CAD's tile emblem and
-  both detail-view Outcome cards use these once real assets existed (see
-  below) — the dashed-wireframe placeholder these replaced is retired along
-  with the "no files yet" state it stood in for.
-
-Emblem-vs-chart split: each project's *tile* emblem now names its subject
-(mission profile, rocket, drone, or — for CAD, once real assets existed — an
-actual product photo) while richer real-data charts (heatmap,
-bar charts, waveform, architecture diagram) live in the detail view's
-Outcome section — the tile is a symbol, the detail page is the evidence.
+Unchanged from the prior direction — every chart-generation function
+(`missionProfileFigure`, `wingPlanformFigure`, `heatmapFigure`,
+`bendingReliefFigure`, `nacaAirfoilFigure`, `attitudeTrackFigure`,
+`scopeFigure`, `flowFigure`, `sensorPanelFigure`, `groupedBarFigure`,
+`hbarFigure`, `missionCourseFigure`) carried over byte-for-byte from the
+kenjpena-era build. They already read every color through
+`getComputedStyle(document.documentElement)` rather than hardcoding hex,
+so repointing the `--ink`/`--ink-2`/`--line`/`--accent` aliases at the
+Modernist palette was the only change needed for them to repaint
+correctly.
 
 ## CAD assets (real media, not generated)
 
-CAD is the one project whose evidence is real photos/models instead of
-SVG generated from real data — `assets/`:
-
-- `compdrone2025.glb` — the actual CompDrone2025 SolidWorks assembly
-  (7 subassemblies), exported to glTF. As delivered this was 192MB;
-  `npx @gltf-transform/cli optimize --compress draco --texture-compress webp`
-  brought it to ~2.2MB with no visible loss of the assembly's real
-  geometry (verified by rendering it before and after). Displayed live via
-  Google's `<model-viewer>` web component (`camera-controls auto-rotate`),
-  loaded from jsdelivr in `<head>` — the only external script this site
-  depends on besides Google Fonts.
-- `compdrone2025-render.png` — a real product render (not this session's
-  work) of the same assembly, used as the Work-grid tile thumbnail since a
-  full `<model-viewer>` is too heavy for a grid of four tiles.
-- `tylok-fatigue-machine.jpg` — a real photo of the actual ASTM F1387 A6
-  flexural fatigue machine, converted from HEIC and downsized (1800px,
-  JPEG q82) for web weight.
+Unchanged from the prior direction: `assets/compdrone2025.glb` (real
+CompDrone2025 SolidWorks assembly, Draco+WebP compressed to ~2.2MB),
+`assets/compdrone2025-render.png` (real product render, reel thumbnail),
+`assets/tylok-fatigue-machine.jpg` (real photo of the ASTM F1387 A6
+machine, grayscale-filtered per the Modernist system's photography rule).
 
 ## Layout
 
-Single column, `max-width: 1080px`, generous top/bottom padding. Work view
-is a 2-column tile grid (`repeat(2, 1fr)`, 1 column under 720px). Detail
-figures are capped at `max-width: 460px` inside their card regardless of
-card width — a 300×200 viewBox chart at 100% width with no cap was a real
-bug (the chart filled almost the whole viewport height on a wide card).
+Full-bleed sections (no centered max-width container, unlike the prior
+direction) with `clamp()`-based side padding — matches the reference
+canvas's edge-to-edge modular-grid feel. Facts render as a 2-column
+`factgrid` with divider rules between cells rather than the prior
+direction's soft cards. Figures live inside `.figure-card` (divider
+border, surface fill, zero radius).
 
 ## Content policy
 
-Unchanged from the prior direction: every number is real, sourced from an
-actual repo, test run, or data file. CAD stays an honest empty state, not a
-fabricated screenshot.
+Unchanged: every number on the page is real, sourced from an actual repo,
+test run, or data file. CAD stays honest; the hero headshot stays an
+honest empty state rather than a fabricated image; the contact section
+offers only real, reachable links.

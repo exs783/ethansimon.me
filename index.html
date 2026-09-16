@@ -1,500 +1,572 @@
 <!doctype html>
 <html lang="en">
 <head>
-<!--
-THESIS: a portfolio that reads like a lab notebook's results section, not a resume -- restrained editorial grid, real outcomes and real method per project.
-OWN-WORLD: near-monochrome light ground, one grotesk, thin rules, real charts standing in for hero imagery. Pinned by brief: https://www.kenjpena.com
-STORY: land on a quiet project grid; open one to read what it does, how it works, and the real number it produced.
-FIRST VIEWPORT: name + one-line role, four project tiles in a loose grid, a floating Work/About switch -- no chrome above it.
-FORM: user-pinned redesign (kenjpena.com) -- concept-seed skipped per new-work.md ("a user- or brief-pinned direction beats the roll, always").
-FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance.
--->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ethan Simon</title>
 <meta name="description" content="Mechanical engineering portfolio — mission-performance simulation, flight-log analysis, and rocket ground-station software.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#f4f4f5; --card:#ffffff; --card-border:#e7e7ea;
-    --ink:#18181b; --ink-2:#6b6b70; --ink-3:#6a6b70;
-    --line:#e2e2e5; --accent:#3355ff;
-    --caution-ink:#8a5a00; --caution-bg:#fff6e0; --caution-border:#f0dca0;
-    --font-body:'Inter', system-ui, sans-serif;
-    --font-mono:'IBM Plex Mono', ui-monospace, monospace;
-  }
-  .sr-only{
-    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
-    overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
-  }
-  *{ box-sizing:border-box; }
-  html{ color-scheme:light; }
-  body{
-    margin:0; background:var(--bg); color:var(--ink); font-family:var(--font-body);
-    padding-inline:24px; -webkit-font-smoothing:antialiased; position:relative;
-  }
-  /* Subtle film-grain texture -- the one thing carried over from the ciridae
-     reference's atmosphere without its dark palette: gives the flat color
-     fields a slight physical, printed-paper feel instead of a flat digital one. */
-  body::before{
-    content:""; position:fixed; inset:0; pointer-events:none; z-index:50;
-    opacity:.035; mix-blend-mode:multiply;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-  a{ color:inherit; }
-  .wrap{ max-width:1080px; margin-inline:auto; padding-block:56px 140px; min-height:100vh; }
+/* ============ Modernist design system tokens (from the pinned Claude Design project) ============ */
+:root{
+  --color-bg:#f3f2f2; --color-surface:#eae9e9; --color-text:#201e1d;
+  --color-accent:#ec3013; --color-accent-2:#e15b47;
+  --color-divider:color-mix(in srgb, #201e1d 40%, transparent);
 
-  h1,h2,h3{ margin:0; font-weight:600; letter-spacing:-0.02em; text-wrap:balance; }
+  --color-neutral-100:#f8f4f4; --color-neutral-200:#eae7e7; --color-neutral-300:#d7d3d3;
+  --color-neutral-400:#bab6b6; --color-neutral-500:#9b9797; --color-neutral-600:#7d7979;
+  --color-neutral-700:#605d5d; --color-neutral-800:#444141; --color-neutral-900:#2d2b2b;
 
-  /* ---- masthead ---- */
-  .masthead{ display:flex; justify-content:space-between; align-items:flex-start; gap:24px; flex-wrap:wrap; margin-bottom:64px; }
-  .masthead h1{ font-size:1.15rem; }
-  .masthead .role{ color:var(--ink-2); font-size:.95rem; margin-top:4px; }
-  .masthead .links{ display:flex; gap:16px; font-size:.9rem; }
-  .masthead .links a{ text-decoration:underline; text-underline-offset:3px; text-decoration-color:var(--ink-3); }
-  .masthead .links a:hover{ text-decoration-color:var(--ink); }
+  --color-accent-100:#fff2ef; --color-accent-600:#dd2b0f; --color-accent-700:#ae1800; --color-accent-800:#7c1405;
 
-  /* ---- views ---- */
-  .view{ display:none; }
-  .view.active{ display:block; }
+  --font-heading:"Archivo", system-ui, sans-serif;
+  --font-heading-weight:800;
+  --font-body:"Archivo", system-ui, sans-serif;
 
-  /* ---- work grid ---- */
-  .intro{ max-width:52ch; color:var(--ink-2); font-size:1.05rem; line-height:1.6; margin-bottom:40px; }
-  .grid{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
-  @media (max-width:720px){ .grid{ grid-template-columns:1fr; } }
+  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-6:24px; --space-8:32px;
+  --radius-md:0px;
 
-  .tile{
-    --mx:0px; --my:0px; --press:1;
-    appearance:none; font:inherit; text-align:left; width:100%;
-    position:relative; background:var(--card); border:1px solid var(--card-border); border-radius:20px;
-    padding:22px 24px 20px; cursor:pointer; display:flex; flex-direction:column; gap:18px; min-height:280px;
-    transform:translate(var(--mx), var(--my)) scale(var(--press));
-    transition:border-color .15s ease, transform .35s cubic-bezier(.34,1.56,.64,1), box-shadow .35s ease;
-  }
-  .tile:hover{ border-color:var(--ink-3); box-shadow:0 16px 32px rgba(0,0,0,.08); --my:-3px; }
-  .tile:active{ --press:0.98; transition-duration:.08s; }
-  .tile.muted .tile-head .name{ color:var(--ink-2); }
-  .tile-head{ display:flex; justify-content:space-between; align-items:baseline; gap:12px; }
-  .tile-head .name{ font-size:1.05rem; font-weight:600; }
-  .tile-head .meta{ font-family:var(--font-mono); font-size:11.5px; color:var(--ink-3); text-transform:uppercase; letter-spacing:.04em; }
-  .tile-figure{ flex:1; display:flex; align-items:center; justify-content:center; }
-  .tile-figure svg{ width:100%; height:120px; }
-  .tile-figure img{ width:auto; max-width:100%; height:120px; object-fit:contain; }
-  .tile-foot{ font-family:var(--font-mono); font-size:13px; color:var(--ink); }
-  .tile-foot .sub{ display:block; font-family:var(--font-body); font-size:12.5px; color:var(--ink-2); margin-top:2px; }
+  --shadow-sm:0 1px 2px color-mix(in srgb, #2d2b2b 14%, transparent);
 
-  /* ---- about ---- */
-  .about-lede{ font-size:1.4rem; line-height:1.5; color:var(--ink); max-width:44ch; margin-bottom:28px; text-wrap:balance; }
-  .about-links{ display:flex; flex-wrap:wrap; gap:8px 16px; font-size:.95rem; margin-bottom:56px; }
-  .about-links a{ text-decoration:underline; text-underline-offset:3px; text-decoration-color:var(--ink-3); }
-  .timeline{ display:flex; flex-direction:column; gap:10px; max-width:640px; }
-  .timeline .row{ display:flex; justify-content:space-between; gap:20px; font-size:1.05rem; padding-block:6px; border-top:1px solid var(--line); }
-  .timeline .row:first-child{ border-top:none; }
-  .timeline .row .when{ font-family:var(--font-mono); font-size:13px; color:var(--ink-2); white-space:nowrap; padding-top:3px; }
-  .timeline .row .what{ text-align:right; }
+  /* Legacy chart-token aliases -- the inline-SVG figure functions below read
+     these names (built up over earlier passes on this site); aliasing them
+     to the Modernist palette means every chart repaints correctly with zero
+     changes to the drawing code itself. */
+  --ink:var(--color-text); --ink-2:var(--color-neutral-600); --ink-3:var(--color-neutral-700);
+  --line:var(--color-divider); --accent:var(--color-accent);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);font-size:15px;line-height:1.55}
+h1,h2,h3,h4,h5,h6{font-family:var(--font-heading);font-weight:var(--font-heading-weight);line-height:1.12;letter-spacing:-.015em;margin:0 0 var(--space-2)}
+h1{font-size:42px} h2{font-size:32px} h3{font-size:22px} h4{font-size:18px} h5{font-size:15px}
+h6{font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+p{margin:0 0 var(--space-3)}
+a{color:var(--color-neutral-900);text-underline-offset:3px}
+a:hover{color:var(--color-accent)}
+img{display:block;max-width:100%}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
+::selection{background:color-mix(in srgb, var(--color-accent) 25%, transparent)}
+.grayscale{filter:grayscale(1) contrast(1.08)}
+.wrap{padding-inline:clamp(20px,5vw,64px)}
 
-  /* ---- detail ---- */
-  .back{
-    --mx:0px; --my:0px; --press:1;
-    display:inline-flex; align-items:center; justify-content:center; gap:6px; font-family:var(--font-mono); font-size:12.5px;
-    color:var(--ink-2); background:var(--card); border:1px solid var(--card-border); border-radius:20px;
-    cursor:pointer; padding:8px 18px; min-height:44px; margin-bottom:28px;
-    transform:translate(var(--mx),var(--my)) scale(var(--press));
-    transition:color .15s ease, border-color .15s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
-  }
-  .back:hover{ color:var(--ink); border-color:var(--ink-3); }
-  .back:active{ --press:0.94; transition-duration:.08s; }
-  .detail-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:20px; flex-wrap:wrap; margin-bottom:8px; }
-  .detail-head h2{ font-size:2rem; }
-  .detail-tag{ font-family:var(--font-mono); font-size:11.5px; color:var(--ink-3); text-transform:uppercase; letter-spacing:.04em; padding-top:8px; }
-  .detail-lede{ color:var(--ink-2); font-size:1.05rem; line-height:1.6; max-width:62ch; margin-bottom:8px; }
+/* — rules — */
+.hr{height:2px;border:0;margin:var(--space-4) 0;background:var(--color-divider)}
 
-  .caution{
-    font-family:var(--font-mono); font-size:12.5px; color:var(--caution-ink); background:var(--caution-bg);
-    border:1px solid var(--caution-border);
-    border-radius:8px; padding:9px 12px; margin-block:16px; max-width:62ch;
-  }
+/* — buttons — */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;text-decoration:none;
+  font-family:var(--font-heading);font-weight:800;font-size:14px;color:var(--color-text);
+  background:transparent;border:1px solid transparent;padding:10px 16px;border-radius:0}
+.btn-primary{background:var(--color-neutral-900);color:var(--color-bg);border-color:var(--color-neutral-900)}
+.btn-primary:hover{background:var(--color-neutral-700);color:var(--color-bg)}
+.btn-secondary{border-color:var(--color-divider)}
+.btn-secondary:hover{background:color-mix(in srgb, var(--color-text) 7%, transparent);color:var(--color-text)}
+.btn-ghost{color:var(--color-accent);padding-inline:0}
+.btn-ghost:hover{color:var(--color-accent-700)}
 
-  .section-label{
-    font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-3);
-    margin-top:36px; margin-bottom:14px;
-  }
+/* — tags — */
+.tag{display:inline-flex;align-items:center;font-size:11px;letter-spacing:.02em;padding:3px 10px;border-radius:0}
+.tag-neutral{background:var(--color-neutral-100);color:var(--color-neutral-800)}
+.tag-outline{border:1px solid var(--color-accent);color:var(--color-accent)}
+.tag-mono-outline{border:1px solid var(--color-neutral-900);color:var(--color-neutral-900)}
 
-  .method p{ color:var(--ink); line-height:1.65; font-size:1rem; max-width:66ch; margin:0 0 12px; }
-  .method code{ font-family:var(--font-mono); font-size:.92em; background:#eaeaed; padding:1px 5px; border-radius:4px; }
+/* — cards / figures / facts — */
+.card{padding:var(--space-4);border:1px solid var(--color-divider);background:var(--color-surface);border-radius:0}
+.figure-card{border:1px solid var(--color-divider);background:var(--color-surface);padding:var(--space-4);margin:var(--space-3) 0;border-radius:0}
+.figure-card svg{width:100%;max-width:460px;height:auto;display:block;margin-inline:auto}
+.figure-card img{width:100%;max-width:520px;height:auto;display:block;margin-inline:auto}
+.figure-card model-viewer{width:100%;height:380px;display:block;--poster-color:transparent}
+.figure-title{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--color-neutral-600);margin-bottom:var(--space-3)}
+.figure-caption{font-size:12.5px;color:var(--color-neutral-600);margin-top:var(--space-3)}
+.factgrid{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--color-divider);margin-top:var(--space-3)}
+.factgrid>div{padding:var(--space-3);border-bottom:1px solid var(--color-divider);border-right:1px solid var(--color-divider)}
+.factgrid>div:nth-child(2n){border-right:none}
+@media (max-width:600px){.factgrid{grid-template-columns:1fr}.factgrid>div{border-right:none}}
+.fact-k{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--color-neutral-600)}
+.fact-v{font-family:var(--font-heading);font-weight:800;font-size:18px;margin-top:4px}
 
-  .figures{ display:flex; flex-direction:column; gap:16px; }
-  .figure-card{ background:var(--card); border:1px solid var(--card-border); border-radius:16px; padding:20px 22px; }
-  .figure-card svg{ width:100%; max-width:460px; height:auto; display:block; margin-inline:auto; }
-  .figure-card img{ width:100%; max-width:520px; height:auto; display:block; margin-inline:auto; border-radius:8px; }
-  .figure-card model-viewer{ width:100%; height:380px; display:block; --poster-color:transparent; }
-  .figure-card .figure-title{ font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-3); margin-bottom:12px; }
-  .figure-caption{ font-size:12.5px; color:var(--ink-2); margin-top:10px; }
+/* — equations — */
+.eqn-block{border:1px solid var(--color-divider);background:var(--color-surface);padding:var(--space-3) var(--space-4);margin:var(--space-3) 0;overflow-x:auto}
+.eqn-label{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--color-neutral-600);margin-bottom:6px}
+.eq{font-size:14px;white-space:nowrap}
+.method-copy p{max-width:70ch}
+.method-copy code{background:var(--color-neutral-100);padding:1px 5px}
 
-  .facts{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
-  @media (max-width:600px){ .facts{ grid-template-columns:1fr; } }
-  .facts .fact{ background:var(--card); padding:14px 16px; display:flex; flex-direction:column; gap:4px; }
-  .facts .fact .k{ font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-3); }
-  .facts .fact .v{ font-size:1.15rem; font-weight:600; }
+/* — nav — */
+.nav{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:var(--space-4);
+  padding:var(--space-3) clamp(20px,5vw,64px);border-bottom:2px solid var(--color-divider);background:var(--color-bg)}
+.nav-brand{font-family:var(--font-heading);font-weight:800;font-size:17px;margin-right:auto;letter-spacing:-.01em}
+.nav a{color:inherit;text-decoration:none;font-size:14px}
+.nav a:hover{color:var(--color-accent)}
 
-  .cta-row{ display:flex; gap:12px; margin-top:28px; }
-  .cta{
-    --mx:0px; --my:0px; --press:1;
-    font-family:var(--font-mono); font-size:12.5px; text-decoration:none; padding:9px 18px; min-height:44px;
-    display:inline-flex; align-items:center; justify-content:center; border-radius:20px;
-    transform:translate(var(--mx),var(--my)) scale(var(--press));
-    transition:transform .15s cubic-bezier(.34,1.56,.64,1), box-shadow .15s ease;
-  }
-  .cta.primary{ background:var(--ink); color:#fff; }
-  .cta.primary:hover{ box-shadow:0 6px 16px rgba(0,0,0,.22); }
-  .cta.secondary{ border:1px solid var(--card-border); color:var(--ink); }
-  .cta:active{ --press:0.94; transition-duration:.08s; }
+/* — hero — */
+.hero{padding:clamp(48px,9vw,110px) clamp(20px,5vw,64px) clamp(40px,6vw,72px);
+  display:grid;grid-template-columns:1.2fr .8fr;gap:clamp(24px,4vw,56px);align-items:end;border-bottom:2px solid var(--color-divider)}
+.hero h1{font-size:clamp(30px,5.4vw,58px);max-width:15ch;margin-bottom:var(--space-4)}
+.hero p{font-size:clamp(15px,1.6vw,18px);max-width:56ch;opacity:.85;margin-bottom:var(--space-6)}
+.headshot-slot{width:100%;aspect-ratio:4/5;max-width:300px;margin-left:auto;border:1px dashed var(--color-divider);
+  display:flex;align-items:center;justify-content:center;text-align:center;color:var(--color-neutral-600);font-size:13px}
+@media (max-width:760px){.hero{grid-template-columns:1fr}.headshot-slot{margin-inline:auto;max-width:220px}}
 
-  /* ---- floating pill nav ---- */
-  .pillnav{
-    position:fixed; left:50%; bottom:26px; transform:translateX(-50%); display:flex; gap:2px;
-    background:var(--ink); border-radius:999px; padding:4px; z-index:20; box-shadow:0 10px 30px rgba(0,0,0,.18);
-  }
-  .pillnav button{
-    --mx:0px; --my:0px; --press:1;
-    font-family:var(--font-body); font-size:13.5px; font-weight:500; border:none; background:none; color:#b9b9bd;
-    padding:8px 18px; min-height:44px; display:inline-flex; align-items:center; border-radius:999px; cursor:pointer;
-    transform:translate(var(--mx),var(--my)) scale(var(--press));
-    transition:background .2s ease, color .2s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
-  }
-  .pillnav button.active{ background:#fff; color:var(--ink); }
-  .pillnav button:active{ --press:0.9; transition-duration:.08s; }
+.scrollband{text-align:center;padding:var(--space-3) 0;font-size:11px;letter-spacing:.14em;color:var(--color-neutral-600);border-bottom:2px solid var(--color-divider)}
 
-  @media (prefers-reduced-motion: reduce){
-    .tile, .cta, .back, .pillnav button{ transition:none !important; }
-    .tile{ --mx:0px !important; --my:0px !important; }
-  }
+/* — reel — */
+#reel{position:relative}
+.reel-sticky{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+.reel-head{padding:clamp(20px,3vw,40px) clamp(20px,5vw,64px) clamp(12px,2vw,20px);
+  display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:12px}
+.reel-frame-count{font:600 14px var(--font-heading);letter-spacing:.05em;color:var(--color-neutral-700)}
+.reel-body{flex:1;background:var(--color-neutral-900);position:relative;display:flex;flex-direction:column}
+.sprocket{height:16px;background-image:radial-gradient(circle, var(--color-bg) 30%, transparent 32%);
+  background-size:32px 16px;background-repeat:repeat-x;background-position:10px center;opacity:.9}
+.reel-viewport{flex:1;overflow:hidden;display:flex;align-items:stretch;padding:14px 0}
+.reel-track{display:flex;gap:clamp(20px,3vw,40px);padding:0 clamp(20px,5vw,64px);will-change:transform}
+.frame{width:clamp(280px,34vw,420px);flex:none;height:100%;background:var(--color-bg);
+  padding:clamp(14px,2vw,22px);display:flex;flex-direction:column;gap:10px;overflow:hidden;text-decoration:none;color:inherit}
+.frame:hover{color:inherit}
+.frame-top{display:flex;justify-content:space-between;align-items:baseline;flex:none}
+.frame-num{font:600 12px var(--font-heading);color:var(--color-neutral-500)}
+.frame-fig{width:100%;height:clamp(80px,17vh,150px);flex:none;display:flex;align-items:center;justify-content:center;background:var(--color-neutral-100)}
+.frame-fig svg{width:100%;height:100%}
+.frame-fig img{width:100%;height:100%;object-fit:cover}
+.frame h3{margin:0;flex:none;font-size:clamp(15px,1.8vw,19px)}
+.frame p{margin:0;font-size:12.5px;opacity:.8;flex:1;overflow:hidden}
+.frame .tag-row{display:flex;gap:6px;flex-wrap:wrap;flex:none}
+.frame .view-link{font:600 12px var(--font-heading);color:var(--color-neutral-900);flex:none}
+
+/* — detail sections — */
+.project-section{padding:clamp(48px,7vw,88px) clamp(20px,5vw,64px);border-bottom:2px solid var(--color-divider);scroll-margin-top:64px}
+.project-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:var(--space-2)}
+.project-head h2{max-width:22ch}
+.project-tagline{max-width:70ch;opacity:.85;font-size:16px}
+.subhead{color:var(--color-neutral-700);margin-top:var(--space-8)}
+.caution{font-size:12.5px;color:var(--color-accent-800);background:var(--color-accent-100);border:1px solid var(--color-accent);padding:9px 12px;max-width:64ch;margin:var(--space-3) 0}
+
+/* — about / skills — */
+.about{padding:clamp(48px,7vw,96px) clamp(20px,5vw,64px);display:grid;grid-template-columns:1.4fr 1fr;gap:clamp(28px,4vw,56px);border-bottom:2px solid var(--color-divider)}
+.about h2{max-width:18ch}
+.about p{font-size:16px;opacity:.85;max-width:60ch}
+.skills{padding:clamp(48px,7vw,96px) clamp(20px,5vw,64px);border-bottom:2px solid var(--color-divider)}
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:clamp(20px,3vw,40px)}
+.skill-item{display:flex;align-items:center;gap:8px;font-size:14px}
+.skill-dot{width:6px;height:6px;background:var(--color-neutral-900);flex:none}
+@media (max-width:760px){.about{grid-template-columns:1fr}}
+
+/* — resume band / contact / footer — */
+.resume-band{padding:clamp(48px,8vw,100px) clamp(20px,5vw,64px);background:var(--color-neutral-900);color:var(--color-bg);
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px}
+.resume-band h6{color:var(--color-neutral-400)}
+.resume-band h2{color:var(--color-bg);max-width:22ch;margin-bottom:0}
+.resume-band .btn{border:1px solid var(--color-bg);color:var(--color-bg)}
+.resume-band .btn:hover{background:color-mix(in srgb, var(--color-bg) 12%, transparent)}
+.contact{padding:clamp(48px,7vw,96px) clamp(20px,5vw,64px)}
+.contact h2{max-width:18ch}
+.contact-links{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:var(--space-4);font-size:15px}
+footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--color-divider);
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--color-neutral-600)}
 </style>
 </head>
 <body>
-<main class="wrap">
 
-  <header class="masthead">
-    <div>
-      <h1>Ethan Simon</h1>
-      <div class="role">Mechanical Engineering, Case Western Reserve University</div>
-    </div>
-    <div class="links">
-      <a href="https://www.linkedin.com/in/ethansimon13" target="_blank" rel="noopener">LinkedIn</a>
-      <a href="https://github.com/exs783" target="_blank" rel="noopener">GitHub</a>
-    </div>
-  </header>
-
-  <!-- WORK -->
-  <section class="view active" id="view-work" aria-labelledby="view-work-h">
-    <h2 id="view-work-h" class="sr-only">Work</h2>
-    <p class="intro">Five projects, shown by outcome: the real number each one produced, and the method that produced it. Click one for the full write-up.</p>
-    <div class="grid" id="work-grid"></div>
-  </section>
-
-  <!-- ABOUT -->
-  <section class="view" id="view-about" aria-labelledby="view-about-h">
-    <h2 id="view-about-h" class="sr-only">About</h2>
-    <p class="about-lede">Mechanical engineering student at Case Western Reserve University (Michelson-Morley Scholar), building simulation, ground-station, and test-equipment software alongside coursework. VTOL Mechanical Team Lead for CWRU's VTOL team — frame and payload design across Tail Sitter, Hexacopter, Quadcopter, and Tiltrotor airframes.</p>
-    <div class="about-links">
-      <a href="mailto:exs783@case.edu">Email</a>
-      <a href="https://www.linkedin.com/in/ethansimon13" target="_blank" rel="noopener">LinkedIn</a>
-      <a href="https://github.com/exs783" target="_blank" rel="noopener">GitHub</a>
-      <a href="https://github.com/exs783/Log_Reader" target="_blank" rel="noopener">Mission Model + Log Dashboard</a>
-      <a href="https://github.com/exs783/Liquid-Rocket" target="_blank" rel="noopener">Liquid Rocket</a>
-    </div>
-    <div class="timeline" id="about-timeline"></div>
-  </section>
-
-  <!-- DETAIL (templated) -->
-  <section class="view" id="view-detail" aria-labelledby="d-title">
-    <button class="back" id="detail-back">&larr; back to work</button>
-    <div class="detail-head">
-      <h2 id="d-title"></h2>
-      <span class="detail-tag" id="d-tag"></span>
-    </div>
-    <p class="detail-lede" id="d-lede"></p>
-    <div id="d-caution"></div>
-
-    <div class="section-label">Overview</div>
-    <div class="method" id="d-overview"></div>
-
-    <div class="section-label">Method</div>
-    <div class="method" id="d-method"></div>
-
-    <div class="section-label">Outcome</div>
-    <div class="figures" id="d-figures"></div>
-
-    <div class="section-label">Numbers</div>
-    <div class="facts" id="d-facts"></div>
-
-    <div class="cta-row" id="d-cta"></div>
-  </section>
-
-</main>
-
-<nav class="pillnav" aria-label="Primary">
-  <button data-view="work" class="active">Work</button>
-  <button data-view="about">About</button>
+<nav class="nav">
+  <span class="nav-brand">ETHAN SIMON</span>
+  <a href="#reel">Projects</a>
+  <a href="#about">About</a>
+  <a href="#skills">Skills</a>
+  <a href="#contact">Contact</a>
+  <a class="btn btn-secondary" href="https://www.linkedin.com/in/ethansimon13" target="_blank" rel="noopener" style="margin-left:8px">LinkedIn ↗</a>
 </nav>
 
+<section class="hero">
+  <div>
+    <h6 style="color:var(--color-neutral-700)">MECHANICAL ENGINEERING · CASE WESTERN RESERVE UNIVERSITY</h6>
+    <h1>I build the tools that decide what actually gets built.</h1>
+    <p>Simulation and optimization software for a heavy-lift VTOL fleet, a flight-log diagnostic dashboard, rocket ground-station software, and the real CAD behind both. Five projects below — scroll to run the reel.</p>
+    <div style="display:flex;gap:var(--space-3);flex-wrap:wrap">
+      <a href="#reel" class="btn btn-primary">View the reel →</a>
+      <a href="https://github.com/exs783" target="_blank" rel="noopener" class="btn btn-secondary">GitHub ↗</a>
+    </div>
+  </div>
+  <div class="headshot-slot">Photo on request</div>
+</section>
+
+<div class="scrollband">↓ SCROLL TO RUN THE REEL ↓</div>
+
+<section id="reel">
+  <div class="reel-sticky">
+    <div class="reel-head">
+      <h2 style="margin:0">PROJECT REEL</h2>
+      <div class="reel-frame-count" id="reel-frame-label">FRAME 01 / 05</div>
+    </div>
+    <div class="reel-body">
+      <div class="sprocket"></div>
+      <div class="reel-viewport" id="reel-viewport">
+        <div class="reel-track" id="reel-track">
+          <a href="#mission-model" class="frame">
+            <div class="frame-top"><span class="tag tag-mono-outline">Simulation</span><span class="frame-num">01 / 05</span></div>
+            <div class="frame-fig" data-fig="missionProfileFigure"></div>
+            <h3>Mission Model</h3>
+            <p>Sweeps every motor, propeller, and battery combination it has data for against a fixed cargo mission and reports which ones actually complete it.</p>
+            <div class="tag-row"><span class="tag tag-neutral">Python</span><span class="tag tag-neutral">Quaternion 6DOF</span></div>
+            <span class="view-link">View project ↗</span>
+          </a>
+          <a href="#wing-optimizer" class="frame">
+            <div class="frame-top"><span class="tag tag-mono-outline">Optimization</span><span class="frame-num">02 / 05</span></div>
+            <div class="frame-fig" data-fig="wingPlanformFigure"></div>
+            <h3>Wing Optimizer</h3>
+            <p>Searches lift coefficient, aspect ratio, and taper ratio for whichever combination minimizes mass, drag, or mission energy.</p>
+            <div class="tag-row"><span class="tag tag-neutral">Python</span><span class="tag tag-neutral">NACA airfoils</span></div>
+            <span class="view-link">View project ↗</span>
+          </a>
+          <a href="#log-dashboard" class="frame">
+            <div class="frame-top"><span class="tag tag-mono-outline">Flight data</span><span class="frame-num">03 / 05</span></div>
+            <div class="frame-fig" data-fig="droneScopeFigure"></div>
+            <h3>Log Dashboard</h3>
+            <p>Decodes ArduCopter/PX4 flight logs into a full diagnostic report — score, issues, and every chart real.</p>
+            <div class="tag-row"><span class="tag tag-neutral">Flask</span><span class="tag tag-neutral">Plotly</span></div>
+            <span class="view-link">View project ↗</span>
+          </a>
+          <a href="#liquid-rocket" class="frame">
+            <div class="frame-top"><span class="tag tag-mono-outline">Propulsion</span><span class="frame-num">04 / 05</span></div>
+            <div class="frame-fig" data-fig="rocketFigure"></div>
+            <h3>Liquid Rocket</h3>
+            <p>Ground-station software for CWRU's Liquid Propulsion Team, rebuilt from two prototypes into one working app.</p>
+            <div class="tag-row"><span class="tag tag-neutral">PyQt6</span><span class="tag tag-neutral">Real wire protocol</span></div>
+            <span class="view-link">View project ↗</span>
+          </a>
+          <a href="#cad" class="frame">
+            <div class="frame-top"><span class="tag tag-mono-outline">CAD</span><span class="frame-num">05 / 05</span></div>
+            <div class="frame-fig" data-fig="cadPhotoFigure"></div>
+            <h3>CAD</h3>
+            <p>Two real SolidWorks builds: a competition hexacopter and an ASTM-standard flexural fatigue test machine.</p>
+            <div class="tag-row"><span class="tag tag-neutral">SolidWorks</span><span class="tag tag-neutral">glTF</span></div>
+            <span class="view-link">View project ↗</span>
+          </a>
+        </div>
+      </div>
+      <div class="sprocket"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= MISSION MODEL ============================= -->
+<section class="project-section" id="mission-model">
+  <div class="project-head">
+    <div>
+      <span class="tag tag-outline">Simulation · 2026</span>
+      <h2 style="margin-top:var(--space-2)">Mission Model</h2>
+    </div>
+  </div>
+  <p class="project-tagline">A mission-performance simulator that sweeps every motor, propeller, and battery combination it has data for against a fixed cargo mission and reports which ones actually complete it — including, for winged tailsitter airframes, a real quaternion 6DOF rigid-body simulation of the hover-to-cruise transition instead of a simplified angle approximation.</p>
+
+  <h6 class="subhead">Overview</h6>
+  <div class="method-copy">
+    <p>Mission Model simulates a specific cargo run for a family of VTOL (vertical takeoff/landing) airframes: takeoff to 100 ft, cruise 1 nautical mile, land, pick up cargo, takeoff, cruise 8 nm, land, drop cargo, takeoff, cruise 1 nm back, land. For every candidate airframe, it sweeps every motor × propeller × battery combination it has spec data for (thousands of combinations) and reports which one actually completes the mission, how much battery it has left over, and how long it can hover — so "which motor should this drone use" becomes a search over real thrust-curve data instead of a guess.</p>
+    <p>Wing sizing for the winged tailsitter variants comes from a separate standalone tool, <code>wing_optimizer.py</code> — its own project below — which sizes every TailSitter config against the fleet's real governed cruise speeds.</p>
+    <p>The airframe list (Hexacopter, Quadcopter, x8, Tail Sitter) matches the real vehicle classes I work on as VTOL Mechanical Team Lead — this is the same kind of simulation-to-inform-design work as the MATLAB/Python scripts I write for the team, built out as a standalone public tool.</p>
+  </div>
+
+  <h6 class="subhead">Method</h6>
+  <div class="method-copy">
+    <p>Every TailSitter vehicle config is sized using Wing Optimizer's energy-based (hover + cruise) objective, evaluated at each tier's real governed cruise speed (18.0/18.8/19.6 m/s). Required wing area scales as 1/v², so getting the real cruise speed right — not a flat placeholder — is the single biggest lever on the sizing result.</p>
+    <p>The mission simulation uses closed-form kinematics for wingless multirotors — thrust against quadratic drag, <code>v̇ = a₀ − k·v²</code>, has an exact tanh solution, so every accel/decel leg is solved in one evaluation instead of stepped through a simulation loop.</p>
+    <p>A winged tailsitter's hover-to-cruise transition can't take that shortcut. The rotor thrust has to physically rotate from vertical to horizontal as the wing builds lift with airspeed, so the required thrust angle and the drag area both keep changing through the maneuver. I integrate that leg as a full quaternion 6DOF rigid body — position, velocity, attitude, and angular rate together. Attitude kinematics: <code>q̇ = ½ q ⊗ [0, ω]</code> (Hamilton, scalar-first), alongside the rotational dynamics <code>I ω̇ = τ − ω × (Iω)</code>. I use quaternions specifically because Euler angles hit a gimbal-lock singularity right at the 90° pitch-over a tailsitter transition goes through — the one attitude this model actually has to fly through on every single leg.</p>
+    <p>Lift points along the wing's own body-fixed axis and scales with the velocity component perpendicular to it, rather than pointing straight up and scaling with raw airspeed the way a simpler model would. That distinction matters most mid-transition, when the vehicle is neither purely hovering nor purely cruising and a fixed lift direction isn't a safe approximation.</p>
+  </div>
+
+  <h6 class="subhead">Outcome</h6>
+  <div class="figure-card">
+    <div class="figure-title">The fixed 11-leg course</div>
+    <div data-fig="missionCourseFigure"></div>
+    <div class="figure-caption">Every candidate flies the same course: takeoff to 100 ft, cruise 1 nm, land, pick up cargo, takeoff, cruise 8 nm, land, drop cargo, takeoff, cruise 1 nm back, land — the actual MISSION_LEGS sequence, cargo carried outbound only.</div>
+  </div>
+  <div class="figure-card">
+    <div class="figure-title">Wing area: fixed heuristic vs. energy-optimized sizing</div>
+    <div data-fig="tierCompareFigure"></div>
+    <div class="figure-caption">Gray = a fixed lift-coefficient/minimum-aspect-ratio heuristic. Black = the energy-based (hover + cruise) objective evaluated at each tier's real governed cruise speed. Required wing area scales as 1/v², so the physics-based objective sizes every tier noticeably larger than the simpler heuristic would.</div>
+  </div>
+  <div class="figure-card">
+    <div class="figure-title">Fleet hover time, all 12 vehicle configs</div>
+    <div data-fig="fleetHoverFigure"></div>
+    <div class="figure-caption">Best-case hover time per vehicle from the mission sweep (2,794 motor × prop × battery combinations), sorted descending. The four TailSitter tiers lead the two reference multirotors, 111.4 min vs. 73.2 and 59.2.</div>
+  </div>
+
+  <h6 class="subhead">Numbers</h6>
+  <div class="factgrid">
+    <div><div class="fact-k">Wing loading, by tier</div><div class="fact-v">17.5–20.8 kg/m²</div></div>
+    <div><div class="fact-k">Aspect ratio, example wing</div><div class="fact-v">8.64</div></div>
+    <div><div class="fact-k">Best fleet hover time</div><div class="fact-v">111.4 min</div></div>
+    <div><div class="fact-k">Mission sweep</div><div class="fact-v">2,794 configs</div></div>
+  </div>
+  <div style="margin-top:var(--space-4)"><a class="btn btn-secondary" href="https://github.com/exs783/Log_Reader" target="_blank" rel="noopener">View repo ↗</a></div>
+</section>
+
+<!-- ============================= WING OPTIMIZER ============================= -->
+<section class="project-section" id="wing-optimizer">
+  <div class="project-head">
+    <div>
+      <span class="tag tag-outline">Optimization tool · 2026</span>
+      <h2 style="margin-top:var(--space-2)">Wing Optimizer</h2>
+    </div>
+  </div>
+  <p class="project-tagline">A wing-sizing tool that searches lift coefficient, aspect ratio, and taper ratio for whichever combination minimizes structural mass, cruise drag, or total mission energy. Three of its search objectives are grounded in real aerostructural optimization papers — not a claim to replicate methods (RANS CFD, nonlinear FE, flight test) a standalone script can't actually run.</p>
+
+  <h6 class="subhead">Overview</h6>
+  <div class="method-copy">
+    <p><code>wing_optimizer.py</code> sizes a wing from mission requirements alone. Given how much weight it has to lift and how fast the aircraft cruises, it searches lift coefficient, aspect ratio, and (for the energy objective) taper ratio for whichever combination minimizes structural mass, cruise drag, or total mission energy, then emits the winning geometry as SolidWorks-ready NACA equations or point-cloud curves, plus a <code>vehicle_configs</code>-style JSON entry Mission Model can load directly.</p>
+    <p>Three of its objectives are each grounded in one real aerostructural optimization paper. Method below covers exactly what carried over from each one, and what I deliberately left out of scope.</p>
+  </div>
+
+  <h6 class="subhead">Method</h6>
+  <div class="method-copy">
+    <p><strong>Aerodynamic-center reporting</strong>, inspired by Grimm, Price &amp; Ahmad's flight-tested flying-wing optimization (<em>Aerospace Systems</em>, 2026), which treats longitudinal stability as the primary design objective. <code>wing_mac_and_ac()</code> reports the wing's own mean aerodynamic chord and where its aerodynamic center sits relative to the root leading edge, derived directly from closed-form wing-theory integrals for both the linear-taper and elliptical planform rather than quoted from a table: <code>c̄ = (2/3)c_root(1+λ+λ²)/(1+λ)</code>, <code>x_AC = ȳ·tan(Λ) + 0.25c̄</code>. This only covers the wing's own half of a stability check — a real static margin also needs the aircraft's CG and any tail, which is out of scope for a wing-only script.</p>
+    <p><strong>Two wing-mass models.</strong> <code>--mass-model empirical</code> is a single fitted AR^0.5 exponent. <code>--mass-model beam</code>, inspired by Zhao et al.'s finite-element model updating for a composite flying-wing (AIAA SciTech 2019, 2019-1814) which calibrates mass and stiffness against real vibration-test data, makes two real structural drivers explicit instead: ultimate load factor and airfoil thickness ratio, through a first-order beam-bending scaling, <code>m ∝ (AR/AR_ref)^1.5 · (n/n_ref) · (t/c_ref ÷ t/c)^0.5</code>. The AR penalty is steeper, load factor enters linearly, and thinner airfoils cost more mass — a physically-derived scaling rather than a named curve fit, so it isn't borrowing anyone else's exact coefficients.</p>
+    <p><strong>Joint taper search.</strong> <code>--objective combined</code> searches taper jointly with cl and aspect ratio, inspired by Bombardieri et al.'s coupled aerostructural wing optimization (<em>Structural and Multidisciplinary Optimization</em>, 2021) — their central finding is that optimizing aerodynamics and structure separately misses real gains a coupled search finds. Taper's only channel into this model is bending relief → wing mass → hover energy, <code>η_bend = (1+2λ)/3</code>, weighed against induced drag from the Oswald-efficiency estimate, <code>e₀ = 4.61(1−0.045·AR^0.68)cos(Λ)^0.15 − 3.1</code>, <code>C_Di = C_L²/(π·AR·e₀)</code>. That's a narrower coupling than the paper's full aero-structural one, but it's real: a taper that trades structural weight for nothing in cruise drag gets evaluated by the same objective as cl and AR, not decided in a separate step.</p>
+  </div>
+
+  <h6 class="subhead">Outcome</h6>
+  <div class="figure-card">
+    <div class="figure-title">Search landscape</div>
+    <div data-fig="heatmapFigure"></div>
+    <div class="figure-caption">The actual (lift coefficient × aspect ratio) energy landscape the optimizer searched for one tier — darker is lower cost. Ring marks the found minimum.</div>
+  </div>
+  <div class="figure-card">
+    <div class="figure-title">Bending relief vs. taper ratio</div>
+    <div data-fig="bendingReliefFigure"></div>
+    <div class="figure-caption">η_bend = (1+2λ)/3, computed over the full taper range — this is the one number taper actually moves in the model, weighed against induced drag to find the joint optimum. Marker is the search's real result for this tier, λ = 0.30.</div>
+  </div>
+  <div class="figure-card">
+    <div class="figure-title">Example wing with joint taper search</div>
+    <div data-fig="wingPlanformFigureFull"></div>
+    <div class="figure-caption">Real output of --objective combined --taper-min 0.3 --taper-max 1.0: AR 8.56, taper ratio 0.30 (root 0.312 m / tip 0.093 m chord), span 1.73 m. Marker is the reported aerodynamic center — MAC 0.222 m, 0.056 m aft of the root leading edge, 0.356 m out along the span.</div>
+  </div>
+  <div class="figure-card">
+    <div class="figure-title">NACA 2412 — the file's own --naca example</div>
+    <div data-fig="nacaAirfoilFigure"></div>
+    <div class="figure-caption">Computed live from the same closed-form thickness/camber equations naca4_airfoil_point() uses — the exact surface, not a traced shape. Dashed line is the camber line; camber and thickness are what --naca hands to SolidWorks as parametric equations.</div>
+  </div>
+
+  <h6 class="subhead">Numbers</h6>
+  <div class="factgrid">
+    <div><div class="fact-k">Mass models</div><div class="fact-v" style="font-size:15px">empirical (AR^0.5) or beam (AR^1.5, load factor, t/c)</div></div>
+    <div><div class="fact-k">Taper ratio found</div><div class="fact-v">0.30, searched 0.3–1.0</div></div>
+    <div><div class="fact-k">MAC, example wing</div><div class="fact-v">0.222 m</div></div>
+    <div><div class="fact-k">x_ac from root LE</div><div class="fact-v">0.056 m</div></div>
+  </div>
+  <div style="margin-top:var(--space-4)"><a class="btn btn-secondary" href="https://github.com/exs783/Log_Reader" target="_blank" rel="noopener">View repo ↗</a></div>
+</section>
+
+<!-- ============================= LOG DASHBOARD ============================= -->
+<section class="project-section" id="log-dashboard">
+  <div class="project-head">
+    <div>
+      <span class="tag tag-outline">Flight-data tooling · 2026</span>
+      <h2 style="margin-top:var(--space-2)">Log Dashboard</h2>
+    </div>
+  </div>
+  <p class="project-tagline">A Flask + Plotly dashboard that decodes ArduCopter/PX4 flight logs into a full diagnostic report — the score, the issues list, and the chart below all come from a real flight log run through the real backend.</p>
+
+  <h6 class="subhead">Overview</h6>
+  <div class="method-copy">
+    <p>Every ArduPilot-based flight controller (Pixhawk and compatibles) writes a binary <code>.BIN</code> log of everything it measured mid-flight — hundreds of message types at up to a few hundred Hz. Reading that raw log to answer "was this flight okay, and if not, why" normally means a separate desktop tool (MAVExplorer) and manual digging. This dashboard does that automatically: upload a log, get back attitude tracking, vibration spectra, motor balance, PID tracking, GPS track, battery health, and barometer/magnetometer data across dedicated tabs, plus one overall flight-quality verdict.</p>
+    <p>It's built for the same audience Mission Model is: someone who just flew a real airframe and needs to know whether the motors, frame, or tuning are actually behaving before flying again — not a generic telemetry viewer.</p>
+  </div>
+
+  <h6 class="subhead">Method</h6>
+  <div class="method-copy">
+    <p>The backend (<code>python_backend.py</code>) reads a raw <code>.BIN</code> log with <code>pymavlink</code>, walks its message stream, and classifies the airframe from its frame-type parameter (quad/hex/octo/X8/tri/Y3/Y6). Vibration channels get an FFT pass — <code>X(f) = ℱ{a(t)} = ∫ a(t)·e^(−i2πft) dt</code> — mirroring the analysis MAVExplorer does for ArduPilot logs.</p>
+    <p>Ten analysis passes run per log — IMU, vibration, attitude, battery, motors, PID/rate controller, GPS, barometer, magnetometer, and discrete flight events (mode changes, arming, errors) — each producing its own stats block. A summary pass then scores the flight 0–100 and lists specific issues (e.g. "poor roll stability," "motor sync issues") instead of just dumping charts and leaving the reader to spot problems.</p>
+    <p>The dashboard (<code>log_dashboard.html</code>) renders the decoded series with Plotly, plus a Custom Plot tab that lets you overlay any two decoded variables against time regardless of category — useful for correlating, say, vibration against throttle.</p>
+  </div>
+
+  <h6 class="subhead">Outcome</h6>
+  <div class="figure-card">
+    <div class="figure-title">Attitude tracking</div>
+    <div data-fig="attitudeTrackFigure"></div>
+    <div class="figure-caption">Real commanded-vs-actual roll from the sample log's attitude pass — the visible gap between the two lines is what the flight-quality pass is flagging as poor roll stability, not an assumption about the aircraft.</div>
+  </div>
+  <div class="figure-card">
+    <div class="figure-title">Vibration trace</div>
+    <div data-fig="scopeFigureTall"></div>
+    <div class="figure-caption">Vibration trace shape from a real decoded sample log (my_flight.bin), 52.1 seconds, 261 GPS fixes.</div>
+  </div>
+
+  <h6 class="subhead">Numbers</h6>
+  <div class="factgrid">
+    <div><div class="fact-k">Flight quality score</div><div class="fact-v">65 / 100 (Fair)</div></div>
+    <div><div class="fact-k">Frame detected</div><div class="fact-v">QUAD, 4 motors</div></div>
+    <div><div class="fact-k">Peak vibration</div><div class="fact-v">33.6 m/s²</div></div>
+    <div><div class="fact-k">Stability issues found</div><div class="fact-v" style="font-size:15px">7 (roll/pitch/yaw + motor sync)</div></div>
+  </div>
+  <div style="margin-top:var(--space-4);display:flex;gap:var(--space-3);flex-wrap:wrap">
+    <a class="btn btn-primary" href="demos/log-dashboard.html">Live demo</a>
+    <a class="btn btn-secondary" href="https://github.com/exs783/Log_Reader" target="_blank" rel="noopener">View repo ↗</a>
+  </div>
+</section>
+
+<!-- ============================= LIQUID ROCKET ============================= -->
+<section class="project-section" id="liquid-rocket">
+  <div class="project-head">
+    <div>
+      <span class="tag tag-outline">CWRU Liquid Propulsion Team · 2026</span>
+      <h2 style="margin-top:var(--space-2)">Liquid Rocket</h2>
+    </div>
+  </div>
+  <p class="project-tagline">Ground-station software for CWRU's Liquid Propulsion Team — rebuilt from two prototypes that were never actually integrated into one working app, one of them my own original hot-fire GUI.</p>
+
+  <h6 class="subhead">Overview</h6>
+  <div class="method-copy">
+    <p>On CWRU's Liquid Propulsion Team (Aug 2025 – Jan 2026) I designed the mechanical thrust-control hardware for hot-fire tests — solenoids and servos regulating propellant flow — and built the PyQt5 control GUI that ran the hot-fire sequences against it.</p>
+    <p>A liquid rocket static test (or hot-fire test) needs a ground station: software running on a laptop near the test stand that shows the person running the test what's happening in real time — tank and chamber pressures, temperatures, thrust (via a load cell) — and lets them open or close valves and fire the igniter without touching the hardware directly. Every reading also needs to be logged, since post-test analysis (did the chamber pressure spike, did a valve stick) depends on having the full data, not just what was visible live.</p>
+    <p>This app is that ground station, rebuilt: a P&amp;ID (piping-and-instrumentation diagram) view for valve control, a live-gauge view for the 9 real sensor channels, and a logging view that records a full test session to CSV.</p>
+  </div>
+
+  <h6 class="subhead">Method</h6>
+  <div class="method-copy">
+    <p>The repo held two separate PyQt prototypes on incompatible Qt bindings: my own original PyQt5 data-logging page (<code>main_v2.py</code>) from the actual hot-fire tests, and a separate PyQt6 P&amp;ID valve-control page. Its own readme said as much: "still needs to be integrated with the other page."</p>
+    <p>Rebuilt as one PyQt6 app (<code>ground_station/</code>) sharing a single sensor/valve state across three tabs — Controls (the real P&amp;ID diagram plus working valve toggles), Live Data (one gauge per real sensor channel), Logging (start/stop → the documented raw + interpolated CSV pair).</p>
+    <p>The wire protocol (<code>P0–P6, T0, L0</code>, one <code>name,value,timestamp</code> line per reading) matches the real Teensy firmware exactly, so a fake data source stands in for hardware without changing anything else — verified with a headless smoke test that boots the real window, ticks it, toggles a valve, and checks a logging session actually writes CSVs.</p>
+    <p>The live demo linked below is a from-scratch JavaScript port of that same protocol and gauge math (not a screen recording) — it runs the identical random-walk sensor simulation and the identical SVG gauge/valve drawing code the Python app uses, so what you click there is what the desktop app actually does with no hardware attached.</p>
+  </div>
+
+  <h6 class="subhead">Outcome</h6>
+  <div class="figure-card">
+    <div class="figure-title">Data flow</div>
+    <div data-fig="flowFigure"></div>
+    <div class="figure-caption">One wire protocol, shared across a fake source (used here) and a future real Teensy connection, feeding all three tabs.</div>
+  </div>
+  <div class="figure-card">
+    <div class="figure-title">Live Data tab gauge grid</div>
+    <div data-fig="sensorPanelFigure"></div>
+    <div class="figure-caption">The Live Data tab's real gauge grid — 7 pressure channels, 1 thermocouple, 1 load cell, same P0–P6/T0/L0 IDs the wire protocol and the real Teensy firmware both use.</div>
+  </div>
+
+  <div class="caution">⚠ Valve toggles are display-only — no serial command channel to real hardware exists yet.</div>
+
+  <h6 class="subhead">Numbers</h6>
+  <div class="factgrid">
+    <div><div class="fact-k">Sensor channels</div><div class="fact-v" style="font-size:15px">7 pressure · 1 thermo · 1 load</div></div>
+    <div><div class="fact-k">Tests passing</div><div class="fact-v">10 / 10</div></div>
+    <div><div class="fact-k">UI</div><div class="fact-v">3-tab PyQt6 app</div></div>
+    <div><div class="fact-k">Valve control</div><div class="fact-v">UI state only</div></div>
+  </div>
+  <div style="margin-top:var(--space-4);display:flex;gap:var(--space-3);flex-wrap:wrap">
+    <a class="btn btn-primary" href="demos/liquid-rocket.html">Live demo</a>
+    <a class="btn btn-secondary" href="https://github.com/exs783/Liquid-Rocket" target="_blank" rel="noopener">View repo ↗</a>
+  </div>
+</section>
+
+<!-- ============================= CAD ============================= -->
+<section class="project-section" id="cad">
+  <div class="project-head">
+    <div>
+      <span class="tag tag-outline">SolidWorks CAD · 2025–2026</span>
+      <h2 style="margin-top:var(--space-2)">CAD</h2>
+    </div>
+  </div>
+  <p class="project-tagline">Two real SolidWorks projects: a competition hexacopter for CWRU's VTOL team, and a flexural fatigue test machine built at Tylok International to an ASTM standard.</p>
+
+  <h6 class="subhead">Overview</h6>
+  <div class="method-copy">
+    <p>CompDrone2025 is a full hexacopter assembly modeled for competition — carbon-fiber tube arms, a machined frame, RTK GPS and Pixhawk avionics mounts, a servo-actuated payload-drop mechanism, and folding landing gear, all as real mated SolidWorks assemblies (not a single dumb part). The model below is the actual assembly, exported to glTF so it's something you can rotate rather than a fixed render.</p>
+    <p>The Tylok fatigue rig tests parts to ASTM F1387 (flexural fatigue of plastic pipe fittings) — a pneumatic actuator cycles a clamped specimen while a cycle counter and a HiP pressure fitting log the test. I designed, built, and implemented the full machine for internal use.</p>
+  </div>
+
+  <h6 class="subhead">Method</h6>
+  <div class="method-copy">
+    <p>CompDrone2025's assembly is organized the way a real drone build actually breaks down: <code>ARM</code> (carbon-fiber tube, motor mount plate/ring, prop), <code>FRM</code> (top/bottom plates, payload mount, protective dome), <code>LGR</code> (landing-gear struts, TPU feet), <code>BATT</code> (battery + velcro strap + printed mount), <code>CAM</code>, <code>PAYLOAD</code> (servo, horn, clamp body, water-bottle attachment), and <code>ELEC</code> (Pixhawk 6X, RTK GPS, baseboard) — seven subassemblies mated into one top-level <code>.SLDASM</code>, each with real vendor parts (T-Motor, Amass, Pixhawk) modeled or imported alongside the machined/printed parts.</p>
+    <p>The fatigue machine follows ASTM F1387 A6: a pneumatic cylinder flexes a clamped specimen at a set rate while a second cylinder and a HiP pressure transducer hold and monitor line pressure, with a cycle-count readout on the control box. Built and implemented end to end during the Tylok co-op.</p>
+  </div>
+
+  <h6 class="subhead">Outcome</h6>
+  <div class="figure-card">
+    <div class="figure-title">CompDrone2025 — interactive model</div>
+    <div data-fig="modelFigureCad"></div>
+    <div class="figure-caption">Drag to orbit. The real 7-subassembly SolidWorks model, exported to glTF and compressed (Draco + WebP) from 192MB to ~2MB.</div>
+  </div>
+  <div class="figure-card">
+    <div class="figure-title">Tylok flexural fatigue test machine</div>
+    <img class="grayscale" src="assets/tylok-fatigue-machine.jpg" alt="Tylok ASTM F1387 A6 flexural fatigue test machine" loading="lazy">
+    <div class="figure-caption">The actual machine — pneumatic actuator, clamped specimen fixture, HiP pressure fitting, and the ASTM F1387 A6 control/readout box.</div>
+  </div>
+
+  <h6 class="subhead">Numbers</h6>
+  <div class="factgrid">
+    <div><div class="fact-k">CompDrone2025 subassemblies</div><div class="fact-v" style="font-size:15px">7 (ARM/FRM/LGR/BATT/CAM/PAYLOAD/ELEC)</div></div>
+    <div><div class="fact-k">Fatigue rig standard</div><div class="fact-v">ASTM F1387 A6</div></div>
+    <div><div class="fact-k">CAD tool</div><div class="fact-v">SolidWorks</div></div>
+    <div><div class="fact-k">Model format here</div><div class="fact-v" style="font-size:15px">glTF (Draco + WebP, ~2 MB)</div></div>
+  </div>
+</section>
+
+<section class="about" id="about">
+  <div>
+    <h6 style="color:var(--color-neutral-700)">ABOUT</h6>
+    <h2>Third-year mechanical engineering student, building the tools that back up what I design.</h2>
+    <p>I'm the VTOL Mechanical Team Lead for CWRU's VTOL team — frame and payload-mechanism design across Tail Sitter, Hexacopter, Quadcopter, and Tiltrotor airframes — alongside a mechanical engineering co-op at Tylok International and a stint on CWRU's Liquid Propulsion Team. Most of what's above exists because the decision it informed needed real numbers behind it, not a guess.</p>
+  </div>
+  <div class="card">
+    <div class="figure-title">QUICK FACTS</div>
+    <div class="hr" style="margin:var(--space-2) 0"></div>
+    <div style="display:flex;flex-direction:column;gap:var(--space-3);font-size:14px">
+      <div><strong>School</strong><br>Case Western Reserve University, B.S. Mechanical Engineering</div>
+      <div><strong>Expected grad</strong><br>May 2028 · Michelson-Morley Scholar</div>
+      <div><strong>Focus areas</strong><br>VTOL/aerospace structures, CAD/CAM, mechanical testing</div>
+      <div><strong>Current role</strong><br>VTOL Mechanical Team Lead, CWRU VTOL Team</div>
+    </div>
+  </div>
+</section>
+
+<section class="skills" id="skills">
+  <h6 style="color:var(--color-neutral-700)">SKILLS &amp; TOOLS</h6>
+  <h2 style="margin-bottom:var(--space-6)">What I build and test with</h2>
+  <div class="skills-grid" id="skills-grid"></div>
+</section>
+
+<section class="resume-band">
+  <div>
+    <h6>LET'S BUILD SOMETHING</h6>
+    <h2>Project logs and test data on request.</h2>
+  </div>
+  <div style="display:flex;gap:var(--space-3);flex-wrap:wrap">
+    <a href="https://www.linkedin.com/in/ethansimon13" target="_blank" rel="noopener" class="btn">LinkedIn ↗</a>
+    <a href="https://github.com/exs783" target="_blank" rel="noopener" class="btn">GitHub ↗</a>
+    <a href="mailto:exs783@case.edu" class="btn">Email</a>
+  </div>
+</section>
+
+<section class="contact" id="contact">
+  <h6 style="color:var(--color-neutral-700)">CONTACT</h6>
+  <h2>Got a project, internship, or test rig that needs a second pair of hands?</h2>
+  <p style="opacity:.8;max-width:46ch">I'm open to internships and collaborations in aerospace, robotics, and manufacturing.</p>
+  <div class="contact-links">
+    <a href="mailto:exs783@case.edu">exs783@case.edu</a>
+    <a href="https://www.linkedin.com/in/ethansimon13" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="https://github.com/exs783" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 Ethan Simon — Mechanical Engineering</span>
+  <span>Every number on this page is real, sourced from an actual repo, test run, or data file.</span>
+</footer>
+
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js" defer></script>
 <script>
 (function(){
   "use strict";
   const NS = "http://www.w3.org/2000/svg";
-  function svg(tag, attrs){
-    const el = document.createElementNS(NS, tag);
-    for (const k in attrs) el.setAttribute(k, attrs[k]);
-    return el;
-  }
+  function svg(tag, attrs){ const el = document.createElementNS(NS, tag); for (const k in attrs) el.setAttribute(k, attrs[k]); return el; }
   function svgRoot(viewBox){ return svg("svg", {viewBox}); }
   const rootStyle = getComputedStyle(document.documentElement);
   const cssVar = (name, fallback) => (rootStyle.getPropertyValue(name) || fallback).trim();
-  const INK = cssVar("--ink", "#18181b"), INK2 = cssVar("--ink-2", "#6b6b70"),
-        LINE = cssVar("--line", "#e2e2e5"), ACCENT = cssVar("--accent", "#3355ff");
+  const INK = cssVar("--ink", "#201e1d"), INK2 = cssVar("--ink-2", "#7d7979"),
+        LINE = cssVar("--line", "#c9c6c6"), ACCENT = cssVar("--accent", "#ec3013");
 
-  // ---------------------------------------------------------------
-  // Figures (monochrome, real data)
-  // ---------------------------------------------------------------
-  function barCompareFigure(oldVal, newVal, unit, maxVal){
-    const root = svgRoot("0 0 300 130");
-    const w = 70, gap = 60, baseY = 108, top = 14;
-    const scale = (baseY - top) / maxVal;
-    [["OLD", oldVal, 70, "#d4d4d8", INK2], ["NEW", newVal, 70 + w + gap, INK, "#fff"]].forEach(([label, val, x, fill]) => {
-      const h = val * scale;
-      root.appendChild(svg("rect", {x, y: baseY - h, width: w, height: h, rx: 6, fill}));
-      const t = svg("text", {x: x + w/2, y: baseY - h - 8, "text-anchor":"middle", "font-size":"13", "font-family":"IBM Plex Mono", "font-weight":"600", fill: INK});
-      t.textContent = val.toFixed(2) + unit;
-      root.appendChild(t);
-      const lbl = svg("text", {x: x + w/2, y: baseY + 18, "text-anchor":"middle", "font-size":"10.5", "font-family":"IBM Plex Mono", fill: INK2, "letter-spacing":"0.05em"});
-      lbl.textContent = label;
-      root.appendChild(lbl);
-    });
-    root.appendChild(svg("line", {x1:0, y1:baseY, x2:300, y2:baseY, stroke:LINE}));
-    return root;
-  }
-
-  // Mission profile: the actual leg sequence Mission_Model.py simulates --
-  // takeoff/100ft, cruise 1nm, land, (pickup), takeoff, cruise 8nm, land,
-  // (dropoff), takeoff, cruise 1nm, land -- as an altitude-vs-distance
-  // silhouette. Representative of the mission itself, not a generic gauge.
-  function missionProfileFigure(){
-    const root = svgRoot("0 0 300 120");
-    const base = 96, top = 20;
-    root.appendChild(svg("line", {x1:6, x2:294, y1:base, y2:base, stroke:LINE}));
-    // three climb/cruise/descend humps: short leg, long leg, short leg
-    const legs = [{w:38, cruiseW:14}, {w:130, cruiseW:76}, {w:38, cruiseW:14}];
-    let x = 14;
-    const pathParts = [`M ${x} ${base}`];
-    legs.forEach(leg => {
-      const climbX = x + (leg.w - leg.cruiseW)/2;
-      const descentX = climbX + leg.cruiseW;
-      const endX = x + leg.w;
-      pathParts.push(`L ${climbX.toFixed(1)} ${top}`);
-      pathParts.push(`L ${descentX.toFixed(1)} ${top}`);
-      pathParts.push(`L ${endX.toFixed(1)} ${base}`);
-      root.appendChild(svg("circle", {cx:endX, cy:base, r:3, fill:INK}));
-      x = endX + 14;
-      if (x < 280) pathParts.push(`M ${x} ${base}`);
-    });
-    root.appendChild(svg("path", {d:pathParts.join(" "), fill:"none", stroke:INK, "stroke-width":2.5, "stroke-linejoin":"round"}));
-    const cap = svg("text", {x:150, y:112, "text-anchor":"middle", "font-size":"9.5", "font-family":"IBM Plex Mono", fill:INK2});
-    cap.textContent = "1nm → 8nm → 1nm cargo run";
-    root.appendChild(cap);
-    return root;
-  }
-
-  // Rocket silhouette + flame: the domain this ground station serves, not
-  // the software architecture (that's flowFigure, still used in the detail
-  // Outcome section below).
-  function rocketFigure(){
-    const root = svgRoot("0 0 300 120");
-    const cx = 150;
-    root.appendChild(svg("path", {
-      d: `M ${cx} 10 L ${cx-16} 46 L ${cx-16} 82 L ${cx+16} 82 L ${cx+16} 46 Z`,
-      fill: "#fff", stroke: INK, "stroke-width": 2.5, "stroke-linejoin":"round",
-    }));
-    root.appendChild(svg("line", {x1:cx, y1:10, x2:cx, y2:82, stroke:LINE, "stroke-width":1}));
-    root.appendChild(svg("path", {d:`M ${cx-16} 66 L ${cx-32} 90 L ${cx-16} 82 Z`, fill:INK}));
-    root.appendChild(svg("path", {d:`M ${cx+16} 66 L ${cx+32} 90 L ${cx+16} 82 Z`, fill:INK}));
-    root.appendChild(svg("circle", {cx, cy:34, r:5, fill:"none", stroke:INK, "stroke-width":1.5}));
-    root.appendChild(svg("path", {
-      d: `M ${cx-9} 82 L ${cx+9} 82 L ${cx+5} 102 L ${cx} 112 L ${cx-5} 102 Z`,
-      fill: ACCENT, opacity: 0.85,
-    }));
-    const cap = svg("text", {x:150, y:112, "text-anchor":"middle", "font-size":"9.5", "font-family":"IBM Plex Mono", fill:INK2});
-    cap.textContent = "hot-fire ground station";
-    root.appendChild(cap);
-    return root;
-  }
-
-  // Real half-wing planform (top-down), drawn from an actual --objective
-  // combined --taper-min/--taper-max run's output geometry -- root/tip chord,
-  // span, and the reported aerodynamic-center location are all real numbers
-  // from that run, not a generic wing glyph.
-  function wingPlanformFigure(){
-    const root = svgRoot("0 0 300 100");
-    const scale = 150; // px per meter
-    const cx = 150, leY = 14;
-    const rootChordPx = 0.3115 * scale, tipChordPx = 0.0935 * scale, halfSpanPx = 0.8666 * scale;
-    const rootTeY = leY + rootChordPx, tipTeY = leY + tipChordPx;
-    [1, -1].forEach(s => {
-      root.appendChild(svg("polygon", {
-        points: `${cx},${leY} ${cx + s*halfSpanPx},${leY} ${cx + s*halfSpanPx},${tipTeY} ${cx},${rootTeY}`,
-        fill: "#fff", stroke: INK, "stroke-width": 2, "stroke-linejoin": "round",
-      }));
-      root.appendChild(svg("line", {
-        x1: cx, y1: leY + 0.25*rootChordPx, x2: cx + s*halfSpanPx, y2: leY + 0.25*tipChordPx,
-        stroke: INK2, "stroke-width": 1, "stroke-dasharray": "3,3",
-      }));
-    });
-    const acX = cx + 0.3555 * scale, acY = leY + 0.0555 * scale;
-    root.appendChild(svg("circle", {cx: acX, cy: acY, r: 3.5, fill: ACCENT}));
-    const acLabel = svg("text", {x: acX + 7, y: acY + 3, "font-size": "9", "font-family": "IBM Plex Mono", fill: ACCENT});
-    acLabel.textContent = "AC";
-    root.appendChild(acLabel);
-    const cap = svg("text", {x: 150, y: 94, "text-anchor": "middle", "font-size": "9.5", "font-family": "IBM Plex Mono", fill: INK2});
-    cap.textContent = "AR 8.56, taper 0.30 (joint search)";
-    root.appendChild(cap);
-    return root;
-  }
-
-  // Labeled altitude/distance profile of the real fixed course
-  // Mission_Model.py flies every candidate through: takeoff/100ft, cruise
-  // 1nm, land, pick up cargo, takeoff, cruise 8nm, land, drop cargo,
-  // takeoff, cruise 1nm back, land -- the actual MISSION_LEGS sequence,
-  // not a generic flight-profile sketch.
-  function missionCourseFigure(){
-    const root = svgRoot("0 0 620 170");
-    const base = 130, top = 30;
-    root.appendChild(svg("line", {x1:10, x2:610, y1:base, y2:base, stroke:LINE}));
-    const legs = [
-      {w:60, cruiseW:20, label:"1 nm"},
-      {w:280, cruiseW:190, label:"8 nm"},
-      {w:60, cruiseW:20, label:"1 nm"},
-    ];
-    const events = ["takeoff", "land · pick up cargo", "land · drop cargo", "land"];
-    let x = 20, ei = 0;
-    const pathParts = [`M ${x} ${base}`];
-    legs.forEach((leg, i) => {
-      const climbX = x + (leg.w - leg.cruiseW) / 2;
-      const descentX = climbX + leg.cruiseW;
-      const endX = x + leg.w;
-      pathParts.push(`L ${climbX.toFixed(1)} ${top}`);
-      const cruiseLabel = svg("text", {x:(climbX+descentX)/2, y:top-8, "text-anchor":"middle", "font-size":"10.5", "font-family":"IBM Plex Mono", fill:INK2});
-      cruiseLabel.textContent = `cruise ${leg.label}`;
-      root.appendChild(cruiseLabel);
-      pathParts.push(`L ${descentX.toFixed(1)} ${top}`);
-      pathParts.push(`L ${endX.toFixed(1)} ${base}`);
-      root.appendChild(svg("circle", {cx:x, cy:base, r:3, fill:INK}));
-      const evLabel = svg("text", {x, y:base+16, "text-anchor":"middle", "font-size":"9.5", "font-family":"IBM Plex Mono", fill:INK2});
-      evLabel.textContent = events[ei++];
-      root.appendChild(evLabel);
-      root.appendChild(svg("circle", {cx:endX, cy:base, r:3, fill:INK}));
-      x = endX + 46;
-      if (i < legs.length - 1) pathParts.push(`M ${x} ${base}`);
-    });
-    const evLabel = svg("text", {x: x - 46, y:base+16, "text-anchor":"middle", "font-size":"9.5", "font-family":"IBM Plex Mono", fill:INK2});
-    evLabel.textContent = events[ei];
-    root.appendChild(evLabel);
-    root.appendChild(svg("path", {d:pathParts.join(" "), fill:"none", stroke:INK, "stroke-width":2.5, "stroke-linejoin":"round"}));
-    return root;
-  }
-
-  // Real NACA 4-digit airfoil cross-section, computed live from the same
-  // closed-form thickness/camber equations wing_optimizer.py's
-  // naca4_airfoil_point() uses -- not a traced/looked-up shape. NACA 2412
-  // is the file's own documented --naca example, used here for the same
-  // reason: a concrete, real section rather than a generic wing glyph.
-  function nacaAirfoilFigure(code){
-    const m = parseInt(code[0], 10) / 100;
-    const p = parseInt(code[1], 10) / 10;
-    const t = parseInt(code.slice(2), 10) / 100;
-    const n = 60;
-    const thickness = x => 5*t*(0.2969*Math.sqrt(x) - 0.1260*x - 0.3516*x**2 + 0.2843*x**3 - 0.1015*x**4);
-    const camber = x => {
-      if (p === 0) return {yc:0, dyc:0};
-      return x < p
-        ? {yc: (m/(p*p))*(2*p*x - x*x), dyc: (2*m/(p*p))*(p - x)}
-        : {yc: (m/((1-p)**2))*((1-2*p) + 2*p*x - x*x), dyc: (2*m/((1-p)**2))*(p - x)};
-    };
-    const upper = [], lower = [];
-    for (let i = 0; i <= n; i++){
-      const x = i/n, yt = thickness(x), {yc, dyc} = camber(x), theta = Math.atan(dyc);
-      upper.push([x - yt*Math.sin(theta), yc + yt*Math.cos(theta)]);
-      lower.push([x + yt*Math.sin(theta), yc - yt*Math.cos(theta)]);
-    }
-    const scale = 460, ox = 10, oy = 66;
-    const toPx = ([x,y]) => `${(ox + x*scale).toFixed(1)},${(oy - y*scale).toFixed(1)}`;
-    const root = svgRoot("0 0 480 130");
-    root.appendChild(svg("polyline", {points: upper.map(toPx).join(" "), fill:"none", stroke:INK, "stroke-width":2}));
-    root.appendChild(svg("polyline", {points: lower.map(toPx).join(" "), fill:"none", stroke:INK, "stroke-width":2}));
-    const camberPts = [];
-    for (let i = 0; i <= n; i++){ const x = i/n; camberPts.push([x, camber(x).yc]); }
-    root.appendChild(svg("polyline", {points: camberPts.map(toPx).join(" "), fill:"none", stroke:ACCENT, "stroke-width":1, "stroke-dasharray":"3,3"}));
-    root.appendChild(svg("line", {x1:ox, y1:oy, x2:ox+scale, y2:oy, stroke:LINE, "stroke-dasharray":"2,3"}));
-    const cap = svg("text", {x:240, y:120, "text-anchor":"middle", "font-size":"10.5", "font-family":"IBM Plex Mono", fill:INK2});
-    cap.textContent = `NACA ${code} — ${(t*100).toFixed(0)}% thickness, ${(m*100).toFixed(0)}% camber at ${(p*100).toFixed(0)}% chord`;
-    root.appendChild(cap);
-    return root;
-  }
-
-  // The actual bending-relief curve, eta_bend = (1+2*lambda)/3, that taper
-  // search weighs against induced drag -- computed live over the full
-  // [0,1] taper range, with the real found taper (0.30) marked, instead of
-  // stating the equation in prose and leaving its shape to the imagination.
-  function bendingReliefFigure(){
-    const W = 300, H = 150, M = {l:36, r:10, t:14, b:34};
-    const plotW = W-M.l-M.r, plotH = H-M.t-M.b;
-    const root = svgRoot(`0 0 ${W} ${H}`);
-    const etaAt = lam => (1 + 2*lam) / 3;
-    const toX = lam => M.l + lam*plotW;
-    const toY = eta => M.t + plotH - ((eta - 1/3) / (2/3)) * plotH;
-    const n = 40, pts = [];
-    for (let i = 0; i <= n; i++){ const lam = i/n; pts.push(`${toX(lam).toFixed(1)},${toY(etaAt(lam)).toFixed(1)}`); }
-    root.appendChild(svg("line", {x1:M.l, x2:W-M.r, y1:M.t+plotH, y2:M.t+plotH, stroke:LINE}));
-    root.appendChild(svg("polyline", {points:pts.join(" "), fill:"none", stroke:INK, "stroke-width":2}));
-    const markLam = 0.30, mx = toX(markLam), my = toY(etaAt(markLam));
-    root.appendChild(svg("line", {x1:mx, x2:mx, y1:M.t, y2:M.t+plotH, stroke:LINE, "stroke-dasharray":"2,3"}));
-    root.appendChild(svg("circle", {cx:mx, cy:my, r:4, fill:ACCENT}));
-    const lbl = svg("text", {x:mx+8, y:my-6, "font-size":"9.5", "font-family":"IBM Plex Mono", fill:ACCENT, "font-weight":"600"});
-    lbl.textContent = `λ=0.30 → η=${etaAt(markLam).toFixed(2)}`;
-    root.appendChild(lbl);
-    [0, 0.5, 1.0].forEach(lam => {
-      const x = toX(lam);
-      const t = svg("text", {x, y:M.t+plotH+16, "text-anchor":"middle", "font-size":"9", "font-family":"IBM Plex Mono", fill:INK2});
-      t.textContent = lam.toFixed(1);
-      root.appendChild(t);
-    });
-    [1/3, 2/3, 1].forEach(eta => {
-      const y = toY(eta);
-      const t = svg("text", {x:M.l-6, y:y+3, "text-anchor":"end", "font-size":"8.5", "font-family":"IBM Plex Mono", fill:INK2});
-      t.textContent = eta.toFixed(2);
-      root.appendChild(t);
-    });
-    const cap = svg("text", {x:W/2, y:H-6, "text-anchor":"middle", "font-size":"9.5", "font-family":"IBM Plex Mono", fill:INK2});
-    cap.textContent = "taper ratio λ  →  bending-relief factor η_bend";
-    root.appendChild(cap);
-    return root;
-  }
-
-  // Small quadcopter glyph riding above the real vibration trace -- names
-  // the subject (a drone flight log) instead of leaving the waveform to
-  // read as a generic signal.
-  function droneScopeFigure(seed){
-    const root = scopeFigure(seed, false);
-    const g = svg("g", {transform:"translate(8,-4) scale(0.55)"});
-    [[-14,-14],[14,-14],[-14,14],[14,14]].forEach(([dx,dy]) => {
-      g.appendChild(svg("circle", {cx:20+dx, cy:16+dy, r:7, fill:"none", stroke:INK2, "stroke-width":2}));
-    });
-    g.appendChild(svg("line", {x1:6, y1:2, x2:34, y2:30, stroke:INK2, "stroke-width":2}));
-    g.appendChild(svg("line", {x1:34, y1:2, x2:6, y2:30, stroke:INK2, "stroke-width":2}));
-    g.appendChild(svg("circle", {cx:20, cy:16, r:4, fill:INK}));
-    root.insertBefore(g, root.firstChild);
-    return root;
-  }
+  /* ============ real-data chart functions (unchanged drawing logic) ============ */
 
   function scopeFigure(seed, tall){
     const h = tall ? 140 : 110;
@@ -512,10 +584,6 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     return root;
   }
 
-  // Real desired-vs-actual roll from the decoded sample log's own attitude
-  // pass (flight-analysis.json, analyses.attitude, ~1 point/sec) -- the gap
-  // between the two lines is the tracking error the flight's "poor roll
-  // stability" finding is actually reporting on, not a generic wobble.
   function attitudeTrackFigure(track){
     const W = 300, H = 130, M = {l:28, r:8, t:12, b:20};
     const plotW = W-M.l-M.r, plotH = H-M.t-M.b;
@@ -530,10 +598,10 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     const actualPts = track.map(p => `${toX(p[0]).toFixed(1)},${toY(p[2]).toFixed(1)}`).join(" ");
     root.appendChild(svg("polyline", {points:desiredPts, fill:"none", stroke:ACCENT, "stroke-width":1.6, "stroke-dasharray":"3,2"}));
     root.appendChild(svg("polyline", {points:actualPts, fill:"none", stroke:INK, "stroke-width":1.6}));
-    const ylab = svg("text", {x:M.l-4, y:M.t+6, "text-anchor":"end", "font-size":"8.5", "font-family":"IBM Plex Mono", fill:INK2});
+    const ylab = svg("text", {x:M.l-4, y:M.t+6, "text-anchor":"end", "font-size":"8.5", "font-family":"Archivo", fill:INK2});
     ylab.textContent = `±${vMax.toFixed(0)}°`;
     root.appendChild(ylab);
-    const cap = svg("text", {x:W/2, y:H-4, "text-anchor":"middle", "font-size":"9.5", "font-family":"IBM Plex Mono", fill:INK2});
+    const cap = svg("text", {x:W/2, y:H-4, "text-anchor":"middle", "font-size":"9.5", "font-family":"Archivo", fill:INK2});
     cap.textContent = "roll — dashed: commanded, solid: actual";
     root.appendChild(cap);
     return root;
@@ -560,19 +628,53 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     root.appendChild(svg("circle", {cx:bx, cy:by, r:5, fill:"none", stroke:ACCENT, "stroke-width":2}));
     [4,8,12].forEach(v => {
       const x = M.l + (v-ar_vals[0])/(ar_vals[ar_vals.length-1]-ar_vals[0])*plotW;
-      const t = svg("text", {x, y:H-8, "text-anchor":"middle", "font-size":"9", "font-family":"IBM Plex Mono", fill:INK2});
+      const t = svg("text", {x, y:H-8, "text-anchor":"middle", "font-size":"9", "font-family":"Archivo", fill:INK2});
       t.textContent = v; root.appendChild(t);
     });
     [0.3,0.65,1.0].forEach(v => {
       const y = M.t + (1-(v-cl_vals[0])/(cl_vals[cl_vals.length-1]-cl_vals[0]))*plotH;
-      const t = svg("text", {x:M.l-6, y:y+3, "text-anchor":"end", "font-size":"9", "font-family":"IBM Plex Mono", fill:INK2});
+      const t = svg("text", {x:M.l-6, y:y+3, "text-anchor":"end", "font-size":"9", "font-family":"Archivo", fill:INK2});
       t.textContent = v.toFixed(1); root.appendChild(t);
     });
     return root;
   }
 
-  function groupedBarFigure(rows, key1, key2, label1, label2, unit, fmt){
-    // rows: [{label, [key1]:v, [key2]:v}, ...] -- fixed left/right bar pair per row, monochrome (gray=old, black=new)
+  function bendingReliefFigure(){
+    const W = 300, H = 150, M = {l:36, r:10, t:14, b:34};
+    const plotW = W-M.l-M.r, plotH = H-M.t-M.b;
+    const root = svgRoot(`0 0 ${W} ${H}`);
+    const etaAt = lam => (1 + 2*lam) / 3;
+    const toX = lam => M.l + lam*plotW;
+    const toY = eta => M.t + plotH - ((eta - 1/3) / (2/3)) * plotH;
+    const n = 40, pts = [];
+    for (let i = 0; i <= n; i++){ const lam = i/n; pts.push(`${toX(lam).toFixed(1)},${toY(etaAt(lam)).toFixed(1)}`); }
+    root.appendChild(svg("line", {x1:M.l, x2:W-M.r, y1:M.t+plotH, y2:M.t+plotH, stroke:LINE}));
+    root.appendChild(svg("polyline", {points:pts.join(" "), fill:"none", stroke:INK, "stroke-width":2}));
+    const markLam = 0.30, mx = toX(markLam), my = toY(etaAt(markLam));
+    root.appendChild(svg("line", {x1:mx, x2:mx, y1:M.t, y2:M.t+plotH, stroke:LINE, "stroke-dasharray":"2,3"}));
+    root.appendChild(svg("circle", {cx:mx, cy:my, r:4, fill:ACCENT}));
+    const lbl = svg("text", {x:mx+8, y:my-6, "font-size":"9.5", "font-family":"Archivo", fill:ACCENT, "font-weight":"600"});
+    lbl.textContent = `λ=0.30 → η=${etaAt(markLam).toFixed(2)}`;
+    root.appendChild(lbl);
+    [0, 0.5, 1.0].forEach(lam => {
+      const x = toX(lam);
+      const t = svg("text", {x, y:M.t+plotH+16, "text-anchor":"middle", "font-size":"9", "font-family":"Archivo", fill:INK2});
+      t.textContent = lam.toFixed(1);
+      root.appendChild(t);
+    });
+    [1/3, 2/3, 1].forEach(eta => {
+      const y = toY(eta);
+      const t = svg("text", {x:M.l-6, y:y+3, "text-anchor":"end", "font-size":"8.5", "font-family":"Archivo", fill:INK2});
+      t.textContent = eta.toFixed(2);
+      root.appendChild(t);
+    });
+    const cap = svg("text", {x:W/2, y:H-6, "text-anchor":"middle", "font-size":"9.5", "font-family":"Archivo", fill:INK2});
+    cap.textContent = "taper ratio λ  →  bending-relief factor η_bend";
+    root.appendChild(cap);
+    return root;
+  }
+
+  function groupedBarFigure(rows, key1, key2){
     const W = 300, H = 170, M = {l:8, r:8, t:10, b:34};
     const plotW = W - M.l - M.r, plotH = H - M.t - M.b;
     const groupW = plotW / rows.length;
@@ -582,16 +684,16 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     root.appendChild(svg("line", {x1:M.l, x2:W-M.r, y1:M.t+plotH, y2:M.t+plotH, stroke:LINE}));
     rows.forEach((r, i) => {
       const gx = M.l + i*groupW + groupW/2;
-      [[key1, "#d4d4d8", -1], [key2, INK, 1]].forEach(([key, fill, side]) => {
+      [[key1, cssVar("--color-neutral-300","#d4d4d8"), -1], [key2, INK, 1]].forEach(([key, fill, side]) => {
         const v = r[key];
         const h = (v/maxVal) * plotH;
         const x = gx + side*gap/2 + (side < 0 ? -barW : 0);
-        root.appendChild(svg("rect", {x, y:M.t+plotH-h, width:barW, height:h, rx:3, fill}));
+        root.appendChild(svg("rect", {x, y:M.t+plotH-h, width:barW, height:h, fill}));
       });
-      const lbl = svg("text", {x:gx, y:H-18, "text-anchor":"middle", "font-size":"10", "font-family":"IBM Plex Mono", fill:INK2});
+      const lbl = svg("text", {x:gx, y:H-18, "text-anchor":"middle", "font-size":"10", "font-family":"Archivo", fill:INK2});
       lbl.textContent = r.label;
       root.appendChild(lbl);
-      const delta = svg("text", {x:gx, y:H-6, "text-anchor":"middle", "font-size":"9", "font-family":"IBM Plex Mono", fill:ACCENT, "font-weight":"600"});
+      const delta = svg("text", {x:gx, y:H-6, "text-anchor":"middle", "font-size":"9", "font-family":"Archivo", fill:ACCENT, "font-weight":"600"});
       const pct = ((r[key2]/r[key1] - 1) * 100);
       delta.textContent = `${pct>=0?"+":""}${pct.toFixed(0)}%`;
       root.appendChild(delta);
@@ -599,11 +701,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     return root;
   }
 
-  function hbarFigure(rows, key, unit, fmt){
-    // rows: [{label, [key]:value}, ...], sorted desc by caller. Value labels
-    // are right-anchored to a fixed column (not placed just-after-the-bar)
-    // so a long label on the longest bar can never overflow the viewBox --
-    // placing it relative to bar length did exactly that until this fix.
+  function hbarFigure(rows, key, fmt){
     const rowH = 20, W = 300, M = {l:118, r:66, t:4, b:4};
     const H = rows.length * rowH + M.t + M.b;
     const plotW = W - M.l - M.r;
@@ -612,32 +710,160 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     rows.forEach((r, i) => {
       const y = M.t + i*rowH;
       const w = (r[key]/maxVal) * plotW;
-      const lbl = svg("text", {x:M.l-8, y:y+13, "text-anchor":"end", "font-size":"9.5", "font-family":"IBM Plex Mono", fill:INK2});
+      const lbl = svg("text", {x:M.l-8, y:y+13, "text-anchor":"end", "font-size":"9.5", "font-family":"Archivo", fill:INK2});
       lbl.textContent = r.label;
       root.appendChild(lbl);
-      root.appendChild(svg("rect", {x:M.l, y:y+2, width:Math.max(w,1), height:14, rx:2, fill:INK}));
-      const val = svg("text", {x:W-4, y:y+13, "text-anchor":"end", "font-size":"9.5", "font-family":"IBM Plex Mono", fill:INK});
+      root.appendChild(svg("rect", {x:M.l, y:y+2, width:Math.max(w,1), height:14, fill:INK}));
+      const val = svg("text", {x:W-4, y:y+13, "text-anchor":"end", "font-size":"9.5", "font-family":"Archivo", fill:INK});
       val.textContent = fmt ? fmt(r[key]) : r[key];
       root.appendChild(val);
     });
     return root;
   }
 
+  function missionCourseFigure(){
+    const root = svgRoot("0 0 620 170");
+    const base = 130, top = 30;
+    root.appendChild(svg("line", {x1:10, x2:610, y1:base, y2:base, stroke:LINE}));
+    const legs = [ {w:60, cruiseW:20, label:"1 nm"}, {w:280, cruiseW:190, label:"8 nm"}, {w:60, cruiseW:20, label:"1 nm"} ];
+    const events = ["takeoff", "land · pick up cargo", "land · drop cargo", "land"];
+    let x = 20, ei = 0;
+    const pathParts = [`M ${x} ${base}`];
+    legs.forEach((leg, i) => {
+      const climbX = x + (leg.w - leg.cruiseW) / 2;
+      const descentX = climbX + leg.cruiseW;
+      const endX = x + leg.w;
+      pathParts.push(`L ${climbX.toFixed(1)} ${top}`);
+      const cruiseLabel = svg("text", {x:(climbX+descentX)/2, y:top-8, "text-anchor":"middle", "font-size":"10.5", "font-family":"Archivo", fill:INK2});
+      cruiseLabel.textContent = `cruise ${leg.label}`;
+      root.appendChild(cruiseLabel);
+      pathParts.push(`L ${descentX.toFixed(1)} ${top}`);
+      pathParts.push(`L ${endX.toFixed(1)} ${base}`);
+      root.appendChild(svg("circle", {cx:x, cy:base, r:3, fill:INK}));
+      const evLabel = svg("text", {x, y:base+16, "text-anchor":"middle", "font-size":"9.5", "font-family":"Archivo", fill:INK2});
+      evLabel.textContent = events[ei++];
+      root.appendChild(evLabel);
+      root.appendChild(svg("circle", {cx:endX, cy:base, r:3, fill:INK}));
+      x = endX + 46;
+      if (i < legs.length - 1) pathParts.push(`M ${x} ${base}`);
+    });
+    const evLabel = svg("text", {x: x - 46, y:base+16, "text-anchor":"middle", "font-size":"9.5", "font-family":"Archivo", fill:INK2});
+    evLabel.textContent = events[ei];
+    root.appendChild(evLabel);
+    root.appendChild(svg("path", {d:pathParts.join(" "), fill:"none", stroke:INK, "stroke-width":2.5, "stroke-linejoin":"round"}));
+    return root;
+  }
+
+  function missionProfileFigure(){
+    const root = svgRoot("0 0 300 120");
+    const base = 96, top = 20;
+    root.appendChild(svg("line", {x1:6, x2:294, y1:base, y2:base, stroke:LINE}));
+    const legs = [{w:38, cruiseW:14}, {w:130, cruiseW:76}, {w:38, cruiseW:14}];
+    let x = 14;
+    const pathParts = [`M ${x} ${base}`];
+    legs.forEach(leg => {
+      const climbX = x + (leg.w - leg.cruiseW)/2;
+      const descentX = climbX + leg.cruiseW;
+      const endX = x + leg.w;
+      pathParts.push(`L ${climbX.toFixed(1)} ${top}`);
+      pathParts.push(`L ${descentX.toFixed(1)} ${top}`);
+      pathParts.push(`L ${endX.toFixed(1)} ${base}`);
+      root.appendChild(svg("circle", {cx:endX, cy:base, r:3, fill:INK}));
+      x = endX + 14;
+      if (x < 280) pathParts.push(`M ${x} ${base}`);
+    });
+    root.appendChild(svg("path", {d:pathParts.join(" "), fill:"none", stroke:INK, "stroke-width":2.5, "stroke-linejoin":"round"}));
+    return root;
+  }
+
+  function rocketFigure(){
+    const root = svgRoot("0 0 300 120");
+    const cx = 150;
+    root.appendChild(svg("path", { d: `M ${cx} 10 L ${cx-16} 46 L ${cx-16} 82 L ${cx+16} 82 L ${cx+16} 46 Z`, fill: "#fff", stroke: INK, "stroke-width": 2.5, "stroke-linejoin":"round" }));
+    root.appendChild(svg("line", {x1:cx, y1:10, x2:cx, y2:82, stroke:LINE, "stroke-width":1}));
+    root.appendChild(svg("path", {d:`M ${cx-16} 66 L ${cx-32} 90 L ${cx-16} 82 Z`, fill:INK}));
+    root.appendChild(svg("path", {d:`M ${cx+16} 66 L ${cx+32} 90 L ${cx+16} 82 Z`, fill:INK}));
+    root.appendChild(svg("circle", {cx, cy:34, r:5, fill:"none", stroke:INK, "stroke-width":1.5}));
+    root.appendChild(svg("path", { d: `M ${cx-9} 82 L ${cx+9} 82 L ${cx+5} 102 L ${cx} 112 L ${cx-5} 102 Z`, fill: ACCENT, opacity: 0.85 }));
+    return root;
+  }
+
+  function wingPlanformFigure(caption){
+    const root = svgRoot("0 0 300 100");
+    const scale = 150;
+    const cx = 150, leY = 14;
+    const rootChordPx = 0.3115 * scale, tipChordPx = 0.0935 * scale, halfSpanPx = 0.8666 * scale;
+    const rootTeY = leY + rootChordPx, tipTeY = leY + tipChordPx;
+    [1, -1].forEach(s => {
+      root.appendChild(svg("polygon", { points: `${cx},${leY} ${cx + s*halfSpanPx},${leY} ${cx + s*halfSpanPx},${tipTeY} ${cx},${rootTeY}`, fill: "#fff", stroke: INK, "stroke-width": 2, "stroke-linejoin": "round" }));
+      root.appendChild(svg("line", { x1: cx, y1: leY + 0.25*rootChordPx, x2: cx + s*halfSpanPx, y2: leY + 0.25*tipChordPx, stroke: INK2, "stroke-width": 1, "stroke-dasharray": "3,3" }));
+    });
+    const acX = cx + 0.3555 * scale, acY = leY + 0.0555 * scale;
+    root.appendChild(svg("circle", {cx: acX, cy: acY, r: 3.5, fill: ACCENT}));
+    if (caption){
+      const acLabel = svg("text", {x: acX + 7, y: acY + 3, "font-size": "9", "font-family": "Archivo", fill: ACCENT});
+      acLabel.textContent = "AC"; root.appendChild(acLabel);
+      const cap = svg("text", {x: 150, y: 94, "text-anchor": "middle", "font-size": "9.5", "font-family": "Archivo", fill: INK2});
+      cap.textContent = "AR 8.56, taper 0.30 (joint search)"; root.appendChild(cap);
+    }
+    return root;
+  }
+
+  function nacaAirfoilFigure(code){
+    const m = parseInt(code[0], 10) / 100;
+    const p = parseInt(code[1], 10) / 10;
+    const t = parseInt(code.slice(2), 10) / 100;
+    const n = 60;
+    const thickness = x => 5*t*(0.2969*Math.sqrt(x) - 0.1260*x - 0.3516*x**2 + 0.2843*x**3 - 0.1015*x**4);
+    const camber = x => {
+      if (p === 0) return {yc:0, dyc:0};
+      return x < p ? {yc: (m/(p*p))*(2*p*x - x*x), dyc: (2*m/(p*p))*(p - x)} : {yc: (m/((1-p)**2))*((1-2*p) + 2*p*x - x*x), dyc: (2*m/((1-p)**2))*(p - x)};
+    };
+    const upper = [], lower = [];
+    for (let i = 0; i <= n; i++){
+      const x = i/n, yt = thickness(x), {yc, dyc} = camber(x), theta = Math.atan(dyc);
+      upper.push([x - yt*Math.sin(theta), yc + yt*Math.cos(theta)]);
+      lower.push([x + yt*Math.sin(theta), yc - yt*Math.cos(theta)]);
+    }
+    const scale = 460, ox = 10, oy = 66;
+    const toPx = ([x,y]) => `${(ox + x*scale).toFixed(1)},${(oy - y*scale).toFixed(1)}`;
+    const root = svgRoot("0 0 480 130");
+    root.appendChild(svg("polyline", {points: upper.map(toPx).join(" "), fill:"none", stroke:INK, "stroke-width":2}));
+    root.appendChild(svg("polyline", {points: lower.map(toPx).join(" "), fill:"none", stroke:INK, "stroke-width":2}));
+    const camberPts = [];
+    for (let i = 0; i <= n; i++){ const x = i/n; camberPts.push([x, camber(x).yc]); }
+    root.appendChild(svg("polyline", {points: camberPts.map(toPx).join(" "), fill:"none", stroke:ACCENT, "stroke-width":1, "stroke-dasharray":"3,3"}));
+    root.appendChild(svg("line", {x1:ox, y1:oy, x2:ox+scale, y2:oy, stroke:LINE, "stroke-dasharray":"2,3"}));
+    const cap = svg("text", {x:240, y:120, "text-anchor":"middle", "font-size":"10.5", "font-family":"Archivo", fill:INK2});
+    cap.textContent = `NACA ${code} — ${(t*100).toFixed(0)}% thickness, ${(m*100).toFixed(0)}% camber at ${(p*100).toFixed(0)}% chord`;
+    root.appendChild(cap);
+    return root;
+  }
+
+  function droneScopeFigure(seed){
+    const root = scopeFigure(seed, false);
+    const g = svg("g", {transform:"translate(8,-4) scale(0.55)"});
+    [[-14,-14],[14,-14],[-14,14],[14,14]].forEach(([dx,dy]) => {
+      g.appendChild(svg("circle", {cx:20+dx, cy:16+dy, r:7, fill:"none", stroke:INK2, "stroke-width":2}));
+    });
+    g.appendChild(svg("line", {x1:6, y1:2, x2:34, y2:30, stroke:INK2, "stroke-width":2}));
+    g.appendChild(svg("line", {x1:34, y1:2, x2:6, y2:30, stroke:INK2, "stroke-width":2}));
+    g.appendChild(svg("circle", {cx:20, cy:16, r:4, fill:INK}));
+    root.insertBefore(g, root.firstChild);
+    return root;
+  }
+
   function flowFigure(){
     const root = svgRoot("0 0 300 140");
-    const boxes = [
-      {x:6, y:56, w:70, h:28, label:"Teensy"},
-      {x:106, y:56, w:88, h:28, label:"sensors.py"},
-      {x:224, y:56, w:70, h:28, label:"main.py"},
-    ];
+    const boxes = [ {x:6, y:56, w:70, h:28, label:"Teensy"}, {x:106, y:56, w:88, h:28, label:"sensors.py"}, {x:224, y:56, w:70, h:28, label:"main.py"} ];
     const defs = svg("defs", {});
     const marker = svg("marker", {id:"arrow", markerWidth:8, markerHeight:8, refX:6, refY:3, orient:"auto"});
     marker.appendChild(svg("path", {d:"M0,0 L6,3 L0,6 Z", fill:INK2}));
     defs.appendChild(marker);
     root.appendChild(defs);
     boxes.forEach((b,i) => {
-      root.appendChild(svg("rect", {x:b.x, y:b.y, width:b.w, height:b.h, rx:6, fill:"#fff", stroke:INK, "stroke-width":1.5}));
-      const t = svg("text", {x:b.x+b.w/2, y:b.y+b.h/2+4, "text-anchor":"middle", "font-size":"10.5", "font-family":"IBM Plex Mono", fill:INK});
+      root.appendChild(svg("rect", {x:b.x, y:b.y, width:b.w, height:b.h, fill:"#fff", stroke:INK, "stroke-width":1.5}));
+      const t = svg("text", {x:b.x+b.w/2, y:b.y+b.h/2+4, "text-anchor":"middle", "font-size":"10.5", "font-family":"Archivo", fill:INK});
       t.textContent = b.label; root.appendChild(t);
       if (i < boxes.length-1){
         const nx = boxes[i+1].x;
@@ -647,17 +873,14 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     const tabs = ["Controls","Live Data","Logging"];
     tabs.forEach((label,i) => {
       const x = 106 + i*30;
-      root.appendChild(svg("rect", {x, y:100, width:26, height:18, rx:4, fill: i===0 ? INK : "#fff", stroke:INK, "stroke-width":1}));
+      root.appendChild(svg("rect", {x, y:100, width:26, height:18, fill: i===0 ? INK : "#fff", stroke:INK, "stroke-width":1}));
     });
-    const cap = svg("text", {x:150, y:132, "text-anchor":"middle", "font-size":"9.5", "font-family":"IBM Plex Mono", fill:INK2});
+    const cap = svg("text", {x:150, y:132, "text-anchor":"middle", "font-size":"9.5", "font-family":"Archivo", fill:INK2});
     cap.textContent = "3-tab PyQt6 app, one shared state";
     root.appendChild(cap);
     return root;
   }
 
-  // The Live Data tab's actual gauge grid: the real wire-protocol channel
-  // IDs (P0-P6 pressure, T0 thermo, L0 load) sensors.py exposes, not a
-  // generic "sensor cluster" glyph.
   function sensorPanelFigure(){
     const channels = [
       {id:"P0", label:"chamber"}, {id:"P1", label:"fuel tank"}, {id:"P2", label:"ox tank"},
@@ -671,42 +894,31 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     channels.forEach((c,i) => {
       const col = i%cols, row = Math.floor(i/cols);
       const x = col*(cw+gap), y = row*(ch+gap);
-      root.appendChild(svg("rect", {x, y, width:cw, height:ch, rx:6, fill:"#fff", stroke:LINE, "stroke-width":1.5}));
-      const id = svg("text", {x:x+10, y:y+24, "font-size":"12", "font-family":"IBM Plex Mono", "font-weight":"600", fill: c.id[0]==="P" ? ACCENT : INK});
-      id.textContent = c.id;
-      root.appendChild(id);
-      const lbl = svg("text", {x:x+10, y:y+40, "font-size":"9", "font-family":"IBM Plex Mono", fill:INK2});
-      lbl.textContent = c.label;
-      root.appendChild(lbl);
+      root.appendChild(svg("rect", {x, y, width:cw, height:ch, fill:"#fff", stroke:LINE, "stroke-width":1.5}));
+      const id = svg("text", {x:x+10, y:y+24, "font-size":"12", "font-family":"Archivo", "font-weight":"800", fill: c.id[0]==="P" ? ACCENT : INK});
+      id.textContent = c.id; root.appendChild(id);
+      const lbl = svg("text", {x:x+10, y:y+40, "font-size":"9", "font-family":"Archivo", fill:INK2});
+      lbl.textContent = c.label; root.appendChild(lbl);
     });
     return root;
   }
 
-  // Isometric wireframe block, dashed -- reads as "a CAD model" while the
-  // dashed/unfilled treatment keeps it honestly an empty slot, not a real render.
   function imgFigure(src, alt){
     const img = document.createElement("img");
     img.src = src; img.alt = alt; img.loading = "lazy";
     return img;
   }
 
-  // Real, interactive glTF viewer (Google's <model-viewer>) -- not a static
-  // render. The source .glb is the actual CompDrone2025 SolidWorks assembly,
-  // exported and compressed (Draco geometry + WebP textures) from 192MB down
-  // to ~2MB so it's actually loadable on a portfolio page.
-  //
-  // The model-viewer library itself only loads when this function first
-  // runs (i.e. when the CAD detail view is actually opened) instead of on
-  // every pageview -- most visitors never open CAD.
   let modelViewerLoading = null;
   function ensureModelViewerLoaded(){
     if (modelViewerLoading) return modelViewerLoading;
     modelViewerLoading = new Promise((resolve, reject) => {
+      const existing = document.querySelector('script[src*="model-viewer"]');
+      if (existing || customElements.get("model-viewer")) { resolve(); return; }
       const s = document.createElement("script");
       s.type = "module";
       s.src = "https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js";
-      s.onload = resolve;
-      s.onerror = reject;
+      s.onload = resolve; s.onerror = reject;
       document.head.appendChild(s);
     });
     return modelViewerLoading;
@@ -714,37 +926,26 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   function modelFigure(src, alt){
     ensureModelViewerLoaded();
     const mv = document.createElement("model-viewer");
-    mv.setAttribute("src", src);
-    mv.setAttribute("alt", alt);
-    mv.setAttribute("camera-controls", "");
-    mv.setAttribute("auto-rotate", "");
-    mv.setAttribute("shadow-intensity", "1");
-    mv.setAttribute("exposure", "1");
-    mv.setAttribute("style", "background-color:#f4f4f5; border-radius:8px;");
+    mv.setAttribute("src", src); mv.setAttribute("alt", alt);
+    mv.setAttribute("camera-controls", ""); mv.setAttribute("auto-rotate", "");
+    mv.setAttribute("shadow-intensity", "1"); mv.setAttribute("exposure", "1");
+    mv.setAttribute("style", "background-color:var(--color-surface);");
     return mv;
   }
 
-  // ---------------------------------------------------------------
-  // Real data (from this session's wing-optimizer run + repo work)
-  // ---------------------------------------------------------------
-  const LANDSCAPE = {"cl_vals": [0.3, 0.3179, 0.3359, 0.3538, 0.3718, 0.3897, 0.4077, 0.4256, 0.4436, 0.4615, 0.4795, 0.4974, 0.5154, 0.5333, 0.5513, 0.5692, 0.5872, 0.6051, 0.6231, 0.641, 0.659, 0.6769, 0.6949, 0.7128, 0.7308, 0.7487, 0.7667, 0.7846, 0.8026, 0.8205, 0.8385, 0.8564, 0.8744, 0.8923, 0.9103, 0.9282, 0.9462, 0.9641, 0.9821, 1.0], "ar_vals": [4.0, 4.2051, 4.4103, 4.6154, 4.8205, 5.0256, 5.2308, 5.4359, 5.641, 5.8462, 6.0513, 6.2564, 6.4615, 6.6667, 6.8718, 7.0769, 7.2821, 7.4872, 7.6923, 7.8974, 8.1026, 8.3077, 8.5128, 8.7179, 8.9231, 9.1282, 9.3333, 9.5385, 9.7436, 9.9487, 10.1538, 10.359, 10.5641, 10.7692, 10.9744, 11.1795, 11.3846, 11.5897, 11.7949, 12.0], "drag_grid": [[158.25, 157.57, 156.97, 156.43, 155.94, 155.5, 155.11, 154.75, 154.43, 154.15, 153.89, 153.66, 153.45, 153.27, 153.11, 152.97, 152.85, 152.75, 152.67, 152.6, 152.55, 152.52, 152.5, 152.5, 152.52, 152.54, 152.59, 152.65, 152.73, 152.82, 152.93, 153.05, 153.2, 153.36, 153.54, 153.75, 153.97, 154.22, 154.49, 154.79], [151.89, 151.17, 150.53, 149.96, 149.44, 148.98, 148.56, 148.19, 147.85, 147.54, 147.27, 147.03, 146.81, 146.62, 146.45, 146.3, 146.17, 146.07, 145.98, 145.91, 145.86, 145.82, 145.8, 145.8, 145.82, 145.85, 145.89, 145.96, 146.04, 146.14, 146.25, 146.39, 146.54, 146.71, 146.91, 147.12, 147.36, 147.62, 147.91, 148.23], [146.35, 145.6, 144.92, 144.31, 143.77, 143.28, 142.84, 142.44, 142.08, 141.76, 141.47, 141.22, 140.99, 140.78, 140.61, 140.45, 140.32, 140.2, 140.11, 140.04, 139.98, 139.94, 139.92, 139.92, 139.94, 139.97, 140.02, 140.09, 140.17, 140.28, 140.4, 140.54, 140.7, 140.89, 141.09, 141.32, 141.57, 141.85, 142.15, 142.49], [141.52, 140.72, 140.0, 139.37, 138.79, 138.28, 137.81, 137.39, 137.02, 136.68, 136.37, 136.1, 135.86, 135.65, 135.46, 135.29, 135.15, 135.03, 134.94, 134.86, 134.8, 134.76, 134.74, 134.74, 134.75, 134.79, 134.84, 134.91, 135.0, 135.11, 135.24, 135.39, 135.56, 135.75, 135.97, 136.21, 136.47, 136.77, 137.09, 137.44], [137.27, 136.43, 135.68, 135.01, 134.41, 133.87, 133.38, 132.94, 132.54, 132.19, 131.87, 131.58, 131.33, 131.1, 130.91, 130.73, 130.59, 130.46, 130.36, 130.28, 130.21, 130.17, 130.15, 130.15, 130.17, 130.2, 130.26, 130.33, 130.43, 130.54, 130.68, 130.84, 131.01, 131.22, 131.44, 131.69, 131.97, 132.28, 132.62, 132.99], [133.54, 132.66, 131.88, 131.17, 130.54, 129.97, 129.46, 129.0, 128.58, 128.21, 127.88, 127.58, 127.31, 127.08, 126.87, 126.69, 126.53, 126.4, 126.29, 126.21, 126.14, 126.1, 126.08, 126.07, 126.09, 126.13, 126.19, 126.27, 126.37, 126.49, 126.63, 126.79, 126.98, 127.19, 127.43, 127.69, 127.99, 128.31, 128.66, 129.05], [130.25, 129.33, 128.51, 127.78, 127.12, 126.52, 125.99, 125.5, 125.07, 124.68, 124.33, 124.02, 123.74, 123.49, 123.27, 123.09, 122.92, 122.79, 122.67, 122.58, 122.52, 122.47, 122.45, 122.44, 122.46, 122.5, 122.56, 122.65, 122.75, 122.88, 123.02, 123.2, 123.39, 123.61, 123.86, 124.14, 124.44, 124.78, 125.15, 125.56], [127.36, 126.4, 125.54, 124.77, 124.08, 123.46, 122.9, 122.4, 121.94, 121.54, 121.17, 120.85, 120.55, 120.3, 120.07, 119.87, 119.7, 119.56, 119.44, 119.35, 119.28, 119.23, 119.21, 119.2, 119.22, 119.27, 119.33, 119.41, 119.52, 119.65, 119.81, 119.99, 120.19, 120.43, 120.68, 120.97, 121.29, 121.64, 122.03, 122.45], [124.8, 123.8, 122.91, 122.11, 121.39, 120.74, 120.16, 119.63, 119.16, 118.74, 118.36, 118.02, 117.71, 117.44, 117.21, 117.0, 116.82, 116.68, 116.55, 116.46, 116.38, 116.33, 116.31, 116.3, 116.33, 116.37, 116.43, 116.52, 116.64, 116.77, 116.94, 117.12, 117.34, 117.58, 117.85, 118.15, 118.48, 118.85, 119.25, 119.69], [122.55, 121.51, 120.58, 119.74, 119.0, 118.32, 117.72, 117.17, 116.68, 116.24, 115.84, 115.49, 115.17, 114.89, 114.65, 114.43, 114.25, 114.09, 113.97, 113.86, 113.79, 113.74, 113.71, 113.71, 113.73, 113.77, 113.84, 113.94, 114.05, 114.2, 114.36, 114.56, 114.78, 115.03, 115.31, 115.62, 115.97, 116.35, 116.77, 117.23], [120.56, 119.48, 118.52, 117.65, 116.87, 116.17, 115.54, 114.98, 114.47, 114.01, 113.6, 113.23, 112.9, 112.61, 112.35, 112.13, 111.94, 111.78, 111.65, 111.54, 111.46, 111.41, 111.38, 111.38, 111.4, 111.45, 111.52, 111.62, 111.74, 111.89, 112.06, 112.26, 112.49, 112.75, 113.05, 113.37, 113.73, 114.13, 114.56, 115.04], [118.81, 117.69, 116.69, 115.79, 114.99, 114.26, 113.61, 113.02, 112.49, 112.01, 111.59, 111.21, 110.87, 110.56, 110.3, 110.07, 109.87, 109.7, 109.57, 109.46, 109.37, 109.32, 109.29, 109.29, 109.31, 109.36, 109.43, 109.53, 109.66, 109.81, 110.0, 110.21, 110.44, 110.71, 111.02, 111.35, 111.73, 112.14, 112.59, 113.09], [117.28, 116.12, 115.08, 114.15, 113.32, 112.56, 111.89, 111.28, 110.73, 110.24, 109.79, 109.4, 109.05, 108.73, 108.46, 108.22, 108.02, 107.84, 107.7, 107.59, 107.5, 107.44, 107.41, 107.41, 107.43, 107.49, 107.56, 107.67, 107.8, 107.96, 108.14, 108.36, 108.61, 108.89, 109.2, 109.55, 109.94, 110.36, 110.83, 111.35], [115.94, 114.74, 113.67, 112.7, 111.84, 111.06, 110.36, 109.73, 109.16, 108.65, 108.19, 107.78, 107.42, 107.1, 106.81, 106.57, 106.35, 106.17, 106.03, 105.91, 105.82, 105.76, 105.73, 105.73, 105.75, 105.8, 105.88, 105.99, 106.13, 106.29, 106.49, 106.71, 106.97, 107.26, 107.58, 107.94, 108.34, 108.78, 109.27, 109.8], [114.78, 113.53, 112.42, 111.43, 110.53, 109.73, 109.0, 108.35, 107.77, 107.24, 106.77, 106.34, 105.97, 105.63, 105.34, 105.08, 104.86, 104.68, 104.52, 104.4, 104.31, 104.25, 104.22, 104.22, 104.24, 104.3, 104.38, 104.49, 104.63, 104.8, 105.0, 105.23, 105.5, 105.8, 106.13, 106.51, 106.92, 107.38, 107.88, 108.43], [113.77, 112.48, 111.34, 110.31, 109.39, 108.55, 107.81, 107.13, 106.53, 105.98, 105.5, 105.06, 104.67, 104.32, 104.02, 103.76, 103.53, 103.34, 103.18, 103.06, 102.96, 102.9, 102.87, 102.86, 102.89, 102.95, 103.03, 103.15, 103.29, 103.47, 103.67, 103.91, 104.19, 104.5, 104.84, 105.23, 105.65, 106.13, 106.64, 107.21], [112.9, 111.58, 110.39, 109.33, 108.38, 107.52, 106.75, 106.06, 105.43, 104.87, 104.37, 103.92, 103.52, 103.16, 102.85, 102.58, 102.34, 102.14, 101.98, 101.85, 101.76, 101.69, 101.66, 101.65, 101.68, 101.74, 101.82, 101.94, 102.09, 102.27, 102.49, 102.74, 103.02, 103.34, 103.69, 104.09, 104.53, 105.02, 105.55, 106.14], [112.16, 110.8, 109.58, 108.49, 107.51, 106.62, 105.83, 105.11, 104.47, 103.89, 103.37, 102.91, 102.49, 102.13, 101.8, 101.52, 101.28, 101.08, 100.91, 100.78, 100.68, 100.61, 100.58, 100.57, 100.6, 100.66, 100.75, 100.87, 101.03, 101.21, 101.43, 101.69, 101.98, 102.31, 102.68, 103.09, 103.54, 104.04, 104.59, 105.19], [111.54, 110.14, 108.89, 107.76, 106.75, 105.84, 105.02, 104.29, 103.62, 103.03, 102.49, 102.01, 101.59, 101.21, 100.88, 100.59, 100.34, 100.13, 99.96, 99.82, 99.72, 99.65, 99.61, 99.61, 99.64, 99.7, 99.79, 99.92, 100.08, 100.27, 100.5, 100.76, 101.06, 101.4, 101.78, 102.2, 102.67, 103.18, 103.75, 104.37], [111.04, 109.59, 108.3, 107.14, 106.1, 105.17, 104.33, 103.57, 102.89, 102.27, 101.72, 101.23, 100.79, 100.4, 100.06, 99.77, 99.51, 99.29, 99.12, 98.98, 98.87, 98.8, 98.76, 98.76, 98.79, 98.85, 98.95, 99.08, 99.24, 99.44, 99.67, 99.94, 100.25, 100.6, 100.99, 101.42, 101.9, 102.43, 103.01, 103.65], [110.63, 109.14, 107.81, 106.62, 105.56, 104.59, 103.73, 102.95, 102.25, 101.62, 101.05, 100.55, 100.1, 99.7, 99.35, 99.04, 98.78, 98.56, 98.37, 98.23, 98.12, 98.05, 98.01, 98.01, 98.04, 98.1, 98.2, 98.33, 98.5, 98.7, 98.94, 99.22, 99.54, 99.9, 100.3, 100.74, 101.24, 101.78, 102.38, 103.04], [110.31, 108.78, 107.42, 106.2, 105.1, 104.11, 103.22, 102.42, 101.7, 101.06, 100.47, 99.95, 99.49, 99.08, 98.72, 98.41, 98.14, 97.91, 97.72, 97.57, 97.46, 97.39, 97.35, 97.34, 97.38, 97.44, 97.54, 97.68, 97.85, 98.06, 98.31, 98.59, 98.92, 99.29, 99.7, 100.16, 100.66, 101.22, 101.84, 102.51], [110.08, 108.51, 107.11, 105.86, 104.73, 103.72, 102.8, 101.98, 101.24, 100.58, 99.98, 99.45, 98.97, 98.55, 98.18, 97.86, 97.58, 97.35, 97.16, 97.0, 96.89, 96.81, 96.77, 96.77, 96.8, 96.87, 96.97, 97.11, 97.29, 97.5, 97.76, 98.05, 98.38, 98.76, 99.18, 99.65, 100.18, 100.75, 101.38, 102.08], [109.92, 108.32, 106.88, 105.59, 104.44, 103.4, 102.46, 101.62, 100.86, 100.18, 99.57, 99.02, 98.53, 98.1, 97.72, 97.39, 97.11, 96.87, 96.67, 96.51, 96.4, 96.32, 96.27, 96.27, 96.3, 96.37, 96.48, 96.62, 96.81, 97.03, 97.28, 97.59, 97.93, 98.32, 98.75, 99.23, 99.77, 100.36, 101.0, 101.71], [109.84, 108.2, 106.72, 105.4, 104.22, 103.15, 102.19, 101.33, 100.55, 99.85, 99.23, 98.66, 98.16, 97.72, 97.33, 96.99, 96.7, 96.46, 96.25, 96.09, 95.97, 95.89, 95.85, 95.85, 95.88, 95.95, 96.06, 96.21, 96.39, 96.62, 96.89, 97.19, 97.55, 97.94, 98.39, 98.88, 99.43, 100.03, 100.7, 101.43], [109.83, 108.14, 106.63, 105.28, 104.07, 102.97, 101.99, 101.11, 100.31, 99.59, 98.95, 98.38, 97.86, 97.41, 97.01, 96.67, 96.37, 96.11, 95.91, 95.74, 95.62, 95.54, 95.49, 95.49, 95.52, 95.6, 95.71, 95.86, 96.05, 96.28, 96.55, 96.87, 97.23, 97.64, 98.09, 98.6, 99.16, 99.78, 100.46, 101.21], [109.88, 108.15, 106.61, 105.22, 103.98, 102.86, 101.85, 100.95, 100.13, 99.4, 98.74, 98.15, 97.63, 97.16, 96.75, 96.4, 96.09, 95.83, 95.62, 95.45, 95.33, 95.24, 95.2, 95.19, 95.23, 95.3, 95.42, 95.57, 95.77, 96.01, 96.28, 96.61, 96.98, 97.39, 97.86, 98.38, 98.95, 99.59, 100.28, 101.05], [109.99, 108.22, 106.64, 105.22, 103.95, 102.8, 101.77, 100.84, 100.01, 99.26, 98.59, 97.98, 97.45, 96.97, 96.55, 96.19, 95.88, 95.61, 95.4, 95.22, 95.09, 95.01, 94.96, 94.96, 94.99, 95.07, 95.19, 95.35, 95.55, 95.79, 96.07, 96.4, 96.78, 97.21, 97.69, 98.22, 98.8, 99.45, 100.17, 100.95], [110.15, 108.34, 106.72, 105.27, 103.97, 102.8, 101.75, 100.8, 99.94, 99.18, 98.49, 97.87, 97.32, 96.84, 96.41, 96.04, 95.72, 95.45, 95.22, 95.05, 94.92, 94.83, 94.78, 94.78, 94.81, 94.89, 95.01, 95.17, 95.38, 95.63, 95.92, 96.26, 96.64, 97.08, 97.57, 98.11, 98.71, 99.37, 100.1, 100.9], [110.36, 108.51, 106.86, 105.38, 104.05, 102.85, 101.77, 100.8, 99.93, 99.14, 98.44, 97.81, 97.25, 96.75, 96.31, 95.93, 95.61, 95.33, 95.1, 94.92, 94.79, 94.7, 94.65, 94.64, 94.68, 94.76, 94.89, 95.05, 95.26, 95.51, 95.81, 96.16, 96.55, 97.0, 97.5, 98.05, 98.67, 99.35, 100.09, 100.91], [110.62, 108.73, 107.04, 105.53, 104.17, 102.94, 101.84, 100.85, 99.96, 99.16, 98.44, 97.8, 97.22, 96.71, 96.27, 95.88, 95.55, 95.26, 95.03, 94.85, 94.71, 94.61, 94.57, 94.56, 94.6, 94.68, 94.81, 94.98, 95.19, 95.45, 95.75, 96.11, 96.51, 96.97, 97.48, 98.04, 98.67, 99.37, 100.13, 100.96], [110.93, 109.0, 107.27, 105.72, 104.33, 103.09, 101.96, 100.95, 100.04, 99.22, 98.48, 97.83, 97.24, 96.72, 96.27, 95.87, 95.53, 95.24, 95.0, 94.81, 94.67, 94.58, 94.53, 94.52, 94.56, 94.65, 94.77, 94.95, 95.16, 95.43, 95.74, 96.1, 96.51, 96.98, 97.5, 98.08, 98.72, 99.43, 100.21, 101.06], [111.27, 109.3, 107.54, 105.96, 104.54, 103.27, 102.12, 101.09, 100.16, 99.32, 98.57, 97.9, 97.3, 96.77, 96.31, 95.9, 95.55, 95.26, 95.02, 94.82, 94.68, 94.58, 94.53, 94.53, 94.57, 94.65, 94.78, 94.96, 95.18, 95.45, 95.77, 96.14, 96.56, 97.03, 97.57, 98.16, 98.81, 99.54, 100.33, 101.2], [111.66, 109.65, 107.85, 106.24, 104.79, 103.49, 102.32, 101.26, 100.31, 99.46, 98.69, 98.01, 97.4, 96.86, 96.38, 95.97, 95.62, 95.32, 95.07, 94.87, 94.72, 94.63, 94.57, 94.57, 94.61, 94.7, 94.83, 95.01, 95.24, 95.51, 95.84, 96.21, 96.64, 97.13, 97.67, 98.28, 98.94, 99.68, 100.49, 101.38], [112.08, 110.03, 108.2, 106.55, 105.08, 103.75, 102.55, 101.48, 100.51, 99.64, 98.86, 98.16, 97.54, 96.99, 96.5, 96.08, 95.72, 95.41, 95.16, 94.96, 94.81, 94.71, 94.65, 94.65, 94.69, 94.78, 94.92, 95.1, 95.33, 95.61, 95.94, 96.33, 96.77, 97.26, 97.81, 98.43, 99.11, 99.86, 100.69, 101.6], [112.54, 110.45, 108.58, 106.9, 105.4, 104.04, 102.82, 101.73, 100.74, 99.85, 99.06, 98.34, 97.71, 97.15, 96.65, 96.22, 95.85, 95.54, 95.28, 95.08, 94.93, 94.82, 94.77, 94.76, 94.81, 94.9, 95.04, 95.22, 95.46, 95.75, 96.08, 96.48, 96.92, 97.43, 97.99, 98.62, 99.31, 100.08, 100.93, 101.85], [113.03, 110.9, 108.99, 107.29, 105.75, 104.37, 103.13, 102.01, 101.0, 100.1, 99.29, 98.56, 97.91, 97.34, 96.84, 96.4, 96.02, 95.7, 95.44, 95.23, 95.08, 94.97, 94.92, 94.91, 94.95, 95.05, 95.19, 95.38, 95.62, 95.91, 96.26, 96.66, 97.11, 97.63, 98.2, 98.84, 99.55, 100.33, 101.19, 102.14], [113.55, 111.38, 109.44, 107.7, 106.14, 104.73, 103.46, 102.32, 101.3, 100.37, 99.55, 98.81, 98.15, 97.56, 97.05, 96.6, 96.22, 95.9, 95.63, 95.42, 95.26, 95.15, 95.09, 95.09, 95.13, 95.23, 95.37, 95.57, 95.81, 96.11, 96.46, 96.87, 97.33, 97.86, 98.44, 99.09, 99.82, 100.61, 101.49, 102.45], [114.11, 111.89, 109.92, 108.14, 106.55, 105.12, 103.83, 102.67, 101.62, 100.68, 99.84, 99.08, 98.41, 97.82, 97.3, 96.84, 96.45, 96.12, 95.85, 95.63, 95.47, 95.36, 95.3, 95.3, 95.34, 95.44, 95.59, 95.78, 96.03, 96.34, 96.69, 97.11, 97.58, 98.11, 98.71, 99.38, 100.11, 100.92, 101.82, 102.8], [114.69, 112.43, 110.42, 108.61, 106.99, 105.53, 104.22, 103.04, 101.97, 101.01, 100.16, 99.39, 98.71, 98.1, 97.57, 97.1, 96.71, 96.37, 96.09, 95.87, 95.71, 95.6, 95.54, 95.53, 95.58, 95.68, 95.83, 96.03, 96.28, 96.59, 96.96, 97.38, 97.86, 98.4, 99.01, 99.69, 100.44, 101.26, 102.17, 103.17]], "best_cl": 0.8564, "best_ar": 8.7179, "min_drag": 94.52, "max_drag": 158.25};
-
+  /* ============ real data ============ */
   const TIER_COMPARE = [
-    {label: "Compact", old_area: 2.84, new_area: 3.4753, old_loading: 21.469, new_loading: 17.544, old_mass: 3012.28, new_mass: 5417.52},
-    {label: "Balanced", old_area: 3.95, new_area: 4.8339, old_loading: 23.421, new_loading: 19.138, old_mass: 4189.61, new_mass: 7535.23},
-    {label: "Big", old_area: 5.09, new_area: 6.2084, old_loading: 25.373, new_loading: 20.802, old_mass: 5398.76, new_mass: 9677.94},
+    {label: "Compact", old_area: 2.84, new_area: 3.4753},
+    {label: "Balanced", old_area: 3.95, new_area: 4.8339},
+    {label: "Big", old_area: 5.09, new_area: 6.2084},
   ];
-
   const FLEET_HOVER = [
     {label:"Hexacopter", hover:73.2}, {label:"Quadcopter", hover:95.7}, {label:"Bicopter_Balanced", hover:111.4},
     {label:"Bicopter_Big", hover:108.7}, {label:"Bicopter_Compact", hover:111.4}, {label:"Contra_Balanced", hover:111.4},
     {label:"Contra_Big", hover:110.4}, {label:"Contra_Compact", hover:111.4}, {label:"Quad_Balanced", hover:95.7},
     {label:"Quad_Big", hover:94.0}, {label:"Quad_Compact", hover:95.7}, {label:"x_8", hover:59.2},
   ].sort((a,b) => b.hover - a.hover);
-
-  // Real desired-vs-actual roll, subsampled ~1 pt/sec from the decoded
-  // sample log's own attitude pass (demos/flight-analysis.json,
-  // analyses.attitude.desRoll/roll) -- [seconds, desired_deg, actual_deg].
+  const LANDSCAPE = {"cl_vals": [0.3, 0.3179, 0.3359, 0.3538, 0.3718, 0.3897, 0.4077, 0.4256, 0.4436, 0.4615, 0.4795, 0.4974, 0.5154, 0.5333, 0.5513, 0.5692, 0.5872, 0.6051, 0.6231, 0.641, 0.659, 0.6769, 0.6949, 0.7128, 0.7308, 0.7487, 0.7667, 0.7846, 0.8026, 0.8205, 0.8385, 0.8564, 0.8744, 0.8923, 0.9103, 0.9282, 0.9462, 0.9641, 0.9821, 1.0], "ar_vals": [4.0, 4.2051, 4.4103, 4.6154, 4.8205, 5.0256, 5.2308, 5.4359, 5.641, 5.8462, 6.0513, 6.2564, 6.4615, 6.6667, 6.8718, 7.0769, 7.2821, 7.4872, 7.6923, 7.8974, 8.1026, 8.3077, 8.5128, 8.7179, 8.9231, 9.1282, 9.3333, 9.5385, 9.7436, 9.9487, 10.1538, 10.359, 10.5641, 10.7692, 10.9744, 11.1795, 11.3846, 11.5897, 11.7949, 12.0], "drag_grid": [[158.25,157.57,156.97,156.43,155.94,155.5,155.11,154.75,154.43,154.15,153.89,153.66,153.45,153.27,153.11,152.97,152.85,152.75,152.67,152.6,152.55,152.52,152.5,152.5,152.52,152.54,152.59,152.65,152.73,152.82,152.93,153.05,153.2,153.36,153.54,153.75,153.97,154.22,154.49,154.79],[151.89,151.17,150.53,149.96,149.44,148.98,148.56,148.19,147.85,147.54,147.27,147.03,146.81,146.62,146.45,146.3,146.17,146.07,145.98,145.91,145.86,145.82,145.8,145.8,145.82,145.85,145.89,145.96,146.04,146.14,146.25,146.39,146.54,146.71,146.91,147.12,147.36,147.62,147.91,148.23],[146.35,145.6,144.92,144.31,143.77,143.28,142.84,142.44,142.08,141.76,141.47,141.22,140.99,140.78,140.61,140.45,140.32,140.2,140.11,140.04,139.98,139.94,139.92,139.92,139.94,139.97,140.02,140.09,140.17,140.28,140.4,140.54,140.7,140.89,141.09,141.32,141.57,141.85,142.15,142.49],[141.52,140.72,140.0,139.37,138.79,138.28,137.81,137.39,137.02,136.68,136.37,136.1,135.86,135.65,135.46,135.29,135.15,135.03,134.94,134.86,134.8,134.76,134.74,134.74,134.75,134.79,134.84,134.91,135.0,135.11,135.24,135.39,135.56,135.75,135.97,136.21,136.47,136.77,137.09,137.44],[137.27,136.43,135.68,135.01,134.41,133.87,133.38,132.94,132.54,132.19,131.87,131.58,131.33,131.1,130.91,130.73,130.59,130.46,130.36,130.28,130.21,130.17,130.15,130.15,130.17,130.2,130.26,130.33,130.43,130.54,130.68,130.84,131.01,131.22,131.44,131.69,131.97,132.28,132.62,132.99],[133.54,132.66,131.88,131.17,130.54,129.97,129.46,129.0,128.58,128.21,127.88,127.58,127.31,127.08,126.87,126.69,126.53,126.4,126.29,126.21,126.14,126.1,126.08,126.07,126.09,126.13,126.19,126.27,126.37,126.49,126.63,126.79,126.98,127.19,127.43,127.69,127.99,128.31,128.66,129.05],[130.25,129.33,128.51,127.78,127.12,126.52,125.99,125.5,125.07,124.68,124.33,124.02,123.74,123.49,123.27,123.09,122.92,122.79,122.67,122.58,122.52,122.47,122.45,122.44,122.46,122.5,122.56,122.65,122.75,122.88,123.02,123.2,123.39,123.61,123.86,124.14,124.44,124.78,125.15,125.56],[127.36,126.4,125.54,124.77,124.08,123.46,122.9,122.4,121.94,121.54,121.17,120.85,120.55,120.3,120.07,119.87,119.7,119.56,119.44,119.35,119.28,119.23,119.21,119.2,119.22,119.27,119.33,119.41,119.52,119.65,119.81,119.99,120.19,120.43,120.68,120.97,121.29,121.64,122.03,122.45],[124.8,123.8,122.91,122.11,121.39,120.74,120.16,119.63,119.16,118.74,118.36,118.02,117.71,117.44,117.21,117.0,116.82,116.68,116.55,116.46,116.38,116.33,116.31,116.3,116.33,116.37,116.43,116.52,116.64,116.77,116.94,117.12,117.34,117.58,117.85,118.15,118.48,118.85,119.25,119.69],[122.55,121.51,120.58,119.74,119.0,118.32,117.72,117.17,116.68,116.24,115.84,115.49,115.17,114.89,114.65,114.43,114.25,114.09,113.97,113.86,113.79,113.74,113.71,113.71,113.73,113.77,113.84,113.94,114.05,114.2,114.36,114.56,114.78,115.03,115.31,115.62,115.97,116.35,116.77,117.23],[120.56,119.48,118.52,117.65,116.87,116.17,115.54,114.98,114.47,114.01,113.6,113.23,112.9,112.61,112.35,112.13,111.94,111.78,111.65,111.54,111.46,111.41,111.38,111.38,111.4,111.45,111.52,111.62,111.74,111.89,112.06,112.26,112.49,112.75,113.05,113.37,113.73,114.13,114.56,115.04],[118.81,117.69,116.69,115.79,114.99,114.26,113.61,113.02,112.49,112.01,111.59,111.21,110.87,110.56,110.3,110.07,109.87,109.7,109.57,109.46,109.37,109.32,109.29,109.29,109.31,109.36,109.43,109.53,109.66,109.81,110.0,110.21,110.44,110.71,111.02,111.35,111.73,112.14,112.59,113.09],[117.28,116.12,115.08,114.15,113.32,112.56,111.89,111.28,110.73,110.24,109.79,109.4,109.05,108.73,108.46,108.22,108.02,107.84,107.7,107.59,107.5,107.44,107.41,107.41,107.43,107.49,107.56,107.67,107.8,107.96,108.14,108.36,108.61,108.89,109.2,109.55,109.94,110.36,110.83,111.35],[115.94,114.74,113.67,112.7,111.84,111.06,110.36,109.73,109.16,108.65,108.19,107.78,107.42,107.1,106.81,106.57,106.35,106.17,106.03,105.91,105.82,105.76,105.73,105.73,105.75,105.8,105.88,105.99,106.13,106.29,106.49,106.71,106.97,107.26,107.58,107.94,108.34,108.78,109.27,109.8],[114.78,113.53,112.42,111.43,110.53,109.73,109.0,108.35,107.77,107.24,106.77,106.34,105.97,105.63,105.34,105.08,104.86,104.68,104.52,104.4,104.31,104.25,104.22,104.22,104.24,104.3,104.38,104.49,104.63,104.8,105.0,105.23,105.5,105.8,106.13,106.51,106.92,107.38,107.88,108.43],[113.77,112.48,111.34,110.31,109.39,108.55,107.81,107.13,106.53,105.98,105.5,105.06,104.67,104.32,104.02,103.76,103.53,103.34,103.18,103.06,102.96,102.9,102.87,102.86,102.89,102.95,103.03,103.15,103.29,103.47,103.67,103.91,104.19,104.5,104.84,105.23,105.65,106.13,106.64,107.21],[112.9,111.58,110.39,109.33,108.38,107.52,106.75,106.06,105.43,104.87,104.37,103.92,103.52,103.16,102.85,102.58,102.34,102.14,101.98,101.85,101.76,101.69,101.66,101.65,101.68,101.74,101.82,101.94,102.09,102.27,102.49,102.74,103.02,103.34,103.69,104.09,104.53,105.02,105.55,106.14],[112.16,110.8,109.58,108.49,107.51,106.62,105.83,105.11,104.47,103.89,103.37,102.91,102.49,102.13,101.8,101.52,101.28,101.08,100.91,100.78,100.68,100.61,100.58,100.57,100.6,100.66,100.75,100.87,101.03,101.21,101.43,101.69,101.98,102.31,102.68,103.09,103.54,104.04,104.59,105.19],[111.54,110.14,108.89,107.76,106.75,105.84,105.02,104.29,103.62,103.03,102.49,102.01,101.59,101.21,100.88,100.59,100.34,100.13,99.96,99.82,99.72,99.65,99.61,99.61,99.64,99.7,99.79,99.92,100.08,100.27,100.5,100.76,101.06,101.4,101.78,102.2,102.67,103.18,103.75,104.37],[111.04,109.59,108.3,107.14,106.1,105.17,104.33,103.57,102.89,102.27,101.72,101.23,100.79,100.4,100.06,99.77,99.51,99.29,99.12,98.98,98.87,98.8,98.76,98.76,98.79,98.85,98.95,99.08,99.24,99.44,99.67,99.94,100.25,100.6,100.99,101.42,101.9,102.43,103.01,103.65],[110.63,109.14,107.81,106.62,105.56,104.59,103.73,102.95,102.25,101.62,101.05,100.55,100.1,99.7,99.35,99.04,98.78,98.56,98.37,98.23,98.12,98.05,98.01,98.01,98.04,98.1,98.2,98.33,98.5,98.7,98.94,99.22,99.54,99.9,100.3,100.74,101.24,101.78,102.38,103.04],[110.31,108.78,107.42,106.2,105.1,104.11,103.22,102.42,101.7,101.06,100.47,99.95,99.49,99.08,98.72,98.41,98.14,97.91,97.72,97.57,97.46,97.39,97.35,97.34,97.38,97.44,97.54,97.68,97.85,98.06,98.31,98.59,98.92,99.29,99.7,100.16,100.66,101.22,101.84,102.51],[110.08,108.51,107.11,105.86,104.73,103.72,102.8,101.98,101.24,100.58,99.98,99.45,98.97,98.55,98.18,97.86,97.58,97.35,97.16,97.0,96.89,96.81,96.77,96.77,96.8,96.87,96.97,97.11,97.29,97.5,97.76,98.05,98.38,98.76,99.18,99.65,100.18,100.75,101.38,102.08],[109.92,108.32,106.88,105.59,104.44,103.4,102.46,101.62,100.86,100.18,99.57,99.02,98.53,98.1,97.72,97.39,97.11,96.87,96.67,96.51,96.4,96.32,96.27,96.27,96.3,96.37,96.48,96.62,96.81,97.03,97.28,97.59,97.93,98.32,98.75,99.23,99.77,100.36,101.0,101.71],[109.84,108.2,106.72,105.4,104.22,103.15,102.19,101.33,100.55,99.85,99.23,98.66,98.16,97.72,97.33,96.99,96.7,96.46,96.25,96.09,95.97,95.89,95.85,95.85,95.88,95.95,96.06,96.21,96.39,96.62,96.89,97.19,97.55,97.94,98.39,98.88,99.43,100.03,100.7,101.43],[109.83,108.14,106.63,105.28,104.07,102.97,101.99,101.11,100.31,99.59,98.95,98.38,97.86,97.41,97.01,96.67,96.37,96.11,95.91,95.74,95.62,95.54,95.49,95.49,95.52,95.6,95.71,95.86,96.05,96.28,96.55,96.87,97.23,97.64,98.09,98.6,99.16,99.78,100.46,101.21],[109.88,108.15,106.61,105.22,103.98,102.86,101.85,100.95,100.13,99.4,98.74,98.15,97.63,97.16,96.75,96.4,96.09,95.83,95.62,95.45,95.33,95.24,95.2,95.19,95.23,95.3,95.42,95.57,95.77,96.01,96.28,96.61,96.98,97.39,97.86,98.38,98.95,99.59,100.28,101.05],[109.99,108.22,106.64,105.22,103.95,102.8,101.77,100.84,100.01,99.26,98.59,97.98,97.45,96.97,96.55,96.19,95.88,95.61,95.4,95.22,95.09,95.01,94.96,94.96,94.99,95.07,95.19,95.35,95.55,95.79,96.07,96.4,96.78,97.21,97.69,98.22,98.8,99.45,100.17,100.95],[110.15,108.34,106.72,105.27,103.97,102.8,101.75,100.8,99.94,99.18,98.49,97.87,97.32,96.84,96.41,96.04,95.72,95.45,95.22,95.05,94.92,94.83,94.78,94.78,94.81,94.89,95.01,95.17,95.38,95.63,95.92,96.26,96.64,97.08,97.57,98.11,98.71,99.37,100.1,100.9],[110.36,108.51,106.86,105.38,104.05,102.85,101.77,100.8,99.93,99.14,98.44,97.81,97.25,96.75,96.31,95.93,95.61,95.33,95.1,94.92,94.79,94.7,94.65,94.64,94.68,94.76,94.89,95.05,95.26,95.51,95.81,96.16,96.55,97.0,97.5,98.05,98.67,99.35,100.09,100.91],[110.62,108.73,107.04,105.53,104.17,102.94,101.84,100.85,99.96,99.16,98.44,97.8,97.22,96.71,96.27,95.88,95.55,95.26,95.03,94.85,94.71,94.61,94.57,94.56,94.6,94.68,94.81,94.98,95.19,95.45,95.75,96.11,96.51,96.97,97.48,98.04,98.67,99.37,100.13,100.96],[110.93,109.0,107.27,105.72,104.33,103.09,101.96,100.95,100.04,99.22,98.48,97.83,97.24,96.72,96.27,95.87,95.53,95.24,95.0,94.81,94.67,94.58,94.53,94.52,94.56,94.65,94.77,94.95,95.16,95.43,95.74,96.1,96.51,96.98,97.5,98.08,98.72,99.43,100.21,101.06],[111.27,109.3,107.54,105.96,104.54,103.27,102.12,101.09,100.16,99.32,98.57,97.9,97.3,96.77,96.31,95.9,95.55,95.26,95.02,94.82,94.68,94.58,94.53,94.53,94.57,94.65,94.78,94.96,95.18,95.45,95.77,96.14,96.56,97.03,97.57,98.16,98.81,99.54,100.33,101.2],[111.66,109.65,107.85,106.24,104.79,103.49,102.32,101.26,100.31,99.46,98.69,98.01,97.4,96.86,96.38,95.97,95.62,95.32,95.07,94.87,94.72,94.63,94.57,94.57,94.61,94.7,94.83,95.01,95.24,95.51,95.84,96.21,96.64,97.13,97.67,98.28,98.94,99.68,100.49,101.38],[112.08,110.03,108.2,106.55,105.08,103.75,102.55,101.48,100.51,99.64,98.86,98.16,97.54,96.99,96.5,96.08,95.72,95.41,95.16,94.96,94.81,94.71,94.65,94.65,94.69,94.78,94.92,95.1,95.33,95.61,95.94,96.33,96.77,97.26,97.81,98.43,99.11,99.86,100.69,101.6],[112.54,110.45,108.58,106.9,105.4,104.04,102.82,101.73,100.74,99.85,99.06,98.34,97.71,97.15,96.65,96.22,95.85,95.54,95.28,95.08,94.93,94.82,94.77,94.76,94.81,94.9,95.04,95.22,95.46,95.75,96.08,96.48,96.92,97.43,97.99,98.62,99.31,100.08,100.93,101.85],[113.03,110.9,108.99,107.29,105.75,104.37,103.13,102.01,101.0,100.1,99.29,98.56,97.91,97.34,96.84,96.4,96.02,95.7,95.44,95.23,95.08,94.97,94.92,94.91,94.95,95.05,95.19,95.38,95.62,95.91,96.26,96.66,97.11,97.63,98.2,98.84,99.55,100.33,101.19,102.14],[113.55,111.38,109.44,107.7,106.14,104.73,103.46,102.32,101.3,100.37,99.55,98.81,98.15,97.56,97.05,96.6,96.22,95.9,95.63,95.42,95.26,95.15,95.09,95.09,95.13,95.23,95.37,95.57,95.81,96.11,96.46,96.87,97.33,97.86,98.44,99.09,99.82,100.61,101.49,102.45],[114.11,111.89,109.92,108.14,106.55,105.12,103.83,102.67,101.62,100.68,99.84,99.08,98.41,97.82,97.3,96.84,96.45,96.12,95.85,95.63,95.47,95.36,95.3,95.3,95.34,95.44,95.59,95.78,96.03,96.34,96.69,97.11,97.58,98.11,98.71,99.38,100.11,100.92,101.82,102.8],[114.69,112.43,110.42,108.61,106.99,105.53,104.22,103.04,101.97,101.01,100.16,99.39,98.71,98.1,97.57,97.1,96.71,96.37,96.09,95.87,95.71,95.6,95.54,95.53,95.58,95.68,95.83,96.03,96.28,96.59,96.96,97.38,97.86,98.4,99.01,99.69,100.44,101.26,102.17,103.17]], "best_cl": 0.8564, "best_ar": 8.7179, "min_drag": 94.52, "max_drag": 158.25};
   const ATTITUDE_TRACK = [
     [0,-0.0,-1.9],[1,-0.0,-1.9],[2,-0.0,-2.0],[3,-0.0,-2.1],[4,-0.0,-2.6],[5,-0.0,0.4],
     [6,-2.5,-3.1],[7,-0.7,2.3],[8,-2.1,-1.8],[9,-1.9,-4.0],[10,-1.3,-3.5],[11,-2.9,-3.8],
@@ -757,341 +958,80 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     [48,-2.8,-4.7],[49,-4.5,-5.0],[50,3.9,-1.0],[51,4.2,3.0],[52,-2.8,-13.2],
   ];
 
-  const PROJECTS = [
-    {
-      id: "mission-model",
-      name: "Mission Model",
-      tag: "Simulation · 2026",
-      cardFoot: "111.4 min hover",
-      cardSub: "2,794 configs swept",
-      tileFigure: () => missionProfileFigure(),
-      lede: "A mission-performance simulator that sweeps every motor, propeller, and battery combination it has data for against a fixed cargo mission and reports which ones actually complete it — including, for winged tailsitter airframes, a real quaternion 6DOF rigid-body simulation of the hover-to-cruise transition instead of a simplified angle approximation.",
-      overview: [
-        "Mission Model simulates a specific cargo run for a family of VTOL (vertical takeoff/landing) airframes: takeoff to 100 ft, cruise 1 nautical mile, land, pick up cargo, takeoff, cruise 8 nm, land, drop cargo, takeoff, cruise 1 nm back, land. For every candidate airframe, it sweeps every motor × propeller × battery combination it has spec data for (thousands of combinations) and reports which one actually completes the mission, how much battery it has left over, and how long it can hover — so 'which motor should this drone use' becomes a search over real thrust-curve data instead of a guess.",
-        "Wing sizing for the winged tailsitter variants comes from a separate standalone tool, <code>wing_optimizer.py</code> — its own project below — which sizes every TailSitter config against the fleet's real governed cruise speeds.",
-        "The airframe list (Hexacopter, Quadcopter, x8, Tail Sitter) matches the real vehicle classes I work on as VTOL Mechanical Team Lead — this is the same kind of simulation-to-inform-design work as the MATLAB/Python scripts I write for the team, built out as a standalone public tool.",
-      ],
-      method: [
-        "Every TailSitter vehicle config is sized using Wing Optimizer's energy-based (hover + cruise) objective, evaluated at each tier's real governed cruise speed (18.0/18.8/19.6 m/s). Required wing area scales as 1/v², so getting the real cruise speed right — not a flat placeholder — is the single biggest lever on the sizing result.",
-        "The mission simulation uses closed-form kinematics for wingless multirotors — thrust against quadratic drag, <code>v̇ = a₀ − k·v²</code>, has an exact tanh solution, so every accel/decel leg is solved in one evaluation instead of stepped through a simulation loop.",
-        "A winged tailsitter's hover-to-cruise transition can't take that shortcut. The rotor thrust has to physically rotate from vertical to horizontal as the wing builds lift with airspeed, so the required thrust angle and the drag area both keep changing through the maneuver. I integrate that leg as a full quaternion 6DOF rigid body — position, velocity, attitude, and angular rate together. Attitude kinematics: <code>q̇ = ½ q ⊗ [0, ω]</code> (Hamilton, scalar-first), alongside the rotational dynamics <code>I ω̇ = τ − ω × (Iω)</code>. I use quaternions specifically because Euler angles hit a gimbal-lock singularity right at the 90° pitch-over a tailsitter transition goes through — the one attitude this model actually has to fly through on every single leg.",
-        "Lift points along the wing's own body-fixed axis and scales with the velocity component perpendicular to it, rather than pointing straight up and scaling with raw airspeed the way a simpler model would. That distinction matters most mid-transition, when the vehicle is neither purely hovering nor purely cruising and a fixed lift direction isn't a safe approximation.",
-      ],
-      figures: [
-        {
-          title: "The fixed 11-leg course",
-          render: () => missionCourseFigure(),
-          caption: "Every candidate flies the same course: takeoff to 100 ft, cruise 1 nm, land, pick up cargo, takeoff, cruise 8 nm, land, drop cargo, takeoff, cruise 1 nm back, land — the actual MISSION_LEGS sequence, cargo carried outbound only.",
-        },
-        {
-          title: "Wing area: fixed heuristic vs. energy-optimized sizing",
-          render: () => groupedBarFigure(TIER_COMPARE, "old_area", "new_area"),
-          caption: "Gray = a fixed lift-coefficient/minimum-aspect-ratio heuristic. Black = the energy-based (hover + cruise) objective evaluated at each tier's real governed cruise speed. Required wing area scales as 1/v², so the physics-based objective sizes every tier noticeably larger than the simpler heuristic would.",
-        },
-        {
-          title: "Fleet hover time, all 12 vehicle configs",
-          render: () => hbarFigure(FLEET_HOVER, "hover", "min", v => v.toFixed(1) + " min"),
-          caption: "Best-case hover time per vehicle from the mission sweep (2,794 motor × prop × battery combinations), sorted descending. The four TailSitter tiers lead the two reference multirotors, 111.4 min vs. 73.2 and 59.2.",
-        },
-      ],
-      facts: [
-        ["Wing loading, by tier", "17.5–20.8 kg/m²"],
-        ["Aspect ratio, example wing", "8.64"],
-        ["Best fleet hover time", "111.4 min"],
-        ["Mission sweep", "2,794 configs"],
-      ],
-      cta: [["View repo", "https://github.com/exs783/Log_Reader", "primary"]],
-    },
-    {
-      id: "wing-optimizer",
-      name: "Wing Optimizer",
-      tag: "Optimization tool · 2026",
-      cardFoot: "Taper ratio 0.30",
-      cardSub: "joint cl/AR/taper search",
-      tileFigure: () => wingPlanformFigure(),
-      lede: "A wing-sizing tool that searches lift coefficient, aspect ratio, and taper ratio for whichever combination minimizes structural mass, cruise drag, or total mission energy. Three of its search objectives are grounded in real aerostructural optimization papers — not a claim to replicate methods (RANS CFD, nonlinear FE, flight test) a standalone script can't actually run.",
-      overview: [
-        "<code>wing_optimizer.py</code> sizes a wing from mission requirements alone. Given how much weight it has to lift and how fast the aircraft cruises, it searches lift coefficient, aspect ratio, and (for the energy objective) taper ratio for whichever combination minimizes structural mass, cruise drag, or total mission energy, then emits the winning geometry as SolidWorks-ready NACA equations or point-cloud curves, plus a <code>vehicle_configs</code>-style JSON entry Mission Model can load directly.",
-        "Three of its objectives are each grounded in one real aerostructural optimization paper. Method below covers exactly what carried over from each one, and what I deliberately left out of scope.",
-      ],
-      method: [
-        "<strong>Aerodynamic-center reporting</strong>, inspired by Grimm, Price &amp; Ahmad's flight-tested flying-wing optimization (<em>Aerospace Systems</em>, 2026), which treats longitudinal stability as the primary design objective. <code>wing_mac_and_ac()</code> reports the wing's own mean aerodynamic chord and where its aerodynamic center sits relative to the root leading edge, derived directly from closed-form wing-theory integrals for both the linear-taper and elliptical planform rather than quoted from a table: <code>c̄ = (2/3)c_root(1+λ+λ²)/(1+λ)</code>, <code>x_AC = ȳ·tan(Λ) + 0.25c̄</code>. This only covers the wing's own half of a stability check — a real static margin also needs the aircraft's CG and any tail, which is out of scope for a wing-only script.",
-        "<strong>Two wing-mass models.</strong> <code>--mass-model empirical</code> is a single fitted AR^0.5 exponent. <code>--mass-model beam</code>, inspired by Zhao et al.'s finite-element model updating for a composite flying-wing (AIAA SciTech 2019, 2019-1814) which calibrates mass and stiffness against real vibration-test data, makes two real structural drivers explicit instead: ultimate load factor and airfoil thickness ratio, through a first-order beam-bending scaling, <code>m ∝ (AR/AR_ref)^1.5 · (n/n_ref) · (t/c_ref ÷ t/c)^0.5</code>. The AR penalty is steeper, load factor enters linearly, and thinner airfoils cost more mass — a physically-derived scaling rather than a named curve fit, so it isn't borrowing anyone else's exact coefficients.",
-        "<strong>Joint taper search.</strong> <code>--objective combined</code> searches taper jointly with cl and aspect ratio, inspired by Bombardieri et al.'s coupled aerostructural wing optimization (<em>Structural and Multidisciplinary Optimization</em>, 2021) — their central finding is that optimizing aerodynamics and structure separately misses real gains a coupled search finds. Taper's only channel into this model is bending relief → wing mass → hover energy, <code>η_bend = (1+2λ)/3</code>, weighed against induced drag from the Oswald-efficiency estimate, <code>e₀ = 4.61(1−0.045·AR^0.68)cos(Λ)^0.15 − 3.1</code>, <code>C_Di = C_L²/(π·AR·e₀)</code>. That's a narrower coupling than the paper's full aero-structural one, but it's real: a taper that trades structural weight for nothing in cruise drag gets evaluated by the same objective as cl and AR, not decided in a separate step.",
-      ],
-      figures: [
-        {
-          title: "Search landscape",
-          render: () => heatmapFigure(LANDSCAPE),
-          caption: "The actual (lift coefficient × aspect ratio) energy landscape the optimizer searched for one tier — darker is lower cost. Ring marks the found minimum.",
-        },
-        {
-          title: "Bending relief vs. taper ratio",
-          render: () => bendingReliefFigure(),
-          caption: "η_bend = (1+2λ)/3, computed over the full taper range — this is the one number taper actually moves in the model, weighed against induced drag to find the joint optimum. Marker is the search's real result for this tier, λ = 0.30.",
-        },
-        {
-          title: "Example wing with joint taper search",
-          render: () => wingPlanformFigure(),
-          caption: "Real output of --objective combined --taper-min 0.3 --taper-max 1.0: AR 8.56, taper ratio 0.30 (root 0.312 m / tip 0.093 m chord), span 1.73 m. Marker is the reported aerodynamic center — MAC 0.222 m, 0.056 m aft of the root leading edge, 0.356 m out along the span.",
-        },
-        {
-          title: "NACA 2412 — the file's own --naca example",
-          render: () => nacaAirfoilFigure("2412"),
-          caption: "Computed live from the same closed-form thickness/camber equations naca4_airfoil_point() uses — the exact surface, not a traced shape. Dashed line is the camber line; camber and thickness are what --naca hands to SolidWorks as parametric equations.",
-        },
-      ],
-      facts: [
-        ["Mass models", "empirical (AR^0.5) or beam (AR^1.5, load factor, t/c)"],
-        ["Taper ratio found", "0.30, searched 0.3–1.0"],
-        ["MAC, example wing", "0.222 m"],
-        ["x_ac from root LE", "0.056 m"],
-      ],
-      cta: [["View repo", "https://github.com/exs783/Log_Reader", "primary"]],
-    },
-    {
-      id: "log-dashboard",
-      name: "Log Dashboard",
-      tag: "Flight-data tooling · 2026",
-      cardFoot: "65/100 flight score",
-      cardSub: "QUAD frame, 7 issues found",
-      tileFigure: () => droneScopeFigure(7),
-      lede: "A Flask + Plotly dashboard that decodes ArduCopter/PX4 flight logs into a full diagnostic report — the score, the issues list, and the chart below all come from a real flight log run through the real backend.",
-      overview: [
-        "Every ArduPilot-based flight controller (Pixhawk and compatibles) writes a binary <code>.BIN</code> log of everything it measured mid-flight — hundreds of message types at up to a few hundred Hz. Reading that raw log to answer \"was this flight okay, and if not, why\" normally means a separate desktop tool (MAVExplorer) and manual digging. This dashboard does that automatically: upload a log, get back attitude tracking, vibration spectra, motor balance, PID tracking, GPS track, battery health, and barometer/magnetometer data across dedicated tabs, plus one overall flight-quality verdict.",
-        "It's built for the same audience Mission Model is: someone who just flew a real airframe and needs to know whether the motors, frame, or tuning are actually behaving before flying again — not a generic telemetry viewer.",
-      ],
-      method: [
-        "The backend (<code>python_backend.py</code>) reads a raw <code>.BIN</code> log with <code>pymavlink</code>, walks its message stream, and classifies the airframe from its frame-type parameter (quad/hex/octo/X8/tri/Y3/Y6). Vibration channels get an FFT pass — <code>X(f) = ℱ{a(t)} = ∫ a(t)·e^(−i2πft) dt</code> — mirroring the analysis MAVExplorer does for ArduPilot logs.",
-        "Ten analysis passes run per log — IMU, vibration, attitude, battery, motors, PID/rate controller, GPS, barometer, magnetometer, and discrete flight events (mode changes, arming, errors) — each producing its own stats block. A summary pass then scores the flight 0–100 and lists specific issues (e.g. \"poor roll stability,\" \"motor sync issues\") instead of just dumping charts and leaving the reader to spot problems.",
-        "The dashboard (<code>log_dashboard.html</code>) renders the decoded series with Plotly, plus a Custom Plot tab that lets you overlay any two decoded variables against time regardless of category — useful for correlating, say, vibration against throttle.",
-      ],
-      figures: [
-        {
-          render: () => attitudeTrackFigure(ATTITUDE_TRACK),
-          caption: "Real commanded-vs-actual roll from the sample log's attitude pass — the visible gap between the two lines is what the flight-quality pass is flagging as poor roll stability, not an assumption about the aircraft.",
-        },
-        {
-          render: () => scopeFigure(11, true),
-          caption: "Vibration trace shape from a real decoded sample log (my_flight.bin), 52.1 seconds, 261 GPS fixes.",
-        },
-      ],
-      facts: [
-        ["Flight quality score", "65 / 100 (Fair)"],
-        ["Frame detected", "QUAD, 4 motors"],
-        ["Peak vibration", "33.6 m/s²"],
-        ["Stability issues found", "7 (roll/pitch/yaw + motor sync)"],
-      ],
-      cta: [
-        ["Live demo", "demos/log-dashboard.html", "primary"],
-        ["View repo", "https://github.com/exs783/Log_Reader", "secondary"],
-      ],
-    },
-    {
-      id: "liquid-rocket",
-      name: "Liquid Rocket",
-      tag: "CWRU Liquid Propulsion Team · 2026",
-      cardFoot: "10 / 10 tests",
-      cardSub: "9 live sensor channels",
-      tileFigure: () => rocketFigure(),
-      lede: "Ground-station software for CWRU's Liquid Propulsion Team — rebuilt from two prototypes that were never actually integrated into one working app, one of them my own original hot-fire GUI.",
-      overview: [
-        "On CWRU's Liquid Propulsion Team (Aug 2025 – Jan 2026) I designed the mechanical thrust-control hardware for hot-fire tests — solenoids and servos regulating propellant flow — and built the PyQt5 control GUI that ran the hot-fire sequences against it.",
-        "A liquid rocket static test (or hot-fire test) needs a ground station: software running on a laptop near the test stand that shows the person running the test what's happening in real time — tank and chamber pressures, temperatures, thrust (via a load cell) — and lets them open or close valves and fire the igniter without touching the hardware directly. Every reading also needs to be logged, since post-test analysis (did the chamber pressure spike, did a valve stick) depends on having the full data, not just what was visible live.",
-        "This app is that ground station, rebuilt: a P&ID (piping-and-instrumentation diagram) view for valve control, a live-gauge view for the 9 real sensor channels, and a logging view that records a full test session to CSV.",
-      ],
-      method: [
-        "The repo held two separate PyQt prototypes on incompatible Qt bindings: my own original PyQt5 data-logging page (<code>main_v2.py</code>) from the actual hot-fire tests, and a separate PyQt6 P&ID valve-control page. Its own readme said as much: “still needs to be integrated with the other page.”",
-        "Rebuilt as one PyQt6 app (<code>ground_station/</code>) sharing a single sensor/valve state across three tabs — Controls (the real P&ID diagram plus working valve toggles), Live Data (one gauge per real sensor channel), Logging (start/stop → the documented raw + interpolated CSV pair).",
-        "The wire protocol (<code>P0–P6, T0, L0</code>, one <code>name,value,timestamp</code> line per reading) matches the real Teensy firmware exactly, so a fake data source stands in for hardware without changing anything else — verified with a headless smoke test that boots the real window, ticks it, toggles a valve, and checks a logging session actually writes CSVs.",
-        "The live demo linked below is a from-scratch JavaScript port of that same protocol and gauge math (not a screen recording) — it runs the identical random-walk sensor simulation and the identical SVG gauge/valve drawing code the Python app uses, so what you click there is what the desktop app actually does with no hardware attached.",
-      ],
-      figures: [
-        {
-          render: () => flowFigure(),
-          caption: "Data flow: one wire protocol, shared across a fake source (used here) and a future real Teensy connection, feeding all three tabs.",
-        },
-        {
-          render: () => sensorPanelFigure(),
-          caption: "The Live Data tab's real gauge grid — 7 pressure channels, 1 thermocouple, 1 load cell, same P0–P6/T0/L0 IDs the wire protocol and the real Teensy firmware both use.",
-        },
-      ],
-      facts: [
-        ["Sensor channels", "7 pressure · 1 thermo · 1 load"],
-        ["Tests passing", "10 / 10"],
-        ["UI", "3-tab PyQt6 app"],
-        ["Valve control", "UI state only"],
-      ],
-      caution: "Valve toggles are display-only — no serial command channel to real hardware exists yet.",
-      cta: [
-        ["Live demo", "demos/liquid-rocket.html", "primary"],
-        ["View repo", "https://github.com/exs783/Liquid-Rocket", "secondary"],
-      ],
-    },
-    {
-      id: "cad",
-      name: "CAD",
-      tag: "SolidWorks CAD · 2025–2026",
-      cardFoot: "7 subassemblies",
-      cardSub: "CompDrone2025 hexacopter",
-      tileFigure: () => imgFigure("assets/compdrone2025-render.png", "CompDrone2025 hexacopter, SolidWorks render"),
-      lede: "Two real SolidWorks projects: a competition hexacopter for CWRU's VTOL team, and a flexural fatigue test machine built at Tylok International to an ASTM standard.",
-      overview: [
-        "CompDrone2025 is a full hexacopter assembly modeled for competition — carbon-fiber tube arms, a machined frame, RTK GPS and Pixhawk avionics mounts, a servo-actuated payload-drop mechanism, and folding landing gear, all as real mated SolidWorks assemblies (not a single dumb part). The model below is the actual assembly, exported to glTF so it's something you can rotate rather than a fixed render.",
-        "The Tylok fatigue rig tests parts to ASTM F1387 (flexural fatigue of plastic pipe fittings) — a pneumatic actuator cycles a clamped specimen while a cycle counter and a HiP pressure fitting log the test. I designed, built, and implemented the full machine for internal use.",
-      ],
-      method: [
-        "CompDrone2025's assembly is organized the way a real drone build actually breaks down: <code>ARM</code> (carbon-fiber tube, motor mount plate/ring, prop), <code>FRM</code> (top/bottom plates, payload mount, protective dome), <code>LGR</code> (landing-gear struts, TPU feet), <code>BATT</code> (battery + velcro strap + printed mount), <code>CAM</code>, <code>PAYLOAD</code> (servo, horn, clamp body, water-bottle attachment), and <code>ELEC</code> (Pixhawk 6X, RTK GPS, baseboard) — seven subassemblies mated into one top-level <code>.SLDASM</code>, each with real vendor parts (T-Motor, Amass, Pixhawk) modeled or imported alongside the machined/printed parts.",
-        "The fatigue machine follows ASTM F1387 A6: a pneumatic cylinder flexes a clamped specimen at a set rate while a second cylinder and a HiP pressure transducer hold and monitor line pressure, with a cycle-count readout on the control box. Built and implemented end to end during the Tylok co-op.",
-      ],
-      figures: [
-        {
-          title: "CompDrone2025 — interactive model",
-          render: () => modelFigure("assets/compdrone2025.glb", "CompDrone2025 hexacopter SolidWorks assembly"),
-          caption: "Drag to orbit. The real 7-subassembly SolidWorks model, exported to glTF and compressed (Draco + WebP) from 192MB to ~2MB.",
-        },
-        {
-          title: "Tylok flexural fatigue test machine",
-          render: () => imgFigure("assets/tylok-fatigue-machine.jpg", "Tylok ASTM F1387 A6 flexural fatigue test machine"),
-          caption: "The actual machine — pneumatic actuator, clamped specimen fixture, HiP pressure fitting, and the ASTM F1387 A6 control/readout box.",
-        },
-      ],
-      facts: [
-        ["CompDrone2025 subassemblies", "7 (ARM/FRM/LGR/BATT/CAM/PAYLOAD/ELEC)"],
-        ["Fatigue rig standard", "ASTM F1387 A6"],
-        ["CAD tool", "SolidWorks"],
-        ["Model format here", "glTF (Draco + WebP, ~2 MB)"],
-      ],
-      cta: [],
-    },
+  const SKILL_GROUPS = [
+    { name: "Simulation & Software", items: ["Python (NumPy/SciPy)", "MATLAB", "Quaternion 6DOF dynamics", "Flask / Plotly"] },
+    { name: "CAD & Design", items: ["SolidWorks", "Assembly modeling (SLDASM)", "GD&T", "glTF export / compression"] },
+    { name: "Manufacturing", items: ["Composite layup", "3D printing (FDM)", "Machined/printed part integration"] },
+    { name: "Testing & Instrumentation", items: ["ASTM fatigue testing", "Flight-log analysis (pymavlink)", "Sensor DAQ / wire protocols"] },
   ];
 
-  const TIMELINE = [
-    ["Aug 2024 – Present", "VTOL Mechanical Team Lead, CWRU VTOL Team — frame/payload design, Tail Sitter/Hexacopter/Quadcopter/Tiltrotor airframes, SolidWorks CAD, MATLAB/Python simulation"],
-    ["Jan – Aug 2026", "Mechanical Engineering Co-Op, Tylok International — designed and built a flexural fatigue test machine to ASTM standards, plus thermal/flow/tensile/pressure test apparatus"],
-    ["Aug 2025 – Jan 2026", "Liquid Propulsion Team, CWRU — built the PyQt5 control GUI and the solenoid/servo mechanical thrust-control hardware for hot-fire test sequences"],
-    ["2022 – 2024", "University of Michigan Battery Lab — physical testing and Python analysis (Pandas, scikit-learn, SciPy, hdbscan) of single- and multi-cell batteries"],
-    ["Aug 2024 – May 2028", "B.S. Mechanical Engineering, Case Western Reserve University — Michelson-Morley Scholar"],
-  ];
-
-  // ---------------------------------------------------------------
-  // Render
-  // ---------------------------------------------------------------
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  // Magnetic hover: the tile eases a few px toward the cursor instead of
-  // sitting dead still under it -- the one "physical weight" cue borrowed
-  // from ciridae's feel, kept subtle so it reads as tactile, not gimmicky.
-  function addMagneticHover(el, strength){
-    if (reduceMotion) return;
-    el.addEventListener("mousemove", (e) => {
-      const r = el.getBoundingClientRect();
-      const mx = (e.clientX - r.left - r.width/2) / (r.width/2);
-      const my = (e.clientY - r.top - r.height/2) / (r.height/2);
-      el.style.setProperty("--mx", (mx*strength).toFixed(1) + "px");
-      el.style.setProperty("--my", (my*strength - strength*0.15).toFixed(1) + "px");
-    });
-    el.addEventListener("mouseleave", () => {
-      el.style.removeProperty("--mx");
-      el.style.removeProperty("--my");
-    });
-  }
-
-  const grid = document.getElementById("work-grid");
-  PROJECTS.forEach(p => {
-    const tile = document.createElement("button");
-    tile.type = "button";
-    tile.className = "tile" + (p.muted ? " muted" : "");
-    tile.setAttribute("aria-label", p.name + " — " + p.tag);
-    tile.innerHTML = `
-      <div class="tile-head"><span class="name">${p.name}</span><span class="meta">${p.tag}</span></div>
-      <div class="tile-figure"></div>
-      <div class="tile-foot">${p.cardFoot}<span class="sub">${p.cardSub}</span></div>
-    `;
-    tile.querySelector(".tile-figure").appendChild(p.tileFigure());
-    tile.addEventListener("click", () => { location.hash = "#project/" + p.id; });
-    addMagneticHover(tile, 6);
-    grid.appendChild(tile);
+  /* ============ wire real figures into their slots ============ */
+  const FIGURE_MAP = {
+    missionProfileFigure: () => missionProfileFigure(),
+    wingPlanformFigure: () => wingPlanformFigure(false),
+    wingPlanformFigureFull: () => wingPlanformFigure(true),
+    droneScopeFigure: () => droneScopeFigure(7),
+    rocketFigure: () => rocketFigure(),
+    cadPhotoFigure: () => imgFigure("assets/compdrone2025-render.png", "CompDrone2025 hexacopter render"),
+    missionCourseFigure: () => missionCourseFigure(),
+    tierCompareFigure: () => groupedBarFigure(TIER_COMPARE, "old_area", "new_area"),
+    fleetHoverFigure: () => hbarFigure(FLEET_HOVER, "hover", v => v.toFixed(1) + " min"),
+    heatmapFigure: () => heatmapFigure(LANDSCAPE),
+    bendingReliefFigure: () => bendingReliefFigure(),
+    nacaAirfoilFigure: () => nacaAirfoilFigure("2412"),
+    attitudeTrackFigure: () => attitudeTrackFigure(ATTITUDE_TRACK),
+    scopeFigureTall: () => scopeFigure(11, true),
+    flowFigure: () => flowFigure(),
+    sensorPanelFigure: () => sensorPanelFigure(),
+    modelFigureCad: () => modelFigure("assets/compdrone2025.glb", "CompDrone2025 hexacopter SolidWorks assembly"),
+  };
+  document.querySelectorAll("[data-fig]").forEach(el => {
+    const fn = FIGURE_MAP[el.dataset.fig];
+    if (fn) el.appendChild(fn());
   });
 
-  const tl = document.getElementById("about-timeline");
-  TIMELINE.forEach(([when, what]) => {
-    const row = document.createElement("div");
-    row.className = "row";
-    row.innerHTML = `<span class="when">${when}</span><span class="what">${what}</span>`;
-    tl.appendChild(row);
+  const skillsGrid = document.getElementById("skills-grid");
+  SKILL_GROUPS.forEach(g => {
+    const col = document.createElement("div");
+    const h5 = document.createElement("h5");
+    h5.style.marginBottom = "var(--space-3)";
+    h5.textContent = g.name;
+    col.appendChild(h5);
+    const list = document.createElement("div");
+    list.style.cssText = "display:flex;flex-direction:column;gap:8px";
+    g.items.forEach(s => {
+      const row = document.createElement("div");
+      row.className = "skill-item";
+      row.innerHTML = '<span class="skill-dot"></span>';
+      row.append(s);
+      list.appendChild(row);
+    });
+    col.appendChild(list);
+    skillsGrid.appendChild(col);
   });
 
-  const views = { work: document.getElementById("view-work"), about: document.getElementById("view-about"), detail: document.getElementById("view-detail") };
-  const pillButtons = document.querySelectorAll(".pillnav button");
-  function showView(name){
-    Object.values(views).forEach(v => v.classList.remove("active"));
-    views[name].classList.add("active");
-    pillButtons.forEach(b => b.classList.toggle("active", b.dataset.view === name));
-    window.scrollTo(0,0);
-  }
-  // Hash-based routing (#work, #about, #project/<id>) so the browser's own
-  // back/forward buttons work between the work grid, About, and a project
-  // detail -- not just the in-page "back to work" button.
-  pillButtons.forEach(b => { b.addEventListener("click", () => { location.hash = "#" + b.dataset.view; }); addMagneticHover(b, 4); });
-  const backBtn = document.getElementById("detail-back");
-  backBtn.addEventListener("click", () => { location.hash = "#work"; });
-  addMagneticHover(backBtn, 4);
+  /* ============ reel scroll-driven horizontal pin ============ */
+  const reelEl = document.getElementById("reel");
+  const stickyEl = document.querySelector(".reel-viewport");
+  const trackEl = document.getElementById("reel-track");
+  const frameLabelEl = document.getElementById("reel-frame-label");
+  const FRAME_COUNT = document.querySelectorAll(".frame").length;
+  reelEl.style.height = "260vh";
+  reelEl.style.position = "relative";
 
-  function openDetail(id){
-    const p = PROJECTS.find(x => x.id === id);
-    document.getElementById("d-title").textContent = p.name;
-    document.getElementById("d-tag").textContent = p.tag;
-    document.getElementById("d-lede").textContent = p.lede;
-    document.getElementById("d-overview").innerHTML = p.overview.map(m => `<p>${m}</p>`).join("");
-    document.getElementById("d-method").innerHTML = p.method.map(m => `<p>${m}</p>`).join("");
-    const cautionEl = document.getElementById("d-caution");
-    cautionEl.innerHTML = p.caution ? `<div class="caution">⚠ ${p.caution}</div>` : "";
-    const figWrap = document.getElementById("d-figures");
-    figWrap.innerHTML = "";
-    p.figures.forEach(f => {
-      const card = document.createElement("div");
-      card.className = "figure-card";
-      if (f.title){
-        const t = document.createElement("div");
-        t.className = "figure-title";
-        t.textContent = f.title;
-        card.appendChild(t);
-      }
-      card.appendChild(f.render());
-      if (f.caption){
-        const cap = document.createElement("div");
-        cap.className = "figure-caption";
-        cap.textContent = f.caption;
-        card.appendChild(cap);
-      }
-      figWrap.appendChild(card);
-    });
-    const facts = document.getElementById("d-facts");
-    facts.innerHTML = p.facts.map(([k,v]) => `<div class="fact"><span class="k">${k}</span><span class="v">${v}</span></div>`).join("");
-    const cta = document.getElementById("d-cta");
-    cta.innerHTML = p.cta.map(([label,href,cls]) => `<a class="cta ${cls}" href="${href}" target="_blank" rel="noopener">${label} →</a>`).join("");
-    cta.querySelectorAll(".cta").forEach(el => addMagneticHover(el, 5));
-    showView("detail");
-    pillButtons.forEach(b => b.classList.remove("active"));
+  function onReelScroll(){
+    const rect = reelEl.getBoundingClientRect();
+    const scrollable = rect.height - window.innerHeight;
+    let progress = scrollable > 0 ? -rect.top / scrollable : 0;
+    progress = Math.max(0, Math.min(1, progress));
+    const maxShift = trackEl.scrollWidth - stickyEl.clientWidth;
+    trackEl.style.transform = "translateX(" + (-progress * Math.max(0, maxShift)) + "px)";
+    const activeIndex = Math.min(FRAME_COUNT - 1, Math.round(progress * (FRAME_COUNT - 1)));
+    frameLabelEl.textContent = "FRAME " + String(activeIndex + 1).padStart(2, "0") + " / 0" + FRAME_COUNT;
   }
-
-  function route(){
-    const hash = location.hash.replace(/^#/, "");
-    if (hash.startsWith("project/")){
-      const id = hash.slice("project/".length);
-      if (PROJECTS.some(p => p.id === id)){
-        openDetail(id);
-        return;
-      }
-    } else if (hash === "about"){
-      showView("about");
-      return;
-    }
-    showView("work");
-  }
-  window.addEventListener("hashchange", route);
-  route();
+  window.addEventListener("scroll", onReelScroll, { passive: true });
+  window.addEventListener("resize", onReelScroll);
+  onReelScroll();
 })();
 </script>
 </body>
