@@ -473,6 +473,33 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     return root;
   }
 
+  // Real desired-vs-actual roll from the decoded sample log's own attitude
+  // pass (flight-analysis.json, analyses.attitude, ~1 point/sec) -- the gap
+  // between the two lines is the tracking error the flight's "poor roll
+  // stability" finding is actually reporting on, not a generic wobble.
+  function attitudeTrackFigure(track){
+    const W = 300, H = 130, M = {l:28, r:8, t:12, b:20};
+    const plotW = W-M.l-M.r, plotH = H-M.t-M.b;
+    const tMax = track[track.length-1][0];
+    const vMax = Math.max(...track.flatMap(p => [Math.abs(p[1]), Math.abs(p[2])])) * 1.15;
+    const root = svgRoot(`0 0 ${W} ${H}`);
+    const zeroY = M.t + plotH/2;
+    root.appendChild(svg("line", {x1:M.l, x2:W-M.r, y1:zeroY, y2:zeroY, stroke:LINE}));
+    const toX = t => M.l + (t/tMax)*plotW;
+    const toY = v => zeroY - (v/vMax)*(plotH/2);
+    const desiredPts = track.map(p => `${toX(p[0]).toFixed(1)},${toY(p[1]).toFixed(1)}`).join(" ");
+    const actualPts = track.map(p => `${toX(p[0]).toFixed(1)},${toY(p[2]).toFixed(1)}`).join(" ");
+    root.appendChild(svg("polyline", {points:desiredPts, fill:"none", stroke:ACCENT, "stroke-width":1.6, "stroke-dasharray":"3,2"}));
+    root.appendChild(svg("polyline", {points:actualPts, fill:"none", stroke:INK, "stroke-width":1.6}));
+    const ylab = svg("text", {x:M.l-4, y:M.t+6, "text-anchor":"end", "font-size":"8.5", "font-family":"IBM Plex Mono", fill:INK2});
+    ylab.textContent = `±${vMax.toFixed(0)}°`;
+    root.appendChild(ylab);
+    const cap = svg("text", {x:W/2, y:H-4, "text-anchor":"middle", "font-size":"9.5", "font-family":"IBM Plex Mono", fill:INK2});
+    cap.textContent = "roll — dashed: commanded, solid: actual";
+    root.appendChild(cap);
+    return root;
+  }
+
   function heatmapFigure(landscape){
     const {cl_vals, ar_vals, drag_grid, min_drag, max_drag, best_cl, best_ar} = landscape;
     const W = 300, H = 200, M = {l:30, r:10, t:10, b:26};
@@ -589,6 +616,33 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     return root;
   }
 
+  // The Live Data tab's actual gauge grid: the real wire-protocol channel
+  // IDs (P0-P6 pressure, T0 thermo, L0 load) sensors.py exposes, not a
+  // generic "sensor cluster" glyph.
+  function sensorPanelFigure(){
+    const channels = [
+      {id:"P0", label:"chamber"}, {id:"P1", label:"fuel tank"}, {id:"P2", label:"ox tank"},
+      {id:"P3", label:"fuel line"}, {id:"P4", label:"ox line"}, {id:"P5", label:"purge"},
+      {id:"P6", label:"N2 supply"}, {id:"T0", label:"chamber temp"}, {id:"L0", label:"thrust"},
+    ];
+    const cols = 3, cw = 94, ch = 56, gap = 6;
+    const rows = Math.ceil(channels.length/cols);
+    const W = cols*cw + (cols-1)*gap, H = rows*ch + (rows-1)*gap;
+    const root = svgRoot(`0 0 ${W} ${H}`);
+    channels.forEach((c,i) => {
+      const col = i%cols, row = Math.floor(i/cols);
+      const x = col*(cw+gap), y = row*(ch+gap);
+      root.appendChild(svg("rect", {x, y, width:cw, height:ch, rx:6, fill:"#fff", stroke:LINE, "stroke-width":1.5}));
+      const id = svg("text", {x:x+10, y:y+24, "font-size":"12", "font-family":"IBM Plex Mono", "font-weight":"600", fill: c.id[0]==="P" ? ACCENT : INK});
+      id.textContent = c.id;
+      root.appendChild(id);
+      const lbl = svg("text", {x:x+10, y:y+40, "font-size":"9", "font-family":"IBM Plex Mono", fill:INK2});
+      lbl.textContent = c.label;
+      root.appendChild(lbl);
+    });
+    return root;
+  }
+
   // Isometric wireframe block, dashed -- reads as "a CAD model" while the
   // dashed/unfilled treatment keeps it honestly an empty slot, not a real render.
   function imgFigure(src, alt){
@@ -649,6 +703,21 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     {label:"Quad_Big", hover:94.0}, {label:"Quad_Compact", hover:95.7}, {label:"x_8", hover:59.2},
   ].sort((a,b) => b.hover - a.hover);
 
+  // Real desired-vs-actual roll, subsampled ~1 pt/sec from the decoded
+  // sample log's own attitude pass (demos/flight-analysis.json,
+  // analyses.attitude.desRoll/roll) -- [seconds, desired_deg, actual_deg].
+  const ATTITUDE_TRACK = [
+    [0,-0.0,-1.9],[1,-0.0,-1.9],[2,-0.0,-2.0],[3,-0.0,-2.1],[4,-0.0,-2.6],[5,-0.0,0.4],
+    [6,-2.5,-3.1],[7,-0.7,2.3],[8,-2.1,-1.8],[9,-1.9,-4.0],[10,-1.3,-3.5],[11,-2.9,-3.8],
+    [12,-6.0,-6.3],[13,-4.4,-6.1],[14,-0.1,-2.5],[15,1.6,0.2],[16,0.3,-4.4],[17,0.3,-1.9],
+    [18,0.0,0.1],[19,-3.3,-3.4],[20,-6.6,-4.7],[21,-6.5,-7.2],[22,-4.2,-4.8],[23,-0.1,1.4],
+    [24,-7.1,-5.4],[25,-5.1,-4.5],[26,-2.7,-0.5],[27,-3.6,-2.7],[28,-4.0,-3.1],[29,-1.6,-1.8],
+    [30,-1.2,1.0],[31,-1.8,-2.7],[32,-3.7,-4.7],[33,0.0,-3.2],[34,2.6,-0.4],[35,7.5,2.7],
+    [36,0.0,-2.9],[37,3.2,-0.3],[38,0.5,-4.6],[39,1.3,-1.9],[40,1.0,-2.1],[41,6.1,2.9],
+    [42,5.4,5.0],[43,-2.1,-1.9],[44,-2.1,-2.8],[45,-0.0,0.2],[46,-3.9,-3.4],[47,-4.6,-2.7],
+    [48,-2.8,-4.7],[49,-4.5,-5.0],[50,3.9,-1.0],[51,4.2,3.0],[52,-2.8,-13.2],
+  ];
+
   const PROJECTS = [
     {
       id: "mission-model",
@@ -657,7 +726,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       cardFoot: "111.4 min hover",
       cardSub: "2,794 configs swept",
       tileFigure: () => missionProfileFigure(),
-      lede: "A VTOL mission-performance simulator for a fleet of cargo tailsitter aircraft. This round re-sized the whole fleet's wings against actual flight speeds instead of a placeholder, and replaced the tailsitter transition's tilt-angle approximation with a real quaternion 6DOF rigid-body integration.",
+      lede: "A mission-performance simulator I built to pick the best airframe, motor, propeller, and battery for a specific mission. This round I re-sized the whole fleet's wings against real flight speeds instead of a placeholder, and rebuilt the tailsitter transition as a real quaternion 6DOF rigid-body simulation instead of an angle approximation.",
       overview: [
         "Mission Model simulates a specific cargo run for a family of VTOL (vertical takeoff/landing) airframes: takeoff to 100 ft, cruise 1 nautical mile, land, pick up cargo, takeoff, cruise 8 nm, land, drop cargo, takeoff, cruise 1 nm back, land. For every candidate airframe, it sweeps every motor × propeller × battery combination it has spec data for (thousands of combinations) and reports which one actually completes the mission, how much battery it has left over, and how long it can hover — so 'which motor should this drone use' becomes a search over real thrust-curve data instead of a guess.",
         "Wing sizing for the winged tailsitter variants comes from a separate standalone tool, <code>wing_optimizer.py</code> — its own project below — which this round re-sized all 9 real TailSitter configs.",
@@ -666,8 +735,8 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       method: [
         "Every one of the 9 real TailSitter vehicle configs was re-sized this round using Wing Optimizer's energy-based (hover + cruise) objective at each tier's real governed cruise speed (18.0/18.8/19.6 m/s) instead of an old flat 25 m/s placeholder — the single biggest driver of the size change below, since required wing area scales as 1/v².",
         "The mission simulation uses closed-form kinematics for wingless multirotors — thrust against quadratic drag, <code>v̇ = a₀ − k·v²</code>, has an exact tanh solution, so every accel/decel leg is solved in one evaluation instead of stepped through a simulation loop.",
-        "A winged tailsitter's hover ↔ cruise transition can't take that shortcut: the rotor thrust has to physically rotate from vertical to horizontal as the wing builds lift with airspeed, so both the required thrust angle and the drag area keep changing through the whole maneuver. That leg now integrates a full quaternion 6DOF rigid-body state — position, velocity, attitude, angular rate — instead of the tilt-angle approximation it used before: attitude kinematics <code>q̇ = ½ q ⊗ [0, ω]</code> (Hamilton, scalar-first convention) alongside the rotational dynamics <code>I ω̇ = τ − ω × (Iω)</code>. Quaternions sidestep the gimbal-lock singularity Euler angles hit exactly at the 90° pitch-over a tailsitter transition requires — the one attitude range this model actually needs to fly through on every leg.",
-        "Lift is resolved along the wing's own body-fixed axis and scaled by the velocity component perpendicular to it, rather than assumed vertical and driven by raw airspeed — the distinction that matters through a transition, where the vehicle is neither purely hovering nor purely cruising and a fixed lift direction stops being a safe approximation.",
+        "A winged tailsitter's hover-to-cruise transition can't take that shortcut. The rotor thrust has to physically rotate from vertical to horizontal as the wing builds lift with airspeed, so the required thrust angle and the drag area both keep changing through the maneuver. I now integrate that leg as a full quaternion 6DOF rigid body — position, velocity, attitude, and angular rate together — instead of the old tilt-angle approximation. Attitude kinematics: <code>q̇ = ½ q ⊗ [0, ω]</code> (Hamilton, scalar-first), alongside the rotational dynamics <code>I ω̇ = τ − ω × (Iω)</code>. I picked quaternions specifically because Euler angles hit a gimbal-lock singularity right at the 90° pitch-over a tailsitter transition goes through — the one attitude this model actually has to fly through on every single leg.",
+        "Lift now points along the wing's own body-fixed axis and scales with the velocity component perpendicular to it, instead of always pointing straight up and scaling with raw airspeed. That distinction matters most mid-transition, when the vehicle is neither purely hovering nor purely cruising and a fixed lift direction just isn't a safe approximation anymore.",
       ],
       figures: [
         {
@@ -701,15 +770,15 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       cardFoot: "Taper 1.0 → 0.30",
       cardSub: "joint cl/AR/taper search",
       tileFigure: () => wingPlanformFigure(),
-      lede: "The standalone wing-sizing tool behind Mission Model's fleet, extended this round with three additions each scoped from a real aerostructural optimization paper's core finding — not a claim to replicate methods (RANS CFD, nonlinear FE, flight test) a standalone script can't run.",
+      lede: "The standalone wing-sizing tool behind Mission Model's fleet. I extended it this round with three additions, each scoped from one real aerostructural optimization paper's core finding — I'm not claiming to replicate methods (RANS CFD, nonlinear FE, flight test) a standalone script can't actually run.",
       overview: [
-        "<code>wing_optimizer.py</code> sizes a wing from mission requirements alone: given how much weight it must lift and how fast the aircraft cruises, it searches lift coefficient, aspect ratio, and (for the energy objective) taper ratio for the combination that minimizes structural mass, cruise drag, or total mission energy (hover + cruise) — then emits the winning geometry as SolidWorks-ready NACA equations or point-cloud curves, plus a <code>vehicle_configs</code>-style JSON entry Mission Model can load directly.",
-        "This round's three additions were each scoped from one paper's real finding while staying honest about what a standalone Python script can and can't do — see Method for the mapping and what's deliberately left out of scope.",
+        "<code>wing_optimizer.py</code> sizes a wing from mission requirements alone. Given how much weight it has to lift and how fast the aircraft cruises, it searches lift coefficient, aspect ratio, and (for the energy objective) taper ratio for whichever combination minimizes structural mass, cruise drag, or total mission energy. Once it's done, it emits the winning geometry as SolidWorks-ready NACA equations or point-cloud curves, plus a <code>vehicle_configs</code>-style JSON entry Mission Model can load directly.",
+        "This round's three additions are each based on one recent paper. Method below covers exactly what carried over from each one, and what I deliberately left out of scope.",
       ],
       method: [
-        "<strong>Aerodynamic-center reporting</strong>, inspired by Grimm, Price &amp; Ahmad's flight-tested flying-wing optimization (<em>Aerospace Systems</em>, 2026), which treats longitudinal stability — static margin and trim moment — as the primary design objective. <code>wing_mac_and_ac()</code> reports the wing's own mean aerodynamic chord and where its aerodynamic center sits relative to the root leading edge, from closed-form wing-theory integrals derived directly for both the linear-taper and elliptical planform: <code>c̄ = (2/3)c_root(1+λ+λ²)/(1+λ)</code>, <code>x_AC = ȳ·tan(Λ) + 0.25c̄</code> (not quoted from a table). This is the wing-only half of a stability check — a real static margin also needs the aircraft's CG and any tail, out of scope for a wing-only script.",
-        "<strong>A second wing-mass model</strong>, inspired by Zhao et al.'s finite-element model updating for a composite flying-wing (AIAA SciTech 2019, 2019-1814), which calibrates mass and stiffness against real vibration-test data — far more rigorous than this file's original single fitted AR exponent. <code>--mass-model beam</code> adds two real structural drivers that heuristic couldn't see, ultimate load factor and airfoil thickness ratio, via a first-order beam-bending scaling <code>m ∝ (AR/AR_ref)^1.5 · (n/n_ref) · (t/c_ref ÷ t/c)^0.5</code> (steeper AR penalty, load factor enters linearly, thinner airfoils cost more mass) — a physically-derived scaling, not a specific named empirical curve fit that would risk misattributing someone else's exact coefficients.",
-        "<strong>Joint taper search</strong>, inspired by Bombardieri et al.'s coupled aerostructural wing optimization (<em>Structural and Multidisciplinary Optimization</em>, 2021), whose central finding is that optimizing aerodynamics and structure separately misses real gains a coupled search finds. <code>--objective combined</code> now accepts <code>--taper-min</code>/<code>--taper-max</code> to search taper jointly with cl and aspect ratio instead of fixing it and applying it after the fact. Taper's only channel into this model is bending relief → wing mass → hover energy, <code>η_bend = (1+2λ)/3</code>, against induced drag from the Oswald-efficiency estimate <code>e₀ = 4.61(1−0.045·AR^0.68)cos(Λ)^0.15 − 3.1</code>, <code>C_Di = C_L²/(π·AR·e₀)</code> — a narrower coupling than the paper's full aero-structural one, but a real one: a taper trading structural weight against nothing in cruise drag is now evaluated by the same objective as cl and AR, not decided by a separate step.",
+        "<strong>Aerodynamic-center reporting</strong>, inspired by Grimm, Price &amp; Ahmad's flight-tested flying-wing optimization (<em>Aerospace Systems</em>, 2026), which treats longitudinal stability as the primary design objective. <code>wing_mac_and_ac()</code> reports the wing's own mean aerodynamic chord and where its aerodynamic center sits relative to the root leading edge. I derived these directly from closed-form wing-theory integrals for both the linear-taper and elliptical planform, rather than quoting them from a table: <code>c̄ = (2/3)c_root(1+λ+λ²)/(1+λ)</code>, <code>x_AC = ȳ·tan(Λ) + 0.25c̄</code>. This only covers the wing's own half of a stability check — a real static margin also needs the aircraft's CG and any tail, which is out of scope for a wing-only script.",
+        "<strong>A second wing-mass model</strong>, inspired by Zhao et al.'s finite-element model updating for a composite flying-wing (AIAA SciTech 2019, 2019-1814), which calibrates mass and stiffness against real vibration-test data — far more rigorous than my original single fitted AR exponent. <code>--mass-model beam</code> adds two real structural drivers that heuristic couldn't see: ultimate load factor and airfoil thickness ratio, through a first-order beam-bending scaling, <code>m ∝ (AR/AR_ref)^1.5 · (n/n_ref) · (t/c_ref ÷ t/c)^0.5</code>. The AR penalty gets steeper, load factor enters linearly, and thinner airfoils cost more mass. It's a physically-derived scaling rather than one specific named curve fit, so I'm not accidentally borrowing someone else's exact coefficients.",
+        "<strong>Joint taper search</strong>, inspired by Bombardieri et al.'s coupled aerostructural wing optimization (<em>Structural and Multidisciplinary Optimization</em>, 2021). Their central finding: optimizing aerodynamics and structure separately misses real gains that a coupled search finds. <code>--objective combined</code> now accepts <code>--taper-min</code>/<code>--taper-max</code> to search taper jointly with cl and aspect ratio instead of fixing it upfront. Taper's only channel into this model is bending relief → wing mass → hover energy, <code>η_bend = (1+2λ)/3</code>, weighed against induced drag from the Oswald-efficiency estimate, <code>e₀ = 4.61(1−0.045·AR^0.68)cos(Λ)^0.15 − 3.1</code>, <code>C_Di = C_L²/(π·AR·e₀)</code>. That's a narrower coupling than the paper's full aero-structural one, but it's real: a taper that trades structural weight for nothing in cruise drag now gets evaluated by the same objective as cl and AR, instead of being decided in a separate step.",
       ],
       figures: [
         {
@@ -743,7 +812,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       cardFoot: "65/100 flight score",
       cardSub: "QUAD frame, 7 issues found",
       tileFigure: () => droneScopeFigure(7),
-      lede: "A Flask + Plotly dashboard that decodes ArduCopter/PX4 flight logs into a full diagnostic report — the same class of binary telemetry this session pulled real numbers from directly.",
+      lede: "A Flask + Plotly dashboard that decodes ArduCopter/PX4 flight logs into a full diagnostic report — the score, the issues list, and the chart below all come from a real flight log run through the real backend.",
       overview: [
         "Every ArduPilot-based flight controller (Pixhawk and compatibles) writes a binary <code>.BIN</code> log of everything it measured mid-flight — hundreds of message types at up to a few hundred Hz. Reading that raw log to answer \"was this flight okay, and if not, why\" normally means a separate desktop tool (MAVExplorer) and manual digging. This dashboard does that automatically: upload a log, get back attitude tracking, vibration spectra, motor balance, PID tracking, GPS track, battery health, and barometer/magnetometer data across dedicated tabs, plus one overall flight-quality verdict.",
         "It's built for the same audience Mission Model is: someone who just flew a real airframe and needs to know whether the motors, frame, or tuning are actually behaving before flying again — not a generic telemetry viewer.",
@@ -753,10 +822,16 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
         "Ten analysis passes run per log — IMU, vibration, attitude, battery, motors, PID/rate controller, GPS, barometer, magnetometer, and discrete flight events (mode changes, arming, errors) — each producing its own stats block. A summary pass then scores the flight 0–100 and lists specific issues (e.g. \"poor roll stability,\" \"motor sync issues\") instead of just dumping charts and leaving the reader to spot problems.",
         "The dashboard (<code>log_dashboard.html</code>) renders the decoded series with Plotly, plus a Custom Plot tab that lets you overlay any two decoded variables against time regardless of category — useful for correlating, say, vibration against throttle.",
       ],
-      figures: [{
-        render: () => scopeFigure(11, true),
-        caption: "Vibration trace shape from a real decoded sample log (my_flight.bin), 52.1 seconds, 261 GPS fixes.",
-      }],
+      figures: [
+        {
+          render: () => attitudeTrackFigure(ATTITUDE_TRACK),
+          caption: "Real commanded-vs-actual roll from the sample log's attitude pass — the visible gap between the two lines is what the flight-quality pass is flagging as poor roll stability, not an assumption about the aircraft.",
+        },
+        {
+          render: () => scopeFigure(11, true),
+          caption: "Vibration trace shape from a real decoded sample log (my_flight.bin), 52.1 seconds, 261 GPS fixes.",
+        },
+      ],
       facts: [
         ["Flight quality score", "65 / 100 (Fair)"],
         ["Frame detected", "QUAD, 4 motors"],
@@ -787,10 +862,16 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
         "The wire protocol (<code>P0–P6, T0, L0</code>, one <code>name,value,timestamp</code> line per reading) matches the real Teensy firmware exactly, so a fake data source stands in for hardware without changing anything else — verified with a headless smoke test that boots the real window, ticks it, toggles a valve, and checks a logging session actually writes CSVs.",
         "The live demo linked below is a from-scratch JavaScript port of that same protocol and gauge math (not a screen recording) — it runs the identical random-walk sensor simulation and the identical SVG gauge/valve drawing code the Python app uses, so what you click there is what the desktop app actually does with no hardware attached.",
       ],
-      figures: [{
-        render: () => flowFigure(),
-        caption: "Data flow: one wire protocol, shared across a fake source (used here) and a future real Teensy connection, feeding all three tabs.",
-      }],
+      figures: [
+        {
+          render: () => flowFigure(),
+          caption: "Data flow: one wire protocol, shared across a fake source (used here) and a future real Teensy connection, feeding all three tabs.",
+        },
+        {
+          render: () => sensorPanelFigure(),
+          caption: "The Live Data tab's real gauge grid — 7 pressure channels, 1 thermocouple, 1 load cell, same P0–P6/T0/L0 IDs the wire protocol and the real Teensy firmware both use.",
+        },
+      ],
       facts: [
         ["Sensor channels", "7 pressure · 1 thermo · 1 load"],
         ["Tests passing", "10 / 10"],
