@@ -549,6 +549,18 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   <div class="method-copy">
     <p>Designed as a derivative of the hexacopter platform: rather than six rotors on a flat frame, the X-8 layout pairs eight motors (coaxial or square-8 arrangement) beneath a wing so the airframe can pitch over into wing-borne cruise. The design goal is a high thrust-to-weight ratio so the vehicle can still transition and recover reliably even before the wing is generating full lift.</p>
   </div>
+
+  <h6 class="subhead">Outcome</h6>
+  <div class="figure-card">
+    <div class="figure-title">5-inch drone frame</div>
+    <div data-fig="x8DroneFigure"></div>
+    <div class="figure-caption">Drag to orbit. The real SolidWorks model, exported to glTF (uncompressed — not yet run through the Draco/WebP pipeline CompDrone2025 got).</div>
+  </div>
+  <div class="figure-card">
+    <div class="figure-title">Tilt motor assembly</div>
+    <div data-fig="x8TiltMotorFigure"></div>
+    <div class="figure-caption">The motor-tilt mechanism that lets the X-8 pitch its thrust from vertical hover into forward, wing-borne cruise.</div>
+  </div>
 </section>
 
 <!-- ============================= TAIL SITTER DESIGNS ============================= -->
@@ -1085,6 +1097,8 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     flowFigure: () => flowFigure(),
     sensorPanelFigure: () => sensorPanelFigure(),
     modelFigureCad: () => modelFigure("assets/compdrone2025.glb", "CompDrone2025 hexacopter SolidWorks assembly"),
+    x8DroneFigure: () => modelFigure("assets/x8-tailsitter-5in-drone.glb", "X-8 tailsitter 5-inch drone frame"),
+    x8TiltMotorFigure: () => modelFigure("assets/x8-tailsitter-tilt-motor-assem.glb", "X-8 tailsitter tilt motor assembly"),
   };
   document.querySelectorAll("[data-fig]").forEach(el => {
     const fn = FIGURE_MAP[el.dataset.fig];
