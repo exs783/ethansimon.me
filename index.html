@@ -217,7 +217,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
           </a>
           <a href="#quadcopter" class="frame">
             <div class="frame-top"><span class="tag tag-mono-outline">CAD</span><span class="frame-num">02 / 10</span></div>
-            <div class="frame-fig"></div>
+            <div class="frame-fig" data-fig="quadcopterOrthoFigure"></div>
             <h3>Quadcopter</h3>
             <p>A basic quadcopter build teaching newer VTOL members multirotor design fundamentals before they move on to transitioning airframes.</p>
             <div class="tag-row"><span class="tag tag-neutral">SolidWorks</span><span class="tag tag-neutral">Teaching</span></div>
@@ -225,7 +225,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
           </a>
           <a href="#x8-tailsitter" class="frame">
             <div class="frame-top"><span class="tag tag-mono-outline">CAD</span><span class="frame-num">03 / 10</span></div>
-            <div class="frame-fig"></div>
+            <div class="frame-fig" data-fig="x8TailsitterOrthoFigure"></div>
             <h3>X-8 Tailsitter</h3>
             <p>An adaptation of the hexacopter into an X-8 tailsitter frame — lift from a wing, and a high thrust-to-weight ratio.</p>
             <div class="tag-row"><span class="tag tag-neutral">SolidWorks</span><span class="tag tag-neutral">Tailsitter</span></div>
@@ -560,7 +560,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 
   <h6 class="subhead">Outcome</h6>
   <div class="figure-card">
-    <div class="figure-title">Tilt motor assembly</div>
+    <div class="figure-title">X-8 Tailsitter</div>
     <div data-fig="x8TiltMotorFigure"></div>
     <div class="figure-caption">Drag to orbit. The real SolidWorks model, exported to glTF (uncompressed — not yet run through the Draco/WebP pipeline CompDrone2025 got). Shows the motor-tilt mechanism that lets the X-8 pitch its thrust from vertical hover into forward, wing-borne cruise.</div>
   </div>
@@ -1126,6 +1126,8 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     modelFigureCad: () => modelFigure("assets/compdrone2025.glb", "CompDrone2025 hexacopter SolidWorks assembly"),
     quadcopterFigure: () => modelFigure("assets/quadcopter-5in-drone.glb", "Quadcopter 5-inch drone frame"),
     x8TiltMotorFigure: () => modelFigure("assets/x8-tailsitter-tilt-motor-assem.glb", "X-8 tailsitter tilt motor assembly"),
+    quadcopterOrthoFigure: () => imgFigure("assets/quadcopter-orthographic.png", "Quadcopter top-down orthographic view"),
+    x8TailsitterOrthoFigure: () => imgFigure("assets/x8-tailsitter-orthographic.png", "X-8 tailsitter top-down orthographic view"),
   };
   document.querySelectorAll("[data-fig]").forEach(el => {
     const fn = FIGURE_MAP[el.dataset.fig];
