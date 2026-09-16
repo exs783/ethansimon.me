@@ -16,14 +16,18 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
 <style>
   :root{
     --bg:#f4f4f5; --card:#ffffff; --card-border:#e7e7ea;
-    --ink:#18181b; --ink-2:#6b6b70; --ink-3:#a3a3a8;
+    --ink:#18181b; --ink-2:#6b6b70; --ink-3:#6a6b70;
     --line:#e2e2e5; --accent:#3355ff;
+    --caution-ink:#8a5a00; --caution-bg:#fff6e0; --caution-border:#f0dca0;
     --font-body:'Inter', system-ui, sans-serif;
     --font-mono:'IBM Plex Mono', ui-monospace, monospace;
+  }
+  .sr-only{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
   }
   *{ box-sizing:border-box; }
   html{ color-scheme:light; }
@@ -63,6 +67,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 
   .tile{
     --mx:0px; --my:0px; --press:1;
+    appearance:none; font:inherit; text-align:left; width:100%;
     position:relative; background:var(--card); border:1px solid var(--card-border); border-radius:20px;
     padding:22px 24px 20px; cursor:pointer; display:flex; flex-direction:column; gap:18px; min-height:280px;
     transform:translate(var(--mx), var(--my)) scale(var(--press));
@@ -93,9 +98,9 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   /* ---- detail ---- */
   .back{
     --mx:0px; --my:0px; --press:1;
-    display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:12.5px;
+    display:inline-flex; align-items:center; justify-content:center; gap:6px; font-family:var(--font-mono); font-size:12.5px;
     color:var(--ink-2); background:var(--card); border:1px solid var(--card-border); border-radius:20px;
-    cursor:pointer; padding:8px 16px; margin-bottom:28px;
+    cursor:pointer; padding:8px 18px; min-height:44px; margin-bottom:28px;
     transform:translate(var(--mx),var(--my)) scale(var(--press));
     transition:color .15s ease, border-color .15s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
   }
@@ -107,7 +112,8 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   .detail-lede{ color:var(--ink-2); font-size:1.05rem; line-height:1.6; max-width:62ch; margin-bottom:8px; }
 
   .caution{
-    font-family:var(--font-mono); font-size:12.5px; color:#8a5a00; background:#fff6e0; border:1px solid #f0dca0;
+    font-family:var(--font-mono); font-size:12.5px; color:var(--caution-ink); background:var(--caution-bg);
+    border:1px solid var(--caution-border);
     border-radius:8px; padding:9px 12px; margin-block:16px; max-width:62ch;
   }
 
@@ -136,8 +142,9 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   .cta-row{ display:flex; gap:12px; margin-top:28px; }
   .cta{
     --mx:0px; --my:0px; --press:1;
-    font-family:var(--font-mono); font-size:12.5px; text-decoration:none; padding:9px 16px; border-radius:20px;
-    display:inline-block; transform:translate(var(--mx),var(--my)) scale(var(--press));
+    font-family:var(--font-mono); font-size:12.5px; text-decoration:none; padding:9px 18px; min-height:44px;
+    display:inline-flex; align-items:center; justify-content:center; border-radius:20px;
+    transform:translate(var(--mx),var(--my)) scale(var(--press));
     transition:transform .15s cubic-bezier(.34,1.56,.64,1), box-shadow .15s ease;
   }
   .cta.primary{ background:var(--ink); color:#fff; }
@@ -153,7 +160,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   .pillnav button{
     --mx:0px; --my:0px; --press:1;
     font-family:var(--font-body); font-size:13.5px; font-weight:500; border:none; background:none; color:#b9b9bd;
-    padding:8px 18px; border-radius:999px; cursor:pointer;
+    padding:8px 18px; min-height:44px; display:inline-flex; align-items:center; border-radius:999px; cursor:pointer;
     transform:translate(var(--mx),var(--my)) scale(var(--press));
     transition:background .2s ease, color .2s ease, transform .15s cubic-bezier(.34,1.56,.64,1);
   }
@@ -167,9 +174,9 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 </style>
 </head>
 <body>
-<div class="wrap">
+<main class="wrap">
 
-  <div class="masthead">
+  <header class="masthead">
     <div>
       <h1>Ethan Simon</h1>
       <div class="role">Mechanical Engineering, Case Western Reserve University</div>
@@ -178,16 +185,18 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       <a href="https://www.linkedin.com/in/ethansimon13" target="_blank" rel="noopener">LinkedIn</a>
       <a href="https://github.com/exs783" target="_blank" rel="noopener">GitHub</a>
     </div>
-  </div>
+  </header>
 
   <!-- WORK -->
-  <section class="view active" id="view-work">
+  <section class="view active" id="view-work" aria-labelledby="view-work-h">
+    <h2 id="view-work-h" class="sr-only">Work</h2>
     <p class="intro">Five projects, shown by outcome: the real number each one produced, and the method that produced it. Click one for the full write-up.</p>
     <div class="grid" id="work-grid"></div>
   </section>
 
   <!-- ABOUT -->
-  <section class="view" id="view-about">
+  <section class="view" id="view-about" aria-labelledby="view-about-h">
+    <h2 id="view-about-h" class="sr-only">About</h2>
     <p class="about-lede">Mechanical engineering student at Case Western Reserve University (Michelson-Morley Scholar), building simulation, ground-station, and test-equipment software alongside coursework. VTOL Mechanical Team Lead for CWRU's VTOL team — frame and payload design across Tail Sitter, Hexacopter, Quadcopter, and Tiltrotor airframes.</p>
     <div class="about-links">
       <a href="mailto:exs783@case.edu">Email</a>
@@ -200,7 +209,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   </section>
 
   <!-- DETAIL (templated) -->
-  <section class="view" id="view-detail">
+  <section class="view" id="view-detail" aria-labelledby="d-title">
     <button class="back" id="detail-back">&larr; back to work</button>
     <div class="detail-head">
       <h2 id="d-title"></h2>
@@ -224,12 +233,12 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     <div class="cta-row" id="d-cta"></div>
   </section>
 
-</div>
+</main>
 
-<div class="pillnav">
+<nav class="pillnav" aria-label="Primary">
   <button data-view="work" class="active">Work</button>
   <button data-view="about">About</button>
-</div>
+</nav>
 
 <script>
 (function(){
@@ -241,7 +250,10 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     return el;
   }
   function svgRoot(viewBox){ return svg("svg", {viewBox}); }
-  const INK = "#18181b", INK2 = "#6b6b70", LINE = "#e2e2e5", ACCENT = "#3355ff";
+  const rootStyle = getComputedStyle(document.documentElement);
+  const cssVar = (name, fallback) => (rootStyle.getPropertyValue(name) || fallback).trim();
+  const INK = cssVar("--ink", "#18181b"), INK2 = cssVar("--ink-2", "#6b6b70"),
+        LINE = cssVar("--line", "#e2e2e5"), ACCENT = cssVar("--accent", "#3355ff");
 
   // ---------------------------------------------------------------
   // Figures (monochrome, real data)
@@ -509,7 +521,25 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   // render. The source .glb is the actual CompDrone2025 SolidWorks assembly,
   // exported and compressed (Draco geometry + WebP textures) from 192MB down
   // to ~2MB so it's actually loadable on a portfolio page.
+  //
+  // The model-viewer library itself only loads when this function first
+  // runs (i.e. when the CAD detail view is actually opened) instead of on
+  // every pageview -- most visitors never open CAD.
+  let modelViewerLoading = null;
+  function ensureModelViewerLoaded(){
+    if (modelViewerLoading) return modelViewerLoading;
+    modelViewerLoading = new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.type = "module";
+      s.src = "https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js";
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+    return modelViewerLoading;
+  }
   function modelFigure(src, alt){
+    ensureModelViewerLoaded();
     const mv = document.createElement("model-viewer");
     mv.setAttribute("src", src);
     mv.setAttribute("alt", alt);
@@ -754,8 +784,10 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 
   const grid = document.getElementById("work-grid");
   PROJECTS.forEach(p => {
-    const tile = document.createElement("div");
+    const tile = document.createElement("button");
+    tile.type = "button";
     tile.className = "tile" + (p.muted ? " muted" : "");
+    tile.setAttribute("aria-label", p.name + " — " + p.tag);
     tile.innerHTML = `
       <div class="tile-head"><span class="name">${p.name}</span><span class="meta">${p.tag}</span></div>
       <div class="tile-figure"></div>
