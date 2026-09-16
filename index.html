@@ -138,7 +138,9 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 .frame .view-link{font:600 12px var(--font-heading);color:var(--color-neutral-900);flex:none}
 
 /* — detail sections — */
-.project-section{padding:clamp(48px,7vw,88px) clamp(20px,5vw,64px);border-bottom:2px solid var(--color-divider);scroll-margin-top:64px}
+.project-section{display:none;padding:clamp(48px,7vw,88px) clamp(20px,5vw,64px);border-bottom:2px solid var(--color-divider);scroll-margin-top:64px}
+.project-section:target{display:block}
+.back-to-reel{font:600 12px var(--font-heading);color:var(--color-neutral-700);display:inline-block;margin-bottom:var(--space-3)}
 .project-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:var(--space-2)}
 .project-head h2{max-width:22ch}
 .project-tagline{max-width:70ch;opacity:.85;font-size:16px}
@@ -254,6 +256,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 
 <!-- ============================= MISSION MODEL ============================= -->
 <section class="project-section" id="mission-model">
+  <a class="back-to-reel" href="#reel">← Back to reel</a>
   <div class="project-head">
     <div>
       <span class="tag tag-outline">Simulation · 2026</span>
@@ -306,6 +309,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 
 <!-- ============================= WING OPTIMIZER ============================= -->
 <section class="project-section" id="wing-optimizer">
+  <a class="back-to-reel" href="#reel">← Back to reel</a>
   <div class="project-head">
     <div>
       <span class="tag tag-outline">Optimization tool · 2026</span>
@@ -361,6 +365,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 
 <!-- ============================= LOG DASHBOARD ============================= -->
 <section class="project-section" id="log-dashboard">
+  <a class="back-to-reel" href="#reel">← Back to reel</a>
   <div class="project-head">
     <div>
       <span class="tag tag-outline">Flight-data tooling · 2026</span>
@@ -409,6 +414,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 
 <!-- ============================= LIQUID ROCKET ============================= -->
 <section class="project-section" id="liquid-rocket">
+  <a class="back-to-reel" href="#reel">← Back to reel</a>
   <div class="project-head">
     <div>
       <span class="tag tag-outline">CWRU Liquid Propulsion Team · 2026</span>
@@ -461,6 +467,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 
 <!-- ============================= CAD ============================= -->
 <section class="project-section" id="cad">
+  <a class="back-to-reel" href="#reel">← Back to reel</a>
   <div class="project-head">
     <div>
       <span class="tag tag-outline">SolidWorks CAD · 2025–2026</span>
