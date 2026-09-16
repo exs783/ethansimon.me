@@ -105,14 +105,10 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
   display:flex;align-items:center;justify-content:center;text-align:center;color:var(--color-neutral-600);font-size:13px}
 @media (max-width:760px){.hero{grid-template-columns:1fr}.headshot-slot{margin-inline:auto;max-width:220px}}
 
-.scrollband{text-align:center;padding:var(--space-3) 0;font-size:11px;letter-spacing:.14em;color:var(--color-neutral-600);border-bottom:2px solid var(--color-divider)}
-
 /* — reel — */
-#reel{position:relative}
-.reel-sticky{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+#reel, #featured-reel{scroll-margin-top:64px}
 .reel-head{padding:clamp(20px,3vw,40px) clamp(20px,5vw,64px) clamp(12px,2vw,20px);
   display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:12px}
-.reel-frame-count{font:600 14px var(--font-heading);letter-spacing:.05em;color:var(--color-neutral-700)}
 .reel-body{flex:1;background:var(--color-neutral-900);position:relative;display:flex;flex-direction:column}
 .sprocket{height:16px;background-image:radial-gradient(circle, var(--color-bg) 30%, transparent 32%);
   background-size:32px 16px;background-repeat:repeat-x;background-position:10px center;opacity:.9}
@@ -180,9 +176,9 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   <div>
     <h6 style="color:var(--color-neutral-700)">MECHANICAL ENGINEERING · CASE WESTERN RESERVE UNIVERSITY</h6>
     <h1>Looking for internship roles with a background in drones, mechanical testing, and simulation.</h1>
-    <p>CAD and manufacturing for real VTOL airframes, plus the simulation and diagnostic software that informs their design. Nine projects below — scroll to run the reel.</p>
+    <p>CAD and manufacturing for real VTOL airframes, plus the simulation and diagnostic software that informs their design. Ten projects below.</p>
     <div style="display:flex;gap:var(--space-3);flex-wrap:wrap">
-      <a href="#reel" class="btn btn-primary">View the reel →</a>
+      <a href="#reel" class="btn btn-primary">View all projects →</a>
       <a href="https://github.com/exs783" target="_blank" rel="noopener" class="btn btn-secondary">GitHub ↗</a>
     </div>
   </div>
@@ -191,7 +187,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 
 <section id="featured-reel">
   <div class="reel-head">
-    <h2 style="margin:0">CHECK OUT THIS PROJECT</h2>
+    <h2 style="margin:0">FEATURED PROJECTS</h2>
   </div>
   <div class="reel-body">
     <div class="sprocket"></div>
@@ -227,19 +223,15 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   </div>
 </section>
 
-<div class="scrollband">↓ SCROLL TO RUN THE REEL ↓</div>
-
 <section id="reel">
-  <div class="reel-sticky">
-    <div class="reel-head">
-      <h2 style="margin:0">PROJECT REEL</h2>
-      <div class="reel-frame-count" id="reel-frame-label">FRAME 01 / 10</div>
-    </div>
-    <div class="reel-body">
-      <div class="sprocket"></div>
-      <div class="reel-viewport" id="reel-viewport">
-        <div class="reel-track" id="reel-track">
-          <a href="#hexacopter-drone" class="frame">
+  <div class="reel-head">
+    <h2 style="margin:0">ALL PROJECTS</h2>
+  </div>
+  <div class="reel-body">
+    <div class="sprocket"></div>
+    <div class="reel-viewport" style="overflow-x:auto">
+      <div class="reel-track">
+        <a href="#hexacopter-drone" class="frame">
             <div class="frame-top"><span class="tag tag-mono-outline">CAD</span><span class="frame-num">01 / 10</span></div>
             <div class="frame-fig" data-fig="cadPhotoFigure"></div>
             <h3>Hexacopter Drone</h3>
@@ -319,10 +311,9 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
             <div class="tag-row"><span class="tag tag-neutral">PyQt6</span><span class="tag tag-neutral">Real wire protocol</span></div>
             <span class="view-link">View project ↗</span>
           </a>
-        </div>
       </div>
-      <div class="sprocket"></div>
     </div>
+    <div class="sprocket"></div>
   </div>
 </section>
 
@@ -1150,28 +1141,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     skillsGrid.appendChild(col);
   });
 
-  /* ============ reel scroll-driven horizontal pin ============ */
-  const reelEl = document.getElementById("reel");
-  const stickyEl = reelEl.querySelector(".reel-viewport");
-  const trackEl = document.getElementById("reel-track");
-  const frameLabelEl = document.getElementById("reel-frame-label");
-  const FRAME_COUNT = trackEl.querySelectorAll(".frame").length;
-  reelEl.style.height = "260vh";
-  reelEl.style.position = "relative";
-
-  function onReelScroll(){
-    const rect = reelEl.getBoundingClientRect();
-    const scrollable = rect.height - window.innerHeight;
-    let progress = scrollable > 0 ? -rect.top / scrollable : 0;
-    progress = Math.max(0, Math.min(1, progress));
-    const maxShift = trackEl.scrollWidth - stickyEl.clientWidth;
-    trackEl.style.transform = "translateX(" + (-progress * Math.max(0, maxShift)) + "px)";
-    const activeIndex = Math.min(FRAME_COUNT - 1, Math.round(progress * (FRAME_COUNT - 1)));
-    frameLabelEl.textContent = "FRAME " + String(activeIndex + 1).padStart(2, "0") + " / " + String(FRAME_COUNT).padStart(2, "0");
-  }
-  window.addEventListener("scroll", onReelScroll, { passive: true });
-  window.addEventListener("resize", onReelScroll);
-  onReelScroll();
 })();
 </script>
 </body>
