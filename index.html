@@ -361,6 +361,86 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     return root;
   }
 
+  // Labeled altitude/distance profile of the real fixed course
+  // Mission_Model.py flies every candidate through: takeoff/100ft, cruise
+  // 1nm, land, pick up cargo, takeoff, cruise 8nm, land, drop cargo,
+  // takeoff, cruise 1nm back, land -- the actual MISSION_LEGS sequence,
+  // not a generic flight-profile sketch.
+  function missionCourseFigure(){
+    const root = svgRoot("0 0 620 170");
+    const base = 130, top = 30;
+    root.appendChild(svg("line", {x1:10, x2:610, y1:base, y2:base, stroke:LINE}));
+    const legs = [
+      {w:60, cruiseW:20, label:"1 nm"},
+      {w:280, cruiseW:190, label:"8 nm"},
+      {w:60, cruiseW:20, label:"1 nm"},
+    ];
+    const events = ["takeoff", "land · pick up cargo", "land · drop cargo", "land"];
+    let x = 20, ei = 0;
+    const pathParts = [`M ${x} ${base}`];
+    legs.forEach((leg, i) => {
+      const climbX = x + (leg.w - leg.cruiseW) / 2;
+      const descentX = climbX + leg.cruiseW;
+      const endX = x + leg.w;
+      pathParts.push(`L ${climbX.toFixed(1)} ${top}`);
+      const cruiseLabel = svg("text", {x:(climbX+descentX)/2, y:top-8, "text-anchor":"middle", "font-size":"10.5", "font-family":"IBM Plex Mono", fill:INK2});
+      cruiseLabel.textContent = `cruise ${leg.label}`;
+      root.appendChild(cruiseLabel);
+      pathParts.push(`L ${descentX.toFixed(1)} ${top}`);
+      pathParts.push(`L ${endX.toFixed(1)} ${base}`);
+      root.appendChild(svg("circle", {cx:x, cy:base, r:3, fill:INK}));
+      const evLabel = svg("text", {x, y:base+16, "text-anchor":"middle", "font-size":"9.5", "font-family":"IBM Plex Mono", fill:INK2});
+      evLabel.textContent = events[ei++];
+      root.appendChild(evLabel);
+      root.appendChild(svg("circle", {cx:endX, cy:base, r:3, fill:INK}));
+      x = endX + 46;
+      if (i < legs.length - 1) pathParts.push(`M ${x} ${base}`);
+    });
+    const evLabel = svg("text", {x: x - 46, y:base+16, "text-anchor":"middle", "font-size":"9.5", "font-family":"IBM Plex Mono", fill:INK2});
+    evLabel.textContent = events[ei];
+    root.appendChild(evLabel);
+    root.appendChild(svg("path", {d:pathParts.join(" "), fill:"none", stroke:INK, "stroke-width":2.5, "stroke-linejoin":"round"}));
+    return root;
+  }
+
+  // Real NACA 4-digit airfoil cross-section, computed live from the same
+  // closed-form thickness/camber equations wing_optimizer.py's
+  // naca4_airfoil_point() uses -- not a traced/looked-up shape. NACA 2412
+  // is the file's own documented --naca example, used here for the same
+  // reason: a concrete, real section rather than a generic wing glyph.
+  function nacaAirfoilFigure(code){
+    const m = parseInt(code[0], 10) / 100;
+    const p = parseInt(code[1], 10) / 10;
+    const t = parseInt(code.slice(2), 10) / 100;
+    const n = 60;
+    const thickness = x => 5*t*(0.2969*Math.sqrt(x) - 0.1260*x - 0.3516*x**2 + 0.2843*x**3 - 0.1015*x**4);
+    const camber = x => {
+      if (p === 0) return {yc:0, dyc:0};
+      return x < p
+        ? {yc: (m/(p*p))*(2*p*x - x*x), dyc: (2*m/(p*p))*(p - x)}
+        : {yc: (m/((1-p)**2))*((1-2*p) + 2*p*x - x*x), dyc: (2*m/((1-p)**2))*(p - x)};
+    };
+    const upper = [], lower = [];
+    for (let i = 0; i <= n; i++){
+      const x = i/n, yt = thickness(x), {yc, dyc} = camber(x), theta = Math.atan(dyc);
+      upper.push([x - yt*Math.sin(theta), yc + yt*Math.cos(theta)]);
+      lower.push([x + yt*Math.sin(theta), yc - yt*Math.cos(theta)]);
+    }
+    const scale = 460, ox = 10, oy = 66;
+    const toPx = ([x,y]) => `${(ox + x*scale).toFixed(1)},${(oy - y*scale).toFixed(1)}`;
+    const root = svgRoot("0 0 480 130");
+    root.appendChild(svg("polyline", {points: upper.map(toPx).join(" "), fill:"none", stroke:INK, "stroke-width":2}));
+    root.appendChild(svg("polyline", {points: lower.map(toPx).join(" "), fill:"none", stroke:INK, "stroke-width":2}));
+    const camberPts = [];
+    for (let i = 0; i <= n; i++){ const x = i/n; camberPts.push([x, camber(x).yc]); }
+    root.appendChild(svg("polyline", {points: camberPts.map(toPx).join(" "), fill:"none", stroke:ACCENT, "stroke-width":1, "stroke-dasharray":"3,3"}));
+    root.appendChild(svg("line", {x1:ox, y1:oy, x2:ox+scale, y2:oy, stroke:LINE, "stroke-dasharray":"2,3"}));
+    const cap = svg("text", {x:240, y:120, "text-anchor":"middle", "font-size":"10.5", "font-family":"IBM Plex Mono", fill:INK2});
+    cap.textContent = `NACA ${code} — ${(t*100).toFixed(0)}% thickness, ${(m*100).toFixed(0)}% camber at ${(p*100).toFixed(0)}% chord`;
+    root.appendChild(cap);
+    return root;
+  }
+
   // Small quadcopter glyph riding above the real vibration trace -- names
   // the subject (a drone flight log) instead of leaving the waveform to
   // read as a generic signal.
@@ -591,6 +671,11 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       ],
       figures: [
         {
+          title: "The fixed 11-leg course",
+          render: () => missionCourseFigure(),
+          caption: "Every candidate flies the same course: takeoff to 100 ft, cruise 1 nm, land, pick up cargo, takeoff, cruise 8 nm, land, drop cargo, takeoff, cruise 1 nm back, land — the actual MISSION_LEGS sequence, cargo carried outbound only.",
+        },
+        {
           title: "Wing area, before vs. after — all 3 tiers",
           render: () => groupedBarFigure(TIER_COMPARE, "old_area", "new_area"),
           caption: "Gray = old fixed-cl/min-AR sizing (25 m/s placeholder cruise). Black = the new combined-objective sizing at each tier's real governed cruise speed. All 3 tiers grew, driven mostly by the slower real cruise speed (area scales as 1/v²).",
@@ -636,6 +721,11 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
           title: "Example wing with joint taper search",
           render: () => wingPlanformFigure(),
           caption: "Real output of --objective combined --taper-min 0.3 --taper-max 1.0: AR 8.56, taper ratio 0.30 (root 0.312 m / tip 0.093 m chord), span 1.73 m. Marker is the reported aerodynamic center — MAC 0.222 m, 0.056 m aft of the root leading edge, 0.356 m out along the span.",
+        },
+        {
+          title: "NACA 2412 — the file's own --naca example",
+          render: () => nacaAirfoilFigure("2412"),
+          caption: "Computed live from the same closed-form thickness/camber equations naca4_airfoil_point() uses — the exact surface, not a traced shape. Dashed line is the camber line; camber and thickness are what --naca hands to SolidWorks as parametric equations.",
         },
       ],
       facts: [
