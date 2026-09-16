@@ -81,12 +81,6 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 .figure-card model-viewer{width:100%;height:380px;display:block;--poster-color:transparent}
 .figure-title{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--color-neutral-600);margin-bottom:var(--space-3)}
 .figure-caption{font-size:12.5px;color:var(--color-neutral-600);margin-top:var(--space-3)}
-.factgrid{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--color-divider);margin-top:var(--space-3)}
-.factgrid>div{padding:var(--space-3);border-bottom:1px solid var(--color-divider);border-right:1px solid var(--color-divider)}
-.factgrid>div:nth-child(2n){border-right:none}
-@media (max-width:600px){.factgrid{grid-template-columns:1fr}.factgrid>div{border-right:none}}
-.fact-k{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--color-neutral-600)}
-.fact-v{font-family:var(--font-heading);font-weight:800;font-size:18px;margin-top:4px}
 
 /* — equations — */
 .eqn-block{border:1px solid var(--color-divider);background:var(--color-surface);padding:var(--space-3) var(--space-4);margin:var(--space-3) 0;overflow-x:auto}
@@ -375,13 +369,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     <div class="figure-caption">Best-case hover time per vehicle from the mission sweep (2,794 motor × prop × battery combinations), sorted descending. The four TailSitter tiers lead the two reference multirotors, 111.4 min vs. 73.2 and 59.2.</div>
   </div>
 
-  <h6 class="subhead">Numbers</h6>
-  <div class="factgrid">
-    <div><div class="fact-k">Wing loading, by tier</div><div class="fact-v">17.5–20.8 kg/m²</div></div>
-    <div><div class="fact-k">Aspect ratio, example wing</div><div class="fact-v">8.64</div></div>
-    <div><div class="fact-k">Best fleet hover time</div><div class="fact-v">111.4 min</div></div>
-    <div><div class="fact-k">Mission sweep</div><div class="fact-v">2,794 configs</div></div>
-  </div>
   <div style="margin-top:var(--space-4)"><a class="btn btn-secondary" href="https://github.com/exs783/Log_Reader" target="_blank" rel="noopener">View repo ↗</a></div>
 </section>
 
@@ -431,13 +418,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     <div class="figure-caption">Computed live from the same closed-form thickness/camber equations naca4_airfoil_point() uses — the exact surface, not a traced shape. Dashed line is the camber line; camber and thickness are what --naca hands to SolidWorks as parametric equations.</div>
   </div>
 
-  <h6 class="subhead">Numbers</h6>
-  <div class="factgrid">
-    <div><div class="fact-k">Mass models</div><div class="fact-v" style="font-size:15px">empirical (AR^0.5) or beam (AR^1.5, load factor, t/c)</div></div>
-    <div><div class="fact-k">Taper ratio found</div><div class="fact-v">0.30, searched 0.3–1.0</div></div>
-    <div><div class="fact-k">MAC, example wing</div><div class="fact-v">0.222 m</div></div>
-    <div><div class="fact-k">x_ac from root LE</div><div class="fact-v">0.056 m</div></div>
-  </div>
   <div style="margin-top:var(--space-4)"><a class="btn btn-secondary" href="https://github.com/exs783/Log_Reader" target="_blank" rel="noopener">View repo ↗</a></div>
 </section>
 
@@ -478,13 +458,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     <div class="figure-caption">Vibration trace shape from a real decoded sample log (my_flight.bin), 52.1 seconds, 261 GPS fixes.</div>
   </div>
 
-  <h6 class="subhead">Numbers</h6>
-  <div class="factgrid">
-    <div><div class="fact-k">Flight quality score</div><div class="fact-v">65 / 100 (Fair)</div></div>
-    <div><div class="fact-k">Frame detected</div><div class="fact-v">QUAD, 4 motors</div></div>
-    <div><div class="fact-k">Peak vibration</div><div class="fact-v">33.6 m/s²</div></div>
-    <div><div class="fact-k">Stability issues found</div><div class="fact-v" style="font-size:15px">7 (roll/pitch/yaw + motor sync)</div></div>
-  </div>
   <div style="margin-top:var(--space-4);display:flex;gap:var(--space-3);flex-wrap:wrap">
     <a class="btn btn-primary" href="demos/log-dashboard.html">Live demo</a>
     <a class="btn btn-secondary" href="https://github.com/exs783/Log_Reader" target="_blank" rel="noopener">View repo ↗</a>
@@ -531,13 +504,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 
   <div class="caution">⚠ Valve toggles are display-only — no serial command channel to real hardware exists yet.</div>
 
-  <h6 class="subhead">Numbers</h6>
-  <div class="factgrid">
-    <div><div class="fact-k">Sensor channels</div><div class="fact-v" style="font-size:15px">7 pressure · 1 thermo · 1 load</div></div>
-    <div><div class="fact-k">Tests passing</div><div class="fact-v">10 / 10</div></div>
-    <div><div class="fact-k">UI</div><div class="fact-v">3-tab PyQt6 app</div></div>
-    <div><div class="fact-k">Valve control</div><div class="fact-v">UI state only</div></div>
-  </div>
   <div style="margin-top:var(--space-4);display:flex;gap:var(--space-3);flex-wrap:wrap">
     <a class="btn btn-primary" href="demos/liquid-rocket.html">Live demo</a>
     <a class="btn btn-secondary" href="https://github.com/exs783/Liquid-Rocket" target="_blank" rel="noopener">View repo ↗</a>
@@ -571,12 +537,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     <div data-fig="modelFigureCad"></div>
   </div>
 
-  <h6 class="subhead">Numbers</h6>
-  <div class="factgrid">
-    <div><div class="fact-k">Subassemblies</div><div class="fact-v" style="font-size:15px">7 (ARM/FRM/LGR/BATT/CAM/PAYLOAD/ELEC)</div></div>
-    <div><div class="fact-k">CAD tool</div><div class="fact-v">SolidWorks</div></div>
-    <div><div class="fact-k">Model format here</div><div class="fact-v" style="font-size:15px">glTF (Draco + WebP, ~2 MB)</div></div>
-  </div>
+
 </section>
 
 <!-- ============================= X-8 TAILSITTER ============================= -->
