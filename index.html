@@ -195,6 +195,44 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   <div class="headshot-slot">Photo on request</div>
 </section>
 
+<section id="featured-reel">
+  <div class="reel-head">
+    <h2 style="margin:0">CHECK OUT THIS PROJECT</h2>
+  </div>
+  <div class="reel-body">
+    <div class="sprocket"></div>
+    <div class="reel-viewport" style="overflow-x:auto">
+      <div class="reel-track" id="featured-track">
+        <a href="#log-dashboard" class="frame">
+          <div class="frame-top"><span class="tag tag-mono-outline">Featured</span></div>
+          <div class="frame-fig" data-fig="droneScopeFigure"></div>
+          <h3>Log Dashboard</h3>
+          <p>Parses real flight data so users can look at sensor errors or find ways to improve their designs.</p>
+          <div class="tag-row"><span class="tag tag-neutral">Flask</span><span class="tag tag-neutral">Plotly</span></div>
+          <span class="view-link">View project ↗</span>
+        </a>
+        <a href="#mission-model" class="frame">
+          <div class="frame-top"><span class="tag tag-mono-outline">Featured</span></div>
+          <div class="frame-fig" data-fig="missionProfileFigure"></div>
+          <h3>Mission Model</h3>
+          <p>Runs a mock DARPA Heavy Lift 2028 course and outputs feasible motor, rotor, battery, and aerostructure configurations.</p>
+          <div class="tag-row"><span class="tag tag-neutral">Python</span><span class="tag tag-neutral">Quaternion 6DOF</span></div>
+          <span class="view-link">View project ↗</span>
+        </a>
+        <a href="#hexacopter-drone" class="frame">
+          <div class="frame-top"><span class="tag tag-mono-outline">Featured</span></div>
+          <div class="frame-fig" data-fig="cadPhotoFigure"></div>
+          <h3>Hexacopter Drone</h3>
+          <p>Design, manufacturing, and testing of a hexacopter for the VFS DBVF competition — frame, motor mounts, sensor mounts, and payload mounts.</p>
+          <div class="tag-row"><span class="tag tag-neutral">SolidWorks</span><span class="tag tag-neutral">DBVF</span></div>
+          <span class="view-link">View project ↗</span>
+        </a>
+      </div>
+    </div>
+    <div class="sprocket"></div>
+  </div>
+</section>
+
 <div class="scrollband">↓ SCROLL TO RUN THE REEL ↓</div>
 
 <section id="reel">
@@ -1153,10 +1191,10 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 
   /* ============ reel scroll-driven horizontal pin ============ */
   const reelEl = document.getElementById("reel");
-  const stickyEl = document.querySelector(".reel-viewport");
+  const stickyEl = reelEl.querySelector(".reel-viewport");
   const trackEl = document.getElementById("reel-track");
   const frameLabelEl = document.getElementById("reel-frame-label");
-  const FRAME_COUNT = document.querySelectorAll(".frame").length;
+  const FRAME_COUNT = trackEl.querySelectorAll(".frame").length;
   reelEl.style.height = "260vh";
   reelEl.style.position = "relative";
 
@@ -1168,7 +1206,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     const maxShift = trackEl.scrollWidth - stickyEl.clientWidth;
     trackEl.style.transform = "translateX(" + (-progress * Math.max(0, maxShift)) + "px)";
     const activeIndex = Math.min(FRAME_COUNT - 1, Math.round(progress * (FRAME_COUNT - 1)));
-    frameLabelEl.textContent = "FRAME " + String(activeIndex + 1).padStart(2, "0") + " / 0" + FRAME_COUNT;
+    frameLabelEl.textContent = "FRAME " + String(activeIndex + 1).padStart(2, "0") + " / " + String(FRAME_COUNT).padStart(2, "0");
   }
   window.addEventListener("scroll", onReelScroll, { passive: true });
   window.addEventListener("resize", onReelScroll);
