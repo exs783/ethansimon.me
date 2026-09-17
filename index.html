@@ -98,11 +98,12 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 
 /* — hero — */
 .hero{padding:clamp(48px,9vw,110px) clamp(20px,5vw,64px) clamp(40px,6vw,72px);
-  border-bottom:2px solid var(--color-divider)}
-.hero h1{font-size:clamp(30px,5.4vw,58px);max-width:22ch;margin-bottom:var(--space-4)}
+  display:grid;grid-template-columns:1.2fr .8fr;gap:clamp(24px,4vw,56px);align-items:end;border-bottom:2px solid var(--color-divider)}
+.hero h1{font-size:clamp(30px,5.4vw,58px);max-width:15ch;margin-bottom:var(--space-4)}
 .hero p{font-size:clamp(15px,1.6vw,18px);max-width:56ch;opacity:.85;margin-bottom:var(--space-6)}
-.headshot-note{display:inline-flex;align-items:center;font-size:12px;color:var(--color-neutral-600);
-  border:1px solid var(--color-divider);padding:4px 10px;margin-top:var(--space-4)}
+.headshot-photo{width:100%;aspect-ratio:4/5;max-width:300px;margin-left:auto;border:1px solid var(--color-divider);
+  object-fit:cover;object-position:center 20%;display:block}
+@media (max-width:760px){.hero{grid-template-columns:1fr}.headshot-photo{margin-inline:auto;max-width:220px}}
 
 /* — reel — */
 #reel, #featured-reel{scroll-margin-top:64px}
@@ -179,8 +180,8 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
       <a href="#reel" class="btn btn-primary">View all projects →</a>
       <a href="https://github.com/exs783" target="_blank" rel="noopener" class="btn btn-secondary">GitHub ↗</a>
     </div>
-    <div><span class="headshot-note">Photo on request</span></div>
   </div>
+  <img class="headshot-photo grayscale" src="assets/ethan-simon-headshot.jpg" alt="Ethan Simon">
 </section>
 
 <section id="featured-reel">

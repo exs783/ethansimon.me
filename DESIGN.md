@@ -72,8 +72,8 @@ changes to their drawing code.
 - **Nav**: sticky top, brand wordmark left, text links (Projects/About/
   Skills/Contact) plus one outlined LinkedIn button, 2px bottom divider.
 - **Hero**: large bold headline + tagline, two CTAs (primary ink button to
-  the reel, secondary outlined GitHub link), an honest dashed-border
-  headshot placeholder ("Photo on request") instead of a fake photo.
+  the reel, secondary outlined GitHub link), a real grayscale-filtered
+  headshot photo (bordered, zero radius, matching the figure-card treatment).
 - **Reel**: `#reel` is a tall (260vh) scroll track; `.reel-sticky` pins at
   `position: sticky; top:0; height:100vh` while JS (`onReelScroll`)
   computes scroll progress through that tall track and applies
@@ -129,6 +129,9 @@ border, surface fill, zero radius).
 ## Content policy
 
 Unchanged: every number on the page is real, sourced from an actual repo,
-test run, or data file. CAD stays honest; the hero headshot stays an
-honest empty state rather than a fabricated image; the contact section
-offers only real, reachable links.
+test run, or data file. CAD stays honest; the contact section offers only
+real, reachable links. The hero headshot is now a real photo
+(`assets/ethan-simon-headshot.jpg`, grayscale-filtered per the Modernist
+system's photography rule) rather than the earlier "Photo on request"
+placeholder — supersedes the prior empty-state approach now that a real
+photo is on hand.
