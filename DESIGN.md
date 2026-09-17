@@ -91,10 +91,10 @@ changes to their drawing code.
   soft-shadow cards.
 - **About / Skills / Résumé band / Contact / Footer**: new sections not
   present in the prior direction's IA, matching the reference canvas's page
-  structure. Résumé band and contact deliberately do not offer a résumé PDF
-  download — no such file exists in this repo, and a dead download link
-  would violate the site's honesty-first content policy — so the band
-  links to real LinkedIn/GitHub/email instead of a fabricated download.
+  structure. Résumé band and contact are merged into one section (see
+  Content policy below): a single blurb line plus large `.btn-lg`
+  LinkedIn/GitHub/email/Resume links — the Resume link now points to a
+  real PDF (`assets/Ethan_Simon_Resume.pdf`), no longer omitted.
 
 ## Charts
 

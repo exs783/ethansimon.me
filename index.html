@@ -66,6 +66,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 .btn-secondary:hover{background:color-mix(in srgb, var(--color-text) 7%, transparent);color:var(--color-text)}
 .btn-ghost{color:var(--color-accent);padding-inline:0}
 .btn-ghost:hover{color:var(--color-accent-700)}
+.btn-lg{font-size:16px;padding:14px 22px}
 
 /* — tags — */
 .tag{display:inline-flex;align-items:center;font-size:11px;letter-spacing:.02em;padding:3px 10px;border-radius:0}
@@ -151,9 +152,8 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 /* — resume band / contact / footer — */
 .resume-band{padding:clamp(48px,8vw,100px) clamp(20px,5vw,64px);background:var(--color-neutral-900);color:var(--color-bg);
   display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px}
-.resume-band h6{color:var(--color-neutral-400)}
-.resume-band h2{color:var(--color-bg);max-width:22ch;margin-bottom:var(--space-2)}
-.resume-band p{color:var(--color-neutral-300);max-width:46ch;margin-bottom:0}
+.resume-band h6{color:var(--color-neutral-400);margin-bottom:var(--space-2)}
+.resume-band p{color:var(--color-neutral-300);font-size:18px;max-width:46ch;margin-bottom:0}
 .resume-band .btn{border:1px solid var(--color-bg);color:var(--color-bg)}
 .resume-band .btn:hover{background:color-mix(in srgb, var(--color-bg) 12%, transparent)}
 footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--color-divider);
@@ -656,13 +656,13 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 <section class="resume-band" id="contact">
   <div>
     <h6>CONTACT</h6>
-    <h2>Got a project, internship, or test rig that needs a second pair of hands?</h2>
     <p>Currently looking for opportunities in Mechanical or Aerospace Engineering, but open to opportunities of any kind. Project logs and test data on request.</p>
   </div>
   <div style="display:flex;gap:var(--space-3);flex-wrap:wrap">
-    <a href="mailto:exs783@case.edu" class="btn">exs783@case.edu</a>
-    <a href="https://www.linkedin.com/in/ethansimon13" target="_blank" rel="noopener" class="btn">LinkedIn ↗</a>
-    <a href="https://github.com/exs783" target="_blank" rel="noopener" class="btn">GitHub ↗</a>
+    <a href="mailto:exs783@case.edu" class="btn btn-lg">exs783@case.edu</a>
+    <a href="https://www.linkedin.com/in/ethansimon13" target="_blank" rel="noopener" class="btn btn-lg">LinkedIn ↗</a>
+    <a href="https://github.com/exs783" target="_blank" rel="noopener" class="btn btn-lg">GitHub ↗</a>
+    <a href="assets/Ethan_Simon_Resume.pdf" target="_blank" class="btn btn-lg">Resume ↗</a>
   </div>
 </section>
 
