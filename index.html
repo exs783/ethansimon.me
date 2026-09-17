@@ -257,7 +257,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
           </a>
           <a href="#tail-sitter-designs" class="frame">
             <div class="frame-top"><span class="tag tag-mono-outline">CAD</span><span class="frame-num">04 / 10</span></div>
-            <div class="frame-fig"></div>
+            <div class="frame-fig" data-fig="tailSitterFigure"></div>
             <h3>Tail Sitter Designs</h3>
             <p>Ongoing project teaching younger VTOL members to design their own tail sitters and improve the club's transition-drone capability.</p>
             <div class="tag-row"><span class="tag tag-neutral">SolidWorks</span><span class="tag tag-neutral">Teaching</span></div>
@@ -265,7 +265,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
           </a>
           <a href="#tilt-rotor-designs" class="frame">
             <div class="frame-top"><span class="tag tag-mono-outline">CAD</span><span class="frame-num">05 / 10</span></div>
-            <div class="frame-fig"></div>
+            <div class="frame-fig" data-fig="tiltRotorFigure"></div>
             <h3>Tilt Rotor Designs</h3>
             <p>Teaching new VTOL members to design tilt rotors and build their own within a semester.</p>
             <div class="tag-row"><span class="tag tag-neutral">SolidWorks</span><span class="tag tag-neutral">Teaching</span></div>
@@ -273,7 +273,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
           </a>
           <a href="#darpa-lift-2028" class="frame">
             <div class="frame-top"><span class="tag tag-mono-outline">CAD</span><span class="frame-num">06 / 10</span></div>
-            <div class="frame-fig"></div>
+            <div class="frame-fig" data-fig="darpaLiftFigure"></div>
             <h3>DARPA Lift 2028</h3>
             <p>A drone to compete in the DARPA LIFT '28 challenge. Current design is a tail sitter with a low rotor count, being actively adapted.</p>
             <div class="tag-row"><span class="tag tag-neutral">SolidWorks</span><span class="tag tag-neutral">In progress</span></div>
@@ -593,6 +593,13 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     <p>Tail-sitters are the simplest wing-based VTOL transition mechanism — the whole airframe pitches over rather than tilting individual motors or wing sections — which makes them the right starting point for members who haven't designed a transitioning aircraft before. The current design under review is a biplane tail-sitter: a small quadcopter core with foils that double as landing gear, weighing an S1223 airfoil against NACA 4412/6412 candidates.</p>
     <p>Design decisions worked through with the team include 2 vs. 4 rotors, one wing vs. two, and how the wings attach to the frame (a matching profile clamp, bolted to the frame). Transition logic gets validated in PX4 + Gazebo SITL simulation before any hardware flies.</p>
   </div>
+
+  <h6 class="subhead">Outcome</h6>
+  <div class="figure-card">
+    <div class="figure-title">Transition mechanism</div>
+    <div data-fig="tailSitterFigure"></div>
+    <div class="figure-caption">CAD not yet finalized — diagram of the mechanism being designed around: the whole airframe pitches from hover to cruise as one rigid body, no separate tilt actuator.</div>
+  </div>
 </section>
 
 <!-- ============================= TILT ROTOR DESIGNS ============================= -->
@@ -610,6 +617,13 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   <div class="method-copy">
     <p>Where a tail-sitter pitches the whole airframe, a tilt-rotor only rotates the motors from vertical to near-horizontal, letting the fuselage stay level through the transition. That's more mechanically complex than a tail-sitter, but easier on payloads and sensors that need to stay upright — the natural next step once members have a tail-sitter under their belt.</p>
   </div>
+
+  <h6 class="subhead">Outcome</h6>
+  <div class="figure-card">
+    <div class="figure-title">Transition mechanism</div>
+    <div data-fig="tiltRotorFigure"></div>
+    <div class="figure-caption">CAD not yet finalized — diagram of the mechanism being designed around: only the rotor nacelles rotate, the fuselage stays level so payloads and sensors don't have to.</div>
+  </div>
 </section>
 
 <!-- ============================= DARPA LIFT 2028 ============================= -->
@@ -626,6 +640,13 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   <h6 class="subhead">Overview</h6>
   <div class="method-copy">
     <p>The CAD counterpart to <a href="#mission-model">Mission Model</a>, which sweeps motor/prop/battery combinations against a mock DARPA Heavy Lift 2028 mission — this is the physical airframe that mission analysis is meant to inform. Current direction is a low-rotor-count tail sitter, prioritizing hover efficiency and cruise range for the heavy-lift mission profile over the redundancy a higher rotor count would buy.</p>
+  </div>
+
+  <h6 class="subhead">Outcome</h6>
+  <div class="figure-card">
+    <div class="figure-title">Rotor-count trade-off</div>
+    <div data-fig="darpaLiftFigure"></div>
+    <div class="figure-caption">CAD not yet finalized — the actual design trade-off driving the current direction: 2 rotors over 6, trading redundancy for hover efficiency and cruise range on the heavy-lift mission.</div>
   </div>
 </section>
 
@@ -684,6 +705,80 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
         LINE = cssVar("--line", "#c9c6c6"), ACCENT = cssVar("--accent", "#ec3013");
 
   /* ============ real-data chart functions (unchanged drawing logic) ============ */
+
+  function pitchIcon(cx, cy, angleDeg){
+    const g = svg("g", {transform:`translate(${cx},${cy}) rotate(${angleDeg})`});
+    g.appendChild(svg("line", {x1:0,y1:-26,x2:0,y2:22, stroke:INK, "stroke-width":2.5, "stroke-linecap":"round"}));
+    g.appendChild(svg("line", {x1:-22,y1:-10,x2:22,y2:-10, stroke:INK, "stroke-width":2.5, "stroke-linecap":"round"}));
+    [-22,22].forEach(dx => g.appendChild(svg("circle", {cx:dx, cy:-10, r:5, fill:"none", stroke:INK, "stroke-width":2})));
+    g.appendChild(svg("path", {d:"M -8 22 L 0 32 L 8 22 Z", fill:"none", stroke:INK, "stroke-width":2, "stroke-linejoin":"round"}));
+    return g;
+  }
+
+  function tailSitterFigure(){
+    const root = svgRoot("0 0 300 140");
+    root.appendChild(pitchIcon(64, 70, 0));
+    root.appendChild(pitchIcon(236, 70, -90));
+    root.appendChild(svg("path", {d:"M 108 40 A 70 70 0 0 1 192 40", fill:"none", stroke:ACCENT, "stroke-width":2, "stroke-dasharray":"4,3"}));
+    root.appendChild(svg("path", {d:"M 188 36 L 196 42 L 186 46 Z", fill:ACCENT}));
+    [["HOVER",64],["CRUISE",236]].forEach(([label,x]) => {
+      const t = svg("text", {x, y:120, "text-anchor":"middle", "font-size":"10.5", "font-family":"Archivo", "font-weight":"600", fill:INK});
+      t.textContent = label; root.appendChild(t);
+    });
+    const cap = svg("text", {x:150, y:22, "text-anchor":"middle", "font-size":"9.5", "font-family":"Archivo", fill:INK2});
+    cap.textContent = "whole airframe pitches over 90° — no separate tilt mechanism";
+    root.appendChild(cap);
+    return root;
+  }
+
+  function tiltRotorFigure(){
+    const root = svgRoot("0 0 300 140");
+    const bodyY = 76;
+    root.appendChild(svg("line", {x1:56, x2:244, y1:bodyY, y2:bodyY, stroke:INK, "stroke-width":2.5, "stroke-linecap":"round"}));
+    function nacelle(cx, angleDeg, dashed){
+      const g = svg("g", {transform:`translate(${cx},${bodyY}) rotate(${angleDeg})`});
+      g.appendChild(svg("line", {x1:0,y1:0,x2:0,y2:-26, stroke: dashed?INK2:INK, "stroke-width":2, "stroke-dasharray": dashed?"3,3":"none", "stroke-linecap":"round"}));
+      g.appendChild(svg("circle", {cx:0, cy:-26, r:6, fill:"none", stroke: dashed?INK2:INK, "stroke-width":2}));
+      return g;
+    }
+    [[70,1],[230,-1]].forEach(([cx,side]) => {
+      root.appendChild(nacelle(cx, 0, true));
+      root.appendChild(nacelle(cx, side*90, false));
+      root.appendChild(svg("path", {d:`M ${cx} ${bodyY-30} A 30 30 0 0 ${side>0?1:0} ${cx+side*30} ${bodyY}`, fill:"none", stroke:ACCENT, "stroke-width":1.5, "stroke-dasharray":"3,2"}));
+    });
+    const fusLbl = svg("text", {x:150, y:118, "text-anchor":"middle", "font-size":"9.5", "font-family":"Archivo", fill:INK2});
+    fusLbl.textContent = "fuselage stays level — dashed: hover, solid: cruise";
+    root.appendChild(fusLbl);
+    const cap = svg("text", {x:150, y:22, "text-anchor":"middle", "font-size":"9.5", "font-family":"Archivo", fill:INK2});
+    cap.textContent = "only the rotor nacelles rotate, vertical → horizontal";
+    root.appendChild(cap);
+    return root;
+  }
+
+  function darpaLiftFigure(){
+    const root = svgRoot("0 0 300 140");
+    function rotorCluster(cx, cy, n, r, accent){
+      const g = svg("g", {transform:`translate(${cx},${cy})`});
+      const positions = n === 2 ? [[-34,0],[34,0]] :
+        Array.from({length:n}, (_,i) => { const a = (i/n)*2*Math.PI; return [Math.cos(a)*30, Math.sin(a)*30]; });
+      positions.forEach(([dx,dy]) => {
+        g.appendChild(svg("line", {x1:0,y1:0,x2:dx,y2:dy, stroke:INK2, "stroke-width":1.5}));
+        g.appendChild(svg("circle", {cx:dx, cy:dy, r, fill:"none", stroke: accent?ACCENT:INK, "stroke-width":2}));
+      });
+      g.appendChild(svg("circle", {cx:0, cy:0, r:5, fill:INK}));
+      return g;
+    }
+    root.appendChild(rotorCluster(76, 74, 2, 14, true));
+    root.appendChild(rotorCluster(224, 74, 6, 9, false));
+    const l1 = svg("text", {x:76, y:126, "text-anchor":"middle", "font-size":"10", "font-family":"Archivo", "font-weight":"600", fill:ACCENT});
+    l1.textContent = "2 rotors — this design"; root.appendChild(l1);
+    const l2 = svg("text", {x:224, y:126, "text-anchor":"middle", "font-size":"10", "font-family":"Archivo", fill:INK2});
+    l2.textContent = "6 rotors — redundant baseline"; root.appendChild(l2);
+    const cap = svg("text", {x:150, y:22, "text-anchor":"middle", "font-size":"9.5", "font-family":"Archivo", fill:INK2});
+    cap.textContent = "low rotor count trades redundancy for hover efficiency + range";
+    root.appendChild(cap);
+    return root;
+  }
 
   function scopeFigure(seed, tall){
     const h = tall ? 140 : 110;
@@ -1107,6 +1202,9 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     x8TiltMotorFigure: () => modelFigure("assets/x8-tailsitter-tilt-motor-assem.glb", "X-8 tailsitter tilt motor assembly"),
     quadcopterOrthoFigure: () => imgFigure("assets/quadcopter-orthographic.png", "Quadcopter top-down orthographic view"),
     x8TailsitterOrthoFigure: () => imgFigure("assets/x8-tailsitter-orthographic.png", "X-8 tailsitter top-down orthographic view"),
+    tailSitterFigure: () => tailSitterFigure(),
+    tiltRotorFigure: () => tiltRotorFigure(),
+    darpaLiftFigure: () => darpaLiftFigure(),
   };
   document.querySelectorAll("[data-fig]").forEach(el => {
     const fn = FIGURE_MAP[el.dataset.fig];
