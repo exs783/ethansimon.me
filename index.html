@@ -98,17 +98,17 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 
 /* — hero — */
 .hero{padding:clamp(48px,9vw,110px) clamp(20px,5vw,64px) clamp(40px,6vw,72px);
-  display:grid;grid-template-columns:1.2fr .8fr;gap:clamp(24px,4vw,56px);align-items:end;border-bottom:2px solid var(--color-divider)}
-.hero h1{font-size:clamp(30px,5.4vw,58px);max-width:15ch;margin-bottom:var(--space-4)}
+  border-bottom:2px solid var(--color-divider)}
+.hero h1{font-size:clamp(30px,5.4vw,58px);max-width:22ch;margin-bottom:var(--space-4)}
 .hero p{font-size:clamp(15px,1.6vw,18px);max-width:56ch;opacity:.85;margin-bottom:var(--space-6)}
-.headshot-slot{width:100%;aspect-ratio:4/5;max-width:300px;margin-left:auto;border:1px dashed var(--color-divider);
-  display:flex;align-items:center;justify-content:center;text-align:center;color:var(--color-neutral-600);font-size:13px}
-@media (max-width:760px){.hero{grid-template-columns:1fr}.headshot-slot{margin-inline:auto;max-width:220px}}
+.headshot-note{display:inline-flex;align-items:center;font-size:12px;color:var(--color-neutral-600);
+  border:1px solid var(--color-divider);padding:4px 10px;margin-top:var(--space-4)}
 
 /* — reel — */
 #reel, #featured-reel{scroll-margin-top:64px}
 .reel-head{padding:clamp(20px,3vw,40px) clamp(20px,5vw,64px) clamp(12px,2vw,20px);
   display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:12px}
+.reel-progress{font:600 12px var(--font-heading);color:var(--color-neutral-600)}
 .reel-body{flex:1;background:var(--color-neutral-900);position:relative;display:flex;flex-direction:column}
 .sprocket{height:16px;background-image:radial-gradient(circle, var(--color-bg) 30%, transparent 32%);
   background-size:32px 16px;background-repeat:repeat-x;background-position:10px center;opacity:.9}
@@ -151,12 +151,10 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 .resume-band{padding:clamp(48px,8vw,100px) clamp(20px,5vw,64px);background:var(--color-neutral-900);color:var(--color-bg);
   display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px}
 .resume-band h6{color:var(--color-neutral-400)}
-.resume-band h2{color:var(--color-bg);max-width:22ch;margin-bottom:0}
+.resume-band h2{color:var(--color-bg);max-width:22ch;margin-bottom:var(--space-2)}
+.resume-band p{color:var(--color-neutral-300);max-width:46ch;margin-bottom:0}
 .resume-band .btn{border:1px solid var(--color-bg);color:var(--color-bg)}
 .resume-band .btn:hover{background:color-mix(in srgb, var(--color-bg) 12%, transparent)}
-.contact{padding:clamp(48px,7vw,96px) clamp(20px,5vw,64px)}
-.contact h2{max-width:18ch}
-.contact-links{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:var(--space-4);font-size:15px}
 footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--color-divider);
   display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--color-neutral-600)}
 </style>
@@ -181,8 +179,8 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
       <a href="#reel" class="btn btn-primary">View all projects →</a>
       <a href="https://github.com/exs783" target="_blank" rel="noopener" class="btn btn-secondary">GitHub ↗</a>
     </div>
+    <div><span class="headshot-note">Photo on request</span></div>
   </div>
-  <div class="headshot-slot">Photo on request</div>
 </section>
 
 <section id="featured-reel">
@@ -226,6 +224,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 <section id="reel">
   <div class="reel-head">
     <h2 style="margin:0">ALL PROJECTS</h2>
+    <span class="reel-progress" id="reel-progress">01 / 10</span>
   </div>
   <div class="reel-body">
     <div class="sprocket"></div>
@@ -653,26 +652,16 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   <div class="skills-grid" id="skills-grid"></div>
 </section>
 
-<section class="resume-band">
+<section class="resume-band" id="contact">
   <div>
-    <h6>LET'S BUILD SOMETHING</h6>
-    <h2>Project logs and test data on request.</h2>
+    <h6>CONTACT</h6>
+    <h2>Got a project, internship, or test rig that needs a second pair of hands?</h2>
+    <p>Currently looking for opportunities in Mechanical or Aerospace Engineering, but open to opportunities of any kind. Project logs and test data on request.</p>
   </div>
   <div style="display:flex;gap:var(--space-3);flex-wrap:wrap">
+    <a href="mailto:exs783@case.edu" class="btn">exs783@case.edu</a>
     <a href="https://www.linkedin.com/in/ethansimon13" target="_blank" rel="noopener" class="btn">LinkedIn ↗</a>
     <a href="https://github.com/exs783" target="_blank" rel="noopener" class="btn">GitHub ↗</a>
-    <a href="mailto:exs783@case.edu" class="btn">Email</a>
-  </div>
-</section>
-
-<section class="contact" id="contact">
-  <h6 style="color:var(--color-neutral-700)">CONTACT</h6>
-  <h2>Got a project, internship, or test rig that needs a second pair of hands?</h2>
-  <p style="opacity:.8;max-width:46ch">Currently looking for opportunities in Mechanical or Aerospace Engineering, but open to opportunities of any kind.</p>
-  <div class="contact-links">
-    <a href="mailto:exs783@case.edu">exs783@case.edu</a>
-    <a href="https://www.linkedin.com/in/ethansimon13" target="_blank" rel="noopener">LinkedIn</a>
-    <a href="https://github.com/exs783" target="_blank" rel="noopener">GitHub</a>
   </div>
 </section>
 
@@ -1086,9 +1075,11 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   ];
 
   const SKILL_GROUPS = [
-    { name: "Simulation & Software", items: ["Python (NumPy/SciPy)", "MATLAB", "Flask / Plotly", "SolidWorks fluid simulation", "SolidWorks Simulation"] },
+    { name: "Programming & Analysis", items: ["Python (NumPy/SciPy)", "MATLAB", "Flask / Plotly"] },
+    { name: "Simulation Tools", items: ["SolidWorks Simulation", "SolidWorks fluid simulation"] },
     { name: "CAD & Design", items: ["SolidWorks", "Assembly modeling (SLDASM)", "GD&T"] },
-    { name: "Manufacturing", items: ["Composite layup", "3D printing", "Milling", "Turning", "Waterjet", "MIG welding", "Jigs"] },
+    { name: "Fabrication", items: ["Composite layup", "3D printing", "Milling", "Turning"] },
+    { name: "Machining & Assembly", items: ["Waterjet", "MIG welding", "Jigs"] },
     { name: "Testing & Instrumentation", items: ["ASTM fatigue testing", "Flight-log analysis (pymavlink)", "Strain testing / gauge reading", "Pressure reading"] },
   ];
 
@@ -1140,6 +1131,18 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     col.appendChild(list);
     skillsGrid.appendChild(col);
   });
+
+  const reelViewport = document.querySelector("#reel .reel-viewport");
+  const reelProgress = document.getElementById("reel-progress");
+  const reelCardCount = document.querySelectorAll("#reel .frame").length;
+  function updateReelProgress(){
+    const maxScroll = reelViewport.scrollWidth - reelViewport.clientWidth;
+    const ratio = maxScroll > 0 ? reelViewport.scrollLeft / maxScroll : 0;
+    const idx = Math.min(reelCardCount, Math.round(ratio * (reelCardCount - 1)) + 1);
+    reelProgress.textContent = String(idx).padStart(2, "0") + " / " + reelCardCount;
+  }
+  reelViewport.addEventListener("scroll", updateReelProgress, {passive: true});
+  updateReelProgress();
 
 })();
 </script>
