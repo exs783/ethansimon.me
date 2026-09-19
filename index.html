@@ -319,7 +319,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
         <span class="view-link">View project <span aria-hidden="true">→</span></span>
       </a>
       <a href="#tail-sitter-designs" class="frame">
-        <div class="frame-top"><span class="tag tag-mono-outline">CAD</span><span class="frame-num">08</span></div>
+        <div class="frame-top"><span class="tag tag-mono-outline">Concept</span><span class="frame-num">08</span></div>
         <div class="frame-fig" data-fig="tailSitterFigure"></div>
         <h4>Tail Sitter Designs</h4>
         <p>An ongoing project teaching younger VTOL members to design their own tail sitters and improve the club's transition-drone capability.</p>
@@ -328,7 +328,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
         <span class="view-link">View project <span aria-hidden="true">→</span></span>
       </a>
       <a href="#tilt-rotor-designs" class="frame">
-        <div class="frame-top"><span class="tag tag-mono-outline">CAD</span><span class="frame-num">09</span></div>
+        <div class="frame-top"><span class="tag tag-mono-outline">Concept</span><span class="frame-num">09</span></div>
         <div class="frame-fig" data-fig="tiltRotorFigure"></div>
         <h4>Tilt Rotor Designs</h4>
         <p>Teaching new VTOL members to design tilt rotors and build their own within a semester.</p>
@@ -337,7 +337,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
         <span class="view-link">View project <span aria-hidden="true">→</span></span>
       </a>
       <a href="#darpa-lift-2028" class="frame">
-        <div class="frame-top"><span class="tag tag-mono-outline">CAD</span><span class="frame-num">10</span></div>
+        <div class="frame-top"><span class="tag tag-mono-outline">Concept</span><span class="frame-num">10</span></div>
         <div class="frame-fig" data-fig="darpaLiftFigure"></div>
         <h4>DARPA Lift 2028</h4>
         <p>The airframe Mission Model is meant to inform: a low-rotor-count tail sitter for the DARPA LIFT '28 challenge, still being adapted.</p>
@@ -926,77 +926,96 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 
   /* ============ real-data chart functions (unchanged drawing logic) ============ */
 
-  function pitchIcon(cx, cy, angleDeg){
-    const g = svg("g", {transform:`translate(${cx},${cy}) rotate(${angleDeg})`});
-    g.appendChild(svg("line", {x1:0,y1:-26,x2:0,y2:22, stroke:INK, "stroke-width":2.5, "stroke-linecap":"round"}));
-    g.appendChild(svg("line", {x1:-22,y1:-10,x2:22,y2:-10, stroke:INK, "stroke-width":2.5, "stroke-linecap":"round"}));
-    [-22,22].forEach(dx => g.appendChild(svg("circle", {cx:dx, cy:-10, r:5, fill:"none", stroke:INK, "stroke-width":2})));
-    g.appendChild(svg("path", {d:"M -8 22 L 0 32 L 8 22 Z", fill:"none", stroke:INK, "stroke-width":2, "stroke-linejoin":"round"}));
+  /* ============ concept drawings (CAD not finalized): graphite line-and-shade, same look as the orthographic renders ============ */
+
+  const GRAPH_LO = cssVar("--color-neutral-600", "#7d7979"), GRAPH_HI = cssVar("--color-neutral-900", "#2d2b2b"),
+        GHOST = cssVar("--color-neutral-400", "#bab6b6");
+  let gradSeq = 0;
+  function graphite(root){
+    const id = "graphite" + (++gradSeq), defs = svg("defs", {}), g = svg("linearGradient", {id, x1:0, y1:0, x2:0, y2:1});
+    [[0, GRAPH_LO],[1, GRAPH_HI]].forEach(([offset, c]) => g.appendChild(svg("stop", {offset, "stop-color":c})));
+    defs.appendChild(g); root.appendChild(defs);
+    return `url(#${id})`;
+  }
+  function disc(cx, cy, rx, ry, stroke, w){
+    const g = svg("g", {});
+    g.appendChild(svg("ellipse", {cx, cy, rx, ry, fill:INK, "fill-opacity":.07, stroke, "stroke-width":w || 1.4}));
+    g.appendChild(svg("ellipse", {cx, cy, rx:Math.min(rx,ry)*.28 + .6, ry:Math.min(rx,ry)*.28 + .6, fill:GRAPH_HI}));
     return g;
+  }
+  function ground(root, x1, x2, y){
+    root.appendChild(svg("line", {x1, x2, y1:y, y2:y, stroke:INK2, "stroke-width":1.2}));
+    for (let x = x1 + 4; x < x2; x += 8) root.appendChild(svg("line", {x1:x, x2:x-5, y1:y, y2:y+5, stroke:GHOST, "stroke-width":1}));
+  }
+  function arcArrow(root, d, head){
+    root.appendChild(svg("path", {d, fill:"none", stroke:ACCENT, "stroke-width":2, "stroke-dasharray":"4,3"}));
+    root.appendChild(svg("path", {d:head, fill:ACCENT}));
+  }
+
+  // Oblique-projection tail sitter facing +x: fuselage, swept wing pair, edge-on prop disc at the nose, foot at the tail.
+  function sitter(root, fill, cx, cy, angle){
+    const g = svg("g", {transform:`translate(${cx},${cy}) rotate(${angle}) scale(1.25)`});
+    g.appendChild(svg("path", {d:"M -4 2 L 14 2 L 6 15 L -12 15 Z", fill:GRAPH_LO, opacity:.75}));          // near wing
+    g.appendChild(svg("rect", {x:-38, y:-5, width:68, height:10, rx:5, fill}));                                // fuselage
+    g.appendChild(svg("path", {d:"M -4 -2 L 14 -2 L 22 -15 L 4 -15 Z", fill:GRAPH_HI}));                        // far wing
+    g.appendChild(svg("rect", {x:-42, y:-8, width:4, height:16, rx:1.5, fill:GRAPH_HI}));                       // tail foot
+    g.appendChild(disc(34, 0, 3.6, 17, INK));                                                                  // prop
+    root.appendChild(g);
   }
 
   function tailSitterFigure(){
-    const root = svgRoot("0 0 300 140");
-    root.appendChild(pitchIcon(64, 70, 0));
-    root.appendChild(pitchIcon(236, 70, -90));
-    root.appendChild(svg("path", {d:"M 108 40 A 70 70 0 0 1 192 40", fill:"none", stroke:ACCENT, "stroke-width":2, "stroke-dasharray":"4,3"}));
-    root.appendChild(svg("path", {d:"M 188 36 L 196 42 L 186 46 Z", fill:ACCENT}));
-    [["HOVER",64],["CRUISE",236]].forEach(([label,x]) => {
-      const t = svg("text", {x, y:120, "text-anchor":"middle", "font-size":"10.5", "font-family":"Archivo", "font-weight":"600", fill:INK});
-      t.textContent = label; root.appendChild(t);
-    });
-    const cap = svg("text", {x:150, y:22, "text-anchor":"middle", "font-size":"9.5", "font-family":"Archivo", fill:INK2});
-    cap.textContent = "whole airframe pitches over 90° — no separate tilt mechanism";
-    root.appendChild(cap);
+    const root = svgRoot("0 0 300 140"), fill = graphite(root);
+    ground(root, 20, 116, 121);
+    sitter(root, fill, 68, 68, -90);
+    sitter(root, fill, 228, 66, 0);
+    root.appendChild(svg("line", {x1:150, x2:170, y1:66, y2:66, stroke:GHOST, "stroke-width":1.5, "stroke-dasharray":"3,3"}));
+    arcArrow(root, "M 112 34 Q 150 4 196 30", "M 190 22 L 202 32 L 188 36 Z");
     return root;
   }
 
+  // Level fuselage with two nacelles; solid = hover (vertical), dashed = cruise (rotated 90° forward). Only the nacelles move.
   function tiltRotorFigure(){
-    const root = svgRoot("0 0 300 140");
-    const bodyY = 76;
-    root.appendChild(svg("line", {x1:56, x2:244, y1:bodyY, y2:bodyY, stroke:INK, "stroke-width":2.5, "stroke-linecap":"round"}));
-    function nacelle(cx, angleDeg, dashed){
-      const g = svg("g", {transform:`translate(${cx},${bodyY}) rotate(${angleDeg})`});
-      g.appendChild(svg("line", {x1:0,y1:0,x2:0,y2:-26, stroke: dashed?INK2:INK, "stroke-width":2, "stroke-dasharray": dashed?"3,3":"none", "stroke-linecap":"round"}));
-      g.appendChild(svg("circle", {cx:0, cy:-26, r:6, fill:"none", stroke: dashed?INK2:INK, "stroke-width":2}));
-      return g;
+    const root = svgRoot("0 0 300 140"), fill = graphite(root), y = 84;
+    root.appendChild(svg("rect", {x:34, y:y-6, width:232, height:12, rx:6, fill}));
+    root.appendChild(svg("path", {d:`M 40 ${y-4} L 30 ${y-22} L 52 ${y-4} Z`, fill:GRAPH_HI}));                 // tail fin
+    root.appendChild(svg("path", {d:`M 118 ${y-3} L 176 ${y-3} L 168 ${y-16} L 130 ${y-16} Z`, fill:GRAPH_HI, opacity:.55})); // wing
+    function nacelle(cx, angle, ghost){
+      const g = svg("g", {transform:`translate(${cx},${y-8}) rotate(${angle})`}), c = ghost ? INK2 : INK;
+      g.appendChild(svg("rect", {x:-4, y:-30, width:8, height:30, rx:3, fill: ghost ? "none" : GRAPH_HI, stroke:c, "stroke-width":1.4, "stroke-dasharray": ghost ? "3,2.5" : "none"}));
+      g.appendChild(disc(0, -33, 20, 3.4, c, ghost ? 1.2 : 1.4));
+      root.appendChild(g);
     }
-    [[70,1],[230,-1]].forEach(([cx,side]) => {
-      root.appendChild(nacelle(cx, 0, true));
-      root.appendChild(nacelle(cx, side*90, false));
-      root.appendChild(svg("path", {d:`M ${cx} ${bodyY-30} A 30 30 0 0 ${side>0?1:0} ${cx+side*30} ${bodyY}`, fill:"none", stroke:ACCENT, "stroke-width":1.5, "stroke-dasharray":"3,2"}));
+    [104, 196].forEach(cx => {
+      nacelle(cx, 90, true); nacelle(cx, 0, false);
+      const ex = cx + 36, ey = y - 34;
+      arcArrow(root, `M ${cx+4} ${y-50} Q ${ex+4} ${y-50} ${ex} ${ey}`, `M ${ex-5} ${ey-6} L ${ex+5} ${ey-6} L ${ex} ${ey+3} Z`);
     });
-    const fusLbl = svg("text", {x:150, y:118, "text-anchor":"middle", "font-size":"9.5", "font-family":"Archivo", fill:INK2});
-    fusLbl.textContent = "fuselage stays level — dashed: hover, solid: cruise";
-    root.appendChild(fusLbl);
-    const cap = svg("text", {x:150, y:22, "text-anchor":"middle", "font-size":"9.5", "font-family":"Archivo", fill:INK2});
-    cap.textContent = "only the rotor nacelles rotate, vertical → horizontal";
-    root.appendChild(cap);
     return root;
   }
 
+  // Top-down planform: 2-rotor tail sitter (accent) against the 6-rotor redundant baseline (ghosted).
   function darpaLiftFigure(){
-    const root = svgRoot("0 0 300 140");
-    function rotorCluster(cx, cy, n, r, accent){
-      const g = svg("g", {transform:`translate(${cx},${cy})`});
-      const positions = n === 2 ? [[-34,0],[34,0]] :
-        Array.from({length:n}, (_,i) => { const a = (i/n)*2*Math.PI; return [Math.cos(a)*30, Math.sin(a)*30]; });
-      positions.forEach(([dx,dy]) => {
-        g.appendChild(svg("line", {x1:0,y1:0,x2:dx,y2:dy, stroke:INK2, "stroke-width":1.5}));
-        g.appendChild(svg("circle", {cx:dx, cy:dy, r, fill:"none", stroke: accent?ACCENT:INK, "stroke-width":2}));
-      });
-      g.appendChild(svg("circle", {cx:0, cy:0, r:5, fill:INK}));
-      return g;
+    const root = svgRoot("0 0 300 140"), fill = graphite(root);
+    function rotor(g, cx, cy, r, stroke, w){
+      g.appendChild(svg("circle", {cx, cy, r, fill:INK, "fill-opacity":.06, stroke, "stroke-width":w}));
+      g.appendChild(svg("line", {x1:cx-r+2, x2:cx+r-2, y1:cy, y2:cy, stroke, "stroke-width":w}));
+      g.appendChild(svg("circle", {cx, cy, r:2.6, fill:GRAPH_HI}));
     }
-    root.appendChild(rotorCluster(76, 74, 2, 14, true));
-    root.appendChild(rotorCluster(224, 74, 6, 9, false));
-    const l1 = svg("text", {x:76, y:126, "text-anchor":"middle", "font-size":"10", "font-family":"Archivo", "font-weight":"600", fill:ACCENT});
-    l1.textContent = "2 rotors — this design"; root.appendChild(l1);
-    const l2 = svg("text", {x:224, y:126, "text-anchor":"middle", "font-size":"10", "font-family":"Archivo", fill:INK2});
-    l2.textContent = "6 rotors — redundant baseline"; root.appendChild(l2);
-    const cap = svg("text", {x:150, y:22, "text-anchor":"middle", "font-size":"9.5", "font-family":"Archivo", fill:INK2});
-    cap.textContent = "low rotor count trades redundancy for hover efficiency + range";
-    root.appendChild(cap);
+    root.appendChild(svg("path", {d:"M 20 62 L 132 62 L 132 78 L 20 78 Z", fill}));                             // wing
+    root.appendChild(svg("rect", {x:70, y:34, width:12, height:76, rx:6, fill:GRAPH_HI}));                       // fuselage
+    [36, 116].forEach(x => rotor(root, x, 70, 15, ACCENT, 2));
+    const hex = svg("g", {opacity:.85});
+    for (let i = 0; i < 6; i++){
+      const a = i/6*2*Math.PI + Math.PI/6, x = 224 + Math.cos(a)*34, y = 66 + Math.sin(a)*34;
+      hex.appendChild(svg("line", {x1:224, y1:66, x2:x, y2:y, stroke:GHOST, "stroke-width":3}));
+      rotor(hex, x, y, 12, INK2, 1.4);
+    }
+    hex.appendChild(svg("circle", {cx:224, cy:66, r:9, fill:GRAPH_LO}));
+    root.appendChild(hex);
+    [["2", 76, ACCENT],["6", 224, INK2]].forEach(([n, x, c]) => {
+      const t = svg("text", {x, y:132, "text-anchor":"middle", "font-size":16, "font-family":"Archivo", "font-weight":800, fill:c});
+      t.textContent = n; root.appendChild(t);
+    });
     return root;
   }
 
