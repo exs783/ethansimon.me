@@ -1205,25 +1205,22 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     return root;
   }
 
+  // Real course proportions (1 nm / 8 nm / 1 nm cruise legs); accent dots mark the two cargo stops.
   function missionProfileFigure(){
-    const root = svgRoot("0 0 300 120");
-    const base = 96, top = 20;
-    root.appendChild(svg("line", {x1:6, x2:294, y1:base, y2:base, stroke:LINE}));
+    const root = svgRoot("0 0 300 120"), fill = graphite(root), base = 96, top = 22;
     const legs = [{w:38, cruiseW:14}, {w:130, cruiseW:76}, {w:38, cruiseW:14}];
+    const dots = [];
     let x = 14;
-    const pathParts = [`M ${x} ${base}`];
-    legs.forEach(leg => {
-      const climbX = x + (leg.w - leg.cruiseW)/2;
-      const descentX = climbX + leg.cruiseW;
-      const endX = x + leg.w;
-      pathParts.push(`L ${climbX.toFixed(1)} ${top}`);
-      pathParts.push(`L ${descentX.toFixed(1)} ${top}`);
-      pathParts.push(`L ${endX.toFixed(1)} ${base}`);
-      root.appendChild(svg("circle", {cx:endX, cy:base, r:3, fill:INK}));
+    legs.forEach((leg, i) => {
+      const climbX = x + (leg.w - leg.cruiseW)/2, descentX = climbX + leg.cruiseW, endX = x + leg.w;
+      const pts = `${x},${base} ${climbX},${top} ${descentX},${top} ${endX},${base}`;
+      root.appendChild(svg("polygon", {points:pts, fill, "fill-opacity":.2}));
+      root.appendChild(svg("polyline", {points:pts, fill:"none", stroke:INK, "stroke-width":2.5, "stroke-linejoin":"round"}));
+      dots.push([x, i > 0 ? ACCENT : INK], [endX, i < 2 ? ACCENT : INK]);
       x = endX + 14;
-      if (x < 280) pathParts.push(`M ${x} ${base}`);
     });
-    root.appendChild(svg("path", {d:pathParts.join(" "), fill:"none", stroke:INK, "stroke-width":2.5, "stroke-linejoin":"round"}));
+    ground(root, 6, 294, base);
+    dots.forEach(([cx, c]) => root.appendChild(svg("circle", {cx, cy:base, r:4, fill:c, stroke:"#fff", "stroke-width":1.5})));
     return root;
   }
 
@@ -1260,6 +1257,22 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     return root;
   }
 
+  // Same real geometry as wingPlanformFigure (AR 8.64, taper 0.30 joint search), drawn larger with shading and dimension ticks.
+  function wingCoverFigure(){
+    const root = svgRoot("0 0 300 120"), fill = graphite(root);
+    const scale = 160, cx = 150, leY = 26;
+    const rootC = 0.3087*scale, tipC = 0.0925*scale, half = 0.8666*scale;
+    [1, -1].forEach(sd => {
+      root.appendChild(svg("polygon", {points:`${cx},${leY} ${cx + sd*half},${leY} ${cx + sd*half},${leY + tipC} ${cx},${leY + rootC}`, fill, stroke:INK, "stroke-width":1.2, "stroke-linejoin":"round"}));
+      root.appendChild(svg("line", {x1:cx, y1:leY + .25*rootC, x2:cx + sd*half, y2:leY + .25*tipC, stroke:"#fff", "stroke-opacity":.55, "stroke-width":1, "stroke-dasharray":"3,3"}));
+    });
+    root.appendChild(svg("rect", {x:cx - 5, y:leY - 12, width:10, height:rootC + 26, rx:5, fill:GRAPH_HI}));
+    const dy = leY + rootC + 24;
+    root.appendChild(svg("path", {d:`M ${cx - half} ${dy} H ${cx + half} M ${cx - half} ${dy - 5} V ${dy + 5} M ${cx + half} ${dy - 5} V ${dy + 5}`, fill:"none", stroke:INK2, "stroke-width":1.2}));
+    root.appendChild(svg("circle", {cx:cx + .3555*scale, cy:leY + .0555*scale, r:4, fill:ACCENT, stroke:"#fff", "stroke-width":1.5}));
+    return root;
+  }
+
   function nacaAirfoilFigure(code){
     const m = parseInt(code[0], 10) / 100;
     const p = parseInt(code[1], 10) / 10;
@@ -1291,16 +1304,24 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     return root;
   }
 
-  function droneScopeFigure(seed){
-    const root = scopeFigure(seed, false);
-    const g = svg("g", {transform:"translate(8,-4) scale(0.55)"});
-    [[-14,-14],[14,-14],[-14,14],[14,14]].forEach(([dx,dy]) => {
-      g.appendChild(svg("circle", {cx:20+dx, cy:16+dy, r:7, fill:"none", stroke:INK2, "stroke-width":2}));
+  // Real Pixhawk flight log (demos/flight-analysis.json): vibration magnitude min/max per 20 samples (m/s²), motor PWM mean per 8 samples.
+  const LOG_COVER = {vmin:[9.7,9.6,9.7,9.7,9.6,9.6,9.6,9.5,9.7,8.2,5.7,6.5,6.2,6.3,6.5,6.5,7.5,9.5,7.7,5.9,6.3,6.8,7.6,8.8,9.6,6.4,5.7,2.4,2.7,10.1,8.6,6.3,6.9,7.2,7.3,6.8,8.3,6.9,7.3,12.1,6.4,5.9,9.7,5.6,6.4,8.3,8.7,6.7,5.5,6.7,6.7,7.9,8.9,8.4,6.6,6.9,7.6,8.1,8.0,8.0,8.0,7.3,7.4,7.2,7.3,7.3,7.6,7.4,7.6,7.5,7.4,7.5,7.2,7.8,7.4,7.6,7.7,7.6,7.4,7.6,8.4,8.7,9.1,9.5,9.1,8.4,8.4,9.1,9.2,8.8,9.5,9.0,9.1,9.7,8.8,8.6,8.8,9.1,10.1,9.3,9.8,10.0,9.9,7.8,7.2,7.3,8.8,8.5,6.1,6.2,7.9,11.4,5.0,5.4,8.8,4.9,5.2,5.7,6.4,8.1,8.3,9.0,8.8,7.4,9.0,9.5,6.9,7.0,2.5,4.9,23.0], vmax:[9.7,9.7,9.7,9.7,9.8,9.9,9.9,11.8,18.2,16.8,11.6,13.9,9.9,9.4,10.2,10.1,20.5,24.1,15.0,10.0,9.5,9.1,10.6,16.7,15.2,14.6,7.9,8.0,20.8,21.3,16.6,9.0,8.3,20.5,20.3,8.3,11.8,8.1,16.7,19.6,12.0,12.5,12.4,11.2,13.9,15.5,15.6,14.6,8.6,9.7,10.1,16.2,16.5,16.2,13.8,9.0,13.8,13.6,14.5,13.9,13.7,12.4,12.4,12.3,12.4,12.2,11.7,12.1,12.1,11.6,11.8,12.1,12.0,12.8,11.6,12.6,12.7,12.4,12.1,11.5,11.4,11.9,11.5,11.5,11.5,11.7,11.2,11.1,11.1,10.9,11.0,10.6,11.1,10.9,10.5,10.7,10.6,11.4,11.5,11.7,11.4,11.4,11.7,10.5,8.1,11.9,14.7,14.1,13.5,12.0,22.6,28.2,12.5,7.8,24.9,13.4,11.3,14.3,10.3,11.6,10.6,10.7,18.8,21.0,12.4,11.9,8.7,8.0,8.2,31.3,32.6], motors:[[1000,1000,1072,1136,1324,1327,1287,1183,1322,1317,1220,1296,1303,1182,1366,1300,1363,1294,1225,1296,1294,1320,1368,1319,1196,1329,1244,1219,1278,1354,1188,1286,1332,1192,1258,1340,1231,1266,1331,1163,1254,1342,1247,1320,1347,1284,1225,1270,1344,1350,1313,1305,1264,1372,1217,1204,1292,1340,1191,1253,1320,1278,1259,1212,1182],[1000,1000,1072,1124,1260,1150,1159,1273,1301,1172,1205,1191,1217,1222,1195,1175,1161,1172,1243,1278,1184,1150,1180,1202,1250,1156,1309,1274,1259,1160,1316,1226,1157,1285,1263,1150,1264,1238,1163,1321,1265,1150,1241,1191,1150,1237,1296,1257,1150,1150,1212,1203,1199,1177,1195,1433,1150,1191,1275,1237,1150,1288,1264,1232,1230],[1000,1000,1072,1134,1384,1269,1167,1238,1422,1191,1213,1185,1282,1245,1353,1209,1174,1235,1297,1266,1219,1218,1342,1198,1287,1241,1229,1323,1366,1227,1268,1347,1200,1257,1348,1242,1220,1343,1204,1323,1342,1237,1280,1283,1229,1318,1339,1321,1214,1248,1322,1305,1275,1283,1192,1462,1206,1307,1310,1313,1241,1278,1328,1268,1258],[1000,1000,1072,1126,1167,1232,1278,1202,1162,1305,1202,1333,1236,1148,1222,1260,1360,1229,1150,1281,1252,1274,1233,1329,1151,1267,1355,1150,1156,1324,1253,1162,1314,1235,1150,1279,1284,1155,1306,1168,1150,1279,1210,1218,1286,1163,1150,1168,1303,1257,1154,1163,1190,1268,1221,1183,1260,1280,1160,1166,1266,1307,1150,1150,1134]]};
+
+  // Real flight-log traces: vibration magnitude envelope (top) and the four motor outputs (bottom).
+  function droneScopeFigure(){
+    const root = svgRoot("0 0 300 120"), fill = graphite(root), x0 = 6, x1 = 294;
+    const {vmin, vmax, motors} = LOG_COVER, n = vmin.length;
+    const vx = i => x0 + i/(n - 1)*(x1 - x0), vy = v => 66 - v/33*56;
+    root.appendChild(svg("line", {x1:x0, x2:x1, y1:vy(9.8), y2:vy(9.8), stroke:INK2, "stroke-width":1, "stroke-dasharray":"3,3"}));
+    const up = vmax.map((v, i) => `${vx(i).toFixed(1)},${vy(v).toFixed(1)}`);
+    const lo = vmin.map((v, i) => `${vx(i).toFixed(1)},${vy(v).toFixed(1)}`).reverse();
+    root.appendChild(svg("polygon", {points:up.concat(lo).join(" "), fill}));
+    root.appendChild(svg("circle", {cx:vx(n - 1) - 3, cy:vy(vmax[n - 1]), r:3.5, fill:ACCENT}));
+    root.appendChild(svg("line", {x1:x0, x2:x1, y1:74, y2:74, stroke:LINE}));
+    motors.forEach((m, k) => {
+      const pts = m.map((v, i) => `${(x0 + i/(m.length - 1)*(x1 - x0)).toFixed(1)},${(114 - (v - 1000)/470*32).toFixed(1)}`).join(" ");
+      root.appendChild(svg("polyline", {points:pts, fill:"none", stroke: k ? INK2 : INK, "stroke-width":k ? 1.1 : 1.6, "stroke-linejoin":"round", opacity:k ? .8 : 1}));
     });
-    g.appendChild(svg("line", {x1:6, y1:2, x2:34, y2:30, stroke:INK2, "stroke-width":2}));
-    g.appendChild(svg("line", {x1:34, y1:2, x2:6, y2:30, stroke:INK2, "stroke-width":2}));
-    g.appendChild(svg("circle", {cx:20, cy:16, r:4, fill:INK}));
-    root.insertBefore(g, root.firstChild);
     return root;
   }
 
@@ -1432,9 +1453,9 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   /* ============ wire real figures into their slots ============ */
   const FIGURE_MAP = {
     missionProfileFigure: () => missionProfileFigure(),
-    wingPlanformFigure: () => wingPlanformFigure(false),
+    wingPlanformFigure: () => wingCoverFigure(),
     wingPlanformFigureFull: () => wingPlanformFigure(true),
-    droneScopeFigure: () => droneScopeFigure(7),
+    droneScopeFigure: () => droneScopeFigure(),
     rocketFigure: () => rocketFigure(),
     cadPhotoFigure: () => imgFigure("assets/compdrone2025-render.webp", "CompDrone2025 hexacopter render"),
     missionCourseFigure: () => missionCourseFigure(),
