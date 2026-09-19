@@ -185,6 +185,8 @@ header{position:sticky;top:0;z-index:40}
 .titleblock{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--color-divider);
   border:2px solid var(--color-divider);margin:var(--space-6) 0 var(--space-4);max-width:860px}
 .titleblock>div{background:var(--color-bg);padding:10px 14px}
+.titleblock-6{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:520px){.titleblock-6{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .tb-label{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-muted)}
 .tb-value{display:block;font-weight:800;font-size:15px}
 
@@ -235,7 +237,8 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 <section class="hero">
   <div>
     <h1>Background in mechanical engineering, with experience in electronic integration, and testing</h1>
-    <p>Mechanical engineering student at Case Western Reserve, looking for a summer 2027 internship. The projects below are what I've built so far.</p>
+    <p>I built a flexural fatigue test machine at Tylok, a mission simulator for VTOL aircraft, and the frame and mounts of a competition hexacopter.</p>
+    <p>Mechanical engineering student at Case Western Reserve, looking for a summer 2027 internship.</p>
     <div style="display:flex;gap:var(--space-3);flex-wrap:wrap">
       <a href="#reel" class="btn btn-primary">See the projects <span aria-hidden="true">→</span></a>
       <a href="assets/Ethan_Simon_Resume.pdf" target="_blank" rel="noopener" class="btn btn-secondary">Resume <span aria-hidden="true">↗</span><span class="sr-only">(PDF, opens in new tab)</span></a>
@@ -263,11 +266,11 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
         <span class="frame-num">Sheet 01</span>
         <div class="frame-fig" data-fig="tylokPhotoFigure"></div>
         <h4>Flexural Fatigue Test Machine</h4>
-        <p>The fatigue test machine I designed, manufactured, and put into service as a co-op at Tylok International, built to test a range of part sizes.</p>
+        <p>The fatigue test machine I designed, manufactured, and put into service as a co-op at Tylok International. Built to ASTM F1387 A6 to test a variety of parts and sizes.</p>
         <div class="frame-tb">
           <div><span class="tb-label">Discipline</span><span class="tb-value">Mechanical testing</span></div>
           <div><span class="tb-label">Built with</span><span class="tb-value">Dewesoft, air cylinders</span></div>
-          <div class="tb-wide"><span class="tb-label">Result</span><span class="tb-result">Built to <strong>ASTM F1387 A6</strong>, Jan–Aug 2026.</span></div>
+          <div class="tb-wide"><span class="tb-label">Result</span><span class="tb-result">Loads over <strong>2,000 lb</strong>, cycle range over <strong>80,000</strong>.</span></div>
         </div>
         <span class="view-link">View project <span aria-hidden="true">→</span></span>
       </a>
@@ -370,19 +373,19 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
       <a href="#quadcopter" class="row">
         <span class="frame-num">Sheet 09</span>
         <h4>Quadcopter</h4>
-        <p>A basic 5-inch quadcopter build that teaches newer VTOL members multirotor design before they move on to transitioning airframes.</p>
+        <p>I use a basic 5-inch quadcopter build to teach newer VTOL members multirotor design before they move on to transitioning airframes.</p>
         <span class="row-meta">CAD · Teaching <span aria-hidden="true">→</span></span>
       </a>
       <a href="#tail-sitter-designs" class="row">
         <span class="frame-num">Sheet 10</span>
         <h4>Tail Sitter Designs</h4>
-        <p>An ongoing project teaching younger VTOL members to design their own tail sitters and improve the club's transition-drone capability.</p>
+        <p>I'm teaching newer VTOL members to design their own tail sitters, so the club can design successful transition drones.</p>
         <span class="row-meta">Concept · Teaching <span aria-hidden="true">→</span></span>
       </a>
       <a href="#tilt-rotor-designs" class="row">
         <span class="frame-num">Sheet 11</span>
         <h4>Tilt Rotor Designs</h4>
-        <p>Teaching new VTOL members to design tilt rotors and build their own within a semester.</p>
+        <p>I teach newer VTOL members to design tilt rotors and build their own within a semester.</p>
         <span class="row-meta">Concept · Teaching <span aria-hidden="true">→</span></span>
       </a>
       <a href="#darpa-lift-2028" class="row">
@@ -412,7 +415,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   <h3 class="subhead">Overview</h3>
   <div class="method-copy">
     <p>Mission Model simulates the running of a course for a variety of airframes. The current iteration runs the following mission: takeoff to 100 ft, cruise 1 nautical mile, land, pick up cargo, takeoff, cruise 8 nm, land, drop cargo, takeoff, cruise 1 nm back, land. For every candidate airframe, it sweeps every motor × propeller × battery combination it has spec data for and reports which one actually completes the mission. It also reports back how much battery it has left over, and how long it can hover.</p>
-    <p>The airframe list (Hexacopter, Quadcopter, x8, Tail Sitter) matches the real vehicle classes I work on as VTOL Mechanical Team Lead — this is the same kind of simulation-to-inform-design work as the MATLAB/Python scripts I write for the team, built out as a standalone public tool.</p>
+    <p>The airframe list (Hexacopter, Quadcopter, x8, Tail Sitter) matches the real vehicle classes I work on as Mechanical and Aerospace Team Lead on the VTOL team — this is the same kind of simulation-to-inform-design work as the MATLAB/Python scripts I write for the team, built out as a standalone public tool.</p>
   </div>
 
   <h3 class="subhead">Method</h3>
@@ -799,17 +802,18 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     <h2>Flexural Fatigue Test Machine</h2>
   </div>
   <p class="project-tagline">A flexural fatigue test machine for internal testing, built to ASTM F1387 A6. I designed, manufactured, and implemented it as a Mechanical Engineering Co-Op at Tylok International.</p>
-  <div class="titleblock">
+  <div class="titleblock titleblock-6">
     <div><span class="tb-label">Discipline</span><span class="tb-value">Mechanical testing</span></div>
     <div><span class="tb-label">Employer</span><span class="tb-value">Tylok International</span></div>
-    <div><span class="tb-label">Role</span><span class="tb-value">Mechanical Engineering Co-Op</span></div>
     <div><span class="tb-label">Dates</span><span class="tb-value">Jan – Aug 2026</span></div>
     <div><span class="tb-label">Standard</span><span class="tb-value">ASTM F1387 A6</span></div>
+    <div><span class="tb-label">Test load</span><span class="tb-value">Over 2,000 lb</span></div>
+    <div><span class="tb-label">Cycle range</span><span class="tb-value">Over 80,000</span></div>
   </div>
 
   <h3 class="subhead">Overview</h3>
   <div class="method-copy">
-    <p>The machine is for internal testing, built in accordance with ASTM standards to handle a variety of parts and sizes. I owned it end to end: the design, the machining and assembly, and the verification. The photo shows the assembled machine, with the ASTM F1387 A6 flexure-fatigue label on its controller.</p>
+    <p>The machine is for internal testing, built in accordance with ASTM standards to handle a variety of parts and sizes. I owned it end to end: the design, the machining and assembly, and the verification. The test load is over 2,000 lb and the cycle range is over 80,000. The photo shows the assembled machine, with the ASTM F1387 A6 flexure-fatigue label on its controller.</p>
     <p>I also developed other internal stress and verification apparatus: thermal, flow, tensile, and pressure testing.</p>
   </div>
 
@@ -818,7 +822,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     <p><strong>Stress analysis first.</strong> I used fundamental principles of stress analysis to decide how to design the system and what its size constraints were, before any CAD.</p>
     <p><strong>CAD.</strong> With the approach and the size limits set, I moved into CAD.</p>
     <p><strong>Machining and assembly.</strong> I machined the parts and assembled the machine.</p>
-    <p><strong>Verification.</strong> I verified the machine and confirmed the results.</p>
+    <p><strong>Verification.</strong> I verified the machine with strain gauge readings and the data I collected, and confirmed the results against them.</p>
     <p><strong>Data collection and control.</strong> I researched, acquired, and integrated a Dewesoft system for data acquisition. I wrote Dewesoft programs (DewesoftX and C++) to collect and analyse the data and to run the machine's control system.</p>
   </div>
 
@@ -862,7 +866,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   <div class="project-head">
     <h2>Quadcopter</h2>
   </div>
-  <p class="project-tagline">A basic quadcopter build teaching newer VTOL members multirotor design fundamentals before they move on to transitioning airframes.</p>
+  <p class="project-tagline">I use a basic quadcopter build to teach newer VTOL members multirotor design fundamentals before they move on to transitioning airframes.</p>
   <div class="titleblock">
     <div><span class="tb-label">Discipline</span><span class="tb-value">CAD, teaching</span></div>
     <div><span class="tb-label">Built with</span><span class="tb-value">SolidWorks</span></div>
@@ -888,7 +892,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   <div class="project-head">
     <h2>Tail Sitter Designs</h2>
   </div>
-  <p class="project-tagline">An ongoing project teaching younger VTOL members how to design their own tail sitters and improving the club's ability to design successful transition drones.</p>
+  <p class="project-tagline">An ongoing project: I'm teaching newer VTOL members how to design their own tail sitters, so the club can design successful transition drones.</p>
   <div class="titleblock">
     <div><span class="tb-label">Discipline</span><span class="tb-value">CAD, teaching</span></div>
     <div><span class="tb-label">Built with</span><span class="tb-value">SolidWorks</span></div>
@@ -915,7 +919,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   <div class="project-head">
     <h2>Tilt Rotor Designs</h2>
   </div>
-  <p class="project-tagline">Similar to Tail Sitter Designs. Teaching new VTOL members how to design tilt rotors and build their own within a semester.</p>
+  <p class="project-tagline">Similar to Tail Sitter Designs. I teach newer VTOL members how to design tilt rotors and build their own within a semester.</p>
   <div class="titleblock">
     <div><span class="tb-label">Discipline</span><span class="tb-value">CAD, teaching</span></div>
     <div><span class="tb-label">Built with</span><span class="tb-value">SolidWorks</span></div>
@@ -976,7 +980,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
         <div><strong>School</strong><br>Case Western Reserve University, B.S. Mechanical Engineering</div>
         <div><strong>Expected grad</strong><br>May 2028 · Michelson-Morley Scholar</div>
         <div><strong>Focus areas</strong><br>VTOL/aerospace structures, CAD/CAM, mechanical testing</div>
-        <div><strong>Current role</strong><br>VTOL Mechanical Team Lead, CWRU VTOL Team</div>
+        <div><strong>Current role</strong><br>Mechanical and Aerospace Team Lead, CWRU VTOL Team</div>
       </div>
     </div>
   </div>
@@ -1005,6 +1009,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
       <ul class="skills-list">
         <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>SolidWorks</li>
         <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>Assembly modeling (SLDASM)</li>
+        <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>SolidWorks CAM</li>
         <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>GD&amp;T</li>
       </ul>
     </div>
@@ -1023,6 +1028,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
         <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>Waterjet</li>
         <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>MIG welding</li>
         <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>Jigs</li>
+        <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>ProtoTRAK</li>
       </ul>
     </div>
     <div>

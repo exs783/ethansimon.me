@@ -26,7 +26,7 @@ Cross-disciplinary systems work on real hardware: simulation/optimization toolin
 
 Mechanical engineering student, Case Western Reserve University (Michelson-Morley Scholar, B.S. Aug 2024 – May 2028). Confirmed from his resume (`~/Downloads/Ethan_Simon_Resume.docx`):
 
-- **VTOL Mechanical Team Lead, CWRU VTOL Team** (Aug 2024 – Present, current/active role) — frame and payload-mechanism design across Tail Sitter (heavy-lift), Hexacopter, Quadcopter, and Tiltrotor airframes; SolidWorks CAD/simulation; MATLAB/Python scripts to inform design decisions; project planning, safety documents, work instructions.
+- **Mechanical and Aerospace Team Lead, CWRU VTOL Team** (Aug 2024 – Present, current/active role) — frame and payload-mechanism design across Tail Sitter (heavy-lift), Hexacopter, Quadcopter, and Tiltrotor airframes; SolidWorks CAD/simulation; MATLAB/Python scripts to inform design decisions; project planning, safety documents, work instructions.
 - **Mechanical Engineering Co-Op, Tylok International** (Jan – Aug 2026) — designed/built a flexural fatigue test machine to ASTM standards, plus thermal/flow/tensile/pressure test apparatus; Dewesoft data-acquisition integration (DewesoftX + C++).
 - **Liquid Propulsion Team, CWRU** (Aug 2025 – Jan 2026) — designed the solenoid/servo mechanical thrust-control hardware and built the original PyQt5 hot-fire control GUI (`main_v2.py` in `exs783/Liquid-Rocket`) — this is the real origin of the Liquid Rocket project featured on the site.
 - **University of Michigan Battery Lab** (2022–2024) — physical testing + Python analysis (Pandas, scikit-learn, SciPy, hdbscan) of battery cells.
