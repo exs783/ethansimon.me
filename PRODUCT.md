@@ -47,7 +47,7 @@ Featured projects, confirmed in scope (engineering only — explicitly excludes 
 - Wing Optimizer: the real (cl × AR) energy-search grid embedded in `index.html`, and a real `--objective combined --taper-min/--taper-max` run's output geometry (root/tip chord, span, MAC, aerodynamic-center location) used for the planform figure.
 - Liquid Rocket: `Rocket_P&ID_GUI1.svg`, `BallValveSchematic.svg` in the repo; a from-scratch JS port of the real Python gauge/valve/sensor logic for the live demo.
 - Log Dashboard: `flight-analysis.json`, the literal output of running the real `python_backend.py` against the real sample flight log (`my_flight.bin`) — 65/100 flight quality score, QUAD frame, 7 stability issues, real vibration/GPS data.
-- CAD: `assets/compdrone2025.glb` (2.2MB, compressed from a 192MB SolidWorks export), `assets/compdrone2025-render.png` (real product render), `assets/tylok-fatigue-machine.jpg` (real photo of the actual machine, HEIC→JPEG, resized).
+- CAD: `assets/compdrone2025.glb` (2.2MB, compressed from a 192MB SolidWorks export), `assets/compdrone2025-render.webp` (real product render), `assets/tylok-fatigue-machine.jpg` (real photo of the actual machine, HEIC→JPEG, resized).
 
 ## Product Principles
 

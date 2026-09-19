@@ -65,7 +65,10 @@ changes to their drawing code.
 ## Type
 
 - **Archivo** (400/600/800) — everything, heading and body alike, per the
-  Modernist system. Weight 800 for all headings, 400 for body.
+  Modernist system. Weight 800 for all headings, 400 for body. Body is 16px;
+  secondary text uses `--color-text-muted` (neutral-700, 5.8:1 on the ground)
+  and accent text uses accent-700; neutral-500/600 are never used for text.
+- **STIX Two Math / Latin Modern Math** (system fallback) — MathML equations only.
 
 ## Components
 
@@ -74,19 +77,21 @@ changes to their drawing code.
 - **Hero**: large bold headline + tagline, two CTAs (primary ink button to
   the reel, secondary outlined GitHub link), a real grayscale-filtered
   headshot photo (bordered, zero radius, matching the figure-card treatment).
-- **Reel**: `#reel` is a tall (260vh) scroll track; `.reel-sticky` pins at
-  `position: sticky; top:0; height:100vh` while JS (`onReelScroll`)
-  computes scroll progress through that tall track and applies
-  `translateX` to `.reel-track`, hand-ported from the reference canvas's
-  own `componentDidMount()`/`onScroll` logic (no framework). Sprocket-hole
-  bars (`radial-gradient` repeating background) top and bottom of the dark
-  reel body, matching the canvas's film-reel conceit. 5 real project
-  frames (down from the canvas's 8 fictional ones), each linking to its
-  detail section anchor and reusing that project's existing tile-emblem
-  chart function as its thumbnail.
-- **Detail sections**: one per project, `scroll-margin-top` so the sticky
-  nav doesn't cover the anchor target. Same Overview/Method/Outcome/Numbers
-  structure as the prior direction, restyled flush-left with the
+- **Projects (film contact sheets)**: `#reel` is one section holding two
+  dark near-black film strips, "Simulation and software" (4 frames) and
+  "Airframes and CAD" (6 frames). Each strip keeps the canvas's
+  sprocket-hole bars top and bottom, but the frames sit in a plain CSS grid
+  (4 / 3 columns, collapsing to 2 then 1) instead of a horizontally
+  scrolling track, so all ten projects are visible without any hidden
+  scroll. Each frame has a category tag, a frame number, the project's own
+  figure, a short description, one real key number, and tags. Supersedes the
+  earlier pinned scroll-driven reel and the later overflow-x reel.
+- **Detail sections**: one per project, `scroll-margin-top: var(--nav-h)` so the
+  sticky nav doesn't cover the anchor target. Each opens with a drawing-style
+  title block (`.titleblock`: discipline, year, built with, repository) and
+  uses Overview/Method/Outcome subheads (real `h3`). Coding projects add
+  native MathML derivations in `.eqn-block`s (`--font-math`), one relation per
+  line, every equation taken from the project's own source. Same structure as the prior direction, restyled flush-left with the
   Modernist figure-card/eqn-block/factgrid components instead of the prior
   soft-shadow cards.
 - **About / Skills / Résumé band / Contact / Footer**: new sections not
@@ -113,7 +118,7 @@ correctly.
 
 Unchanged from the prior direction: `assets/compdrone2025.glb` (real
 CompDrone2025 SolidWorks assembly, Draco+WebP compressed to ~2.2MB),
-`assets/compdrone2025-render.png` (real product render, reel thumbnail),
+`assets/compdrone2025-render.webp` (real product render, reel thumbnail),
 `assets/tylok-fatigue-machine.jpg` (real photo of the ASTM F1387 A6
 machine, grayscale-filtered per the Modernist system's photography rule).
 

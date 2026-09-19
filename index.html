@@ -21,12 +21,18 @@
 
   --color-accent-100:#fff2ef; --color-accent-600:#dd2b0f; --color-accent-700:#ae1800; --color-accent-800:#7c1405;
 
+  /* Secondary text: neutral-700 is 5.8:1 on the page ground and 5.3:1 on the surface fill.
+     neutral-500/600 are for rules, dots and decoration only -- never for text. */
+  --color-text-muted:var(--color-neutral-700);
+
   --font-heading:"Archivo", system-ui, sans-serif;
   --font-heading-weight:800;
   --font-body:"Archivo", system-ui, sans-serif;
+  --font-math:"STIX Two Math","Latin Modern Math","Cambria Math",math,serif;
 
   --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-6:24px; --space-8:32px;
   --radius-md:0px;
+  --nav-h:72px;
 
   --shadow-sm:0 1px 2px color-mix(in srgb, #2d2b2b 14%, transparent);
 
@@ -34,24 +40,25 @@
      these names (built up over earlier passes on this site); aliasing them
      to the Modernist palette means every chart repaints correctly with zero
      changes to the drawing code itself. */
-  --ink:var(--color-text); --ink-2:var(--color-neutral-600); --ink-3:var(--color-neutral-700);
+  --ink:var(--color-text); --ink-2:var(--color-neutral-700); --ink-3:var(--color-neutral-800);
   --line:var(--color-divider); --accent:var(--color-accent);
 }
 *,*::before,*::after{box-sizing:border-box}
-body{margin:0;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);font-size:15px;line-height:1.55}
-h1,h2,h3,h4,h5,h6{font-family:var(--font-heading);font-weight:var(--font-heading-weight);line-height:1.12;letter-spacing:-.015em;margin:0 0 var(--space-2)}
-h1{font-size:42px} h2{font-size:32px} h3{font-size:22px} h4{font-size:18px} h5{font-size:15px}
-h6{font-size:12px;letter-spacing:.1em;text-transform:uppercase}
-p{margin:0 0 var(--space-3)}
+html{scrollbar-color:var(--color-neutral-600) var(--color-bg)}
+body{margin:0;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);font-size:16px;line-height:1.55;caret-color:var(--color-accent);accent-color:var(--color-accent)}
+h1,h2,h3,h4,h5{font-family:var(--font-heading);font-weight:var(--font-heading-weight);line-height:1.12;letter-spacing:-.015em;margin:0 0 var(--space-2);text-wrap:balance}
+h1{font-size:42px} h2{font-size:32px} h3{font-size:22px} h4{font-size:18px} h5{font-size:16px}
+p{margin:0 0 var(--space-3);text-wrap:pretty}
 a{color:var(--color-neutral-900);text-underline-offset:3px}
-a:hover{color:var(--color-accent)}
+a:hover{color:var(--color-accent-700)}
 img{display:block;max-width:100%}
-code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em}
 :focus{outline:none}
 :focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
 ::selection{background:color-mix(in srgb, var(--color-accent) 25%, transparent)}
 .grayscale{filter:grayscale(1) contrast(1.08)}
 .wrap{padding-inline:clamp(20px,5vw,64px)}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 
 /* — rules — */
 .hr{height:2px;border:0;margin:var(--space-4) 0;background:var(--color-divider)}
@@ -59,19 +66,19 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 /* — buttons — */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;text-decoration:none;
   font-family:var(--font-heading);font-weight:800;font-size:14px;color:var(--color-text);
-  background:transparent;border:1px solid transparent;padding:10px 16px;border-radius:0}
+  background:transparent;border:1px solid transparent;padding:12px 16px;border-radius:0;min-height:44px}
 .btn-primary{background:var(--color-neutral-900);color:var(--color-bg);border-color:var(--color-neutral-900)}
 .btn-primary:hover{background:var(--color-neutral-700);color:var(--color-bg)}
 .btn-secondary{border-color:var(--color-divider)}
 .btn-secondary:hover{background:color-mix(in srgb, var(--color-text) 7%, transparent);color:var(--color-text)}
-.btn-ghost{color:var(--color-accent);padding-inline:0}
-.btn-ghost:hover{color:var(--color-accent-700)}
+.btn-ghost{color:var(--color-accent-700);padding-inline:0}
+.btn-ghost:hover{color:var(--color-accent-800)}
 .btn-lg{font-size:16px;padding:14px 22px}
 
 /* — tags — */
-.tag{display:inline-flex;align-items:center;font-size:11px;letter-spacing:.02em;padding:3px 10px;border-radius:0}
+.tag{display:inline-flex;align-items:center;font-size:12px;letter-spacing:.02em;padding:3px 10px;border-radius:0}
 .tag-neutral{background:var(--color-neutral-100);color:var(--color-neutral-800)}
-.tag-outline{border:1px solid var(--color-accent);color:var(--color-accent)}
+.tag-outline{border:1px solid var(--color-accent);color:var(--color-accent-700)}
 .tag-mono-outline{border:1px solid var(--color-neutral-900);color:var(--color-neutral-900)}
 
 /* — cards / figures / facts — */
@@ -82,280 +89,351 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 .figure-card model-viewer{width:100%;height:380px;display:block;--poster-color:transparent}
 
 .tradespace-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:var(--space-3)}
-.tradespace-tab{font:600 11.5px/1 var(--font-body);padding:7px 12px;border:1px solid var(--color-divider);background:transparent;color:var(--color-neutral-600);cursor:pointer;border-radius:0}
+.tradespace-tab{font:600 13px/1 var(--font-body);padding:12px 14px;min-height:44px;border:1px solid var(--color-divider);background:transparent;color:var(--color-text-muted);cursor:pointer;border-radius:0}
 .tradespace-tab[aria-pressed="true"]{background:var(--color-neutral-900);color:var(--color-bg);border-color:var(--color-neutral-900)}
-.tradespace-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:var(--color-neutral-600);margin-bottom:var(--space-2)}
+.tradespace-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--color-text-muted);margin-bottom:var(--space-2);font-variant-numeric:tabular-nums}
 .tradespace-legend-item{display:inline-flex;align-items:center;gap:6px}
 .tradespace-dot{width:8px;height:8px;display:inline-block}
 .tradespace-canvas-wrap{position:relative}
 .tradespace-canvas-wrap canvas{width:100%;height:340px;display:block;touch-action:none}
-.tradespace-axis-label{font-size:10.5px;color:var(--color-neutral-600);text-align:center;margin-top:4px}
-.tradespace-tooltip{position:absolute;pointer-events:none;background:var(--color-bg);border:1px solid var(--color-divider);padding:6px 9px;font-size:11px;line-height:1.5;color:var(--color-text);white-space:nowrap;opacity:0;transition:opacity .1s}
+.tradespace-axis-label{font-size:12px;color:var(--color-text-muted);text-align:center;margin-top:4px}
+.tradespace-tooltip{position:absolute;pointer-events:none;background:var(--color-bg);border:1px solid var(--color-divider);padding:6px 9px;font-size:12px;line-height:1.5;color:var(--color-text);white-space:nowrap;opacity:0;transition:opacity .1s;font-variant-numeric:tabular-nums}
 .tradespace-tooltip .t-veh{font-weight:700}
-.tradespace-tooltip .t-status{font-size:10px;font-weight:600}
-.figure-title{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--color-neutral-600);margin-bottom:var(--space-3)}
-.figure-caption{font-size:12.5px;color:var(--color-neutral-600);margin-top:var(--space-3)}
+.tradespace-tooltip .t-status{font-size:12px;font-weight:600}
+.figure-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-muted);margin-bottom:var(--space-3)}
+.figure-caption{font-size:14px;color:var(--color-text-muted);margin-top:var(--space-3);max-width:75ch}
 
-/* — equations — */
-.eqn-block{border:1px solid var(--color-divider);background:var(--color-surface);padding:var(--space-3) var(--space-4);margin:var(--space-3) 0;overflow-x:auto}
-.eqn-label{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--color-neutral-600);margin-bottom:6px}
-.eq{font-size:14px;white-space:nowrap}
+/* — equations (native MathML) — */
+.eqn-block{border:1px solid var(--color-divider);background:var(--color-surface);padding:var(--space-3) var(--space-4);margin:var(--space-3) 0;overflow-x:auto;max-width:820px;scrollbar-color:var(--color-neutral-600) transparent}
+.eqn-label{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--color-text-muted);margin-bottom:6px}
+.eqn-block math{font-family:var(--font-math);font-size:1.2em;margin:.35em 0}
+.eqn-note{font-size:14px;color:var(--color-text-muted);margin:var(--space-2) 0 0;max-width:70ch}
 .method-copy p{max-width:70ch}
 .method-copy code{background:var(--color-neutral-100);padding:1px 5px}
+.method-copy h4{margin-top:var(--space-6);margin-bottom:var(--space-2)}
+.method-copy math{font-family:var(--font-math);font-size:1.1em}
 
 /* — nav — */
 .nav{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:var(--space-4);
-  padding:var(--space-3) clamp(20px,5vw,64px);border-bottom:2px solid var(--color-divider);background:var(--color-bg)}
-.nav-brand{font-family:var(--font-heading);font-weight:800;font-size:17px;margin-right:auto;letter-spacing:-.01em}
-.nav a{color:inherit;text-decoration:none;font-size:14px}
-.nav a:hover{color:var(--color-accent)}
+  padding:var(--space-2) clamp(20px,5vw,64px);border-bottom:2px solid var(--color-divider);background:var(--color-bg)}
+.nav-brand{font-family:var(--font-heading);font-weight:800;font-size:17px;margin-right:auto;letter-spacing:-.01em;white-space:nowrap}
+.nav a{color:inherit;text-decoration:none;font-size:14px;padding:12px 4px;min-height:44px;display:inline-flex;align-items:center}
+.nav a.btn{padding:12px 16px}
+.nav a:hover{color:var(--color-accent-700)}
+.nav a.btn:hover{color:var(--color-text)}
+@media (max-width:600px){
+  .nav{gap:var(--space-3)}
+  .nav .nav-skills,.nav .nav-linkedin{display:none}
+}
 
 /* — hero — */
 .hero{padding:clamp(48px,9vw,110px) clamp(20px,5vw,64px) clamp(40px,6vw,72px);
   display:grid;grid-template-columns:1.2fr .8fr;gap:clamp(24px,4vw,56px);align-items:end;border-bottom:2px solid var(--color-divider)}
-.hero h1{font-size:clamp(30px,5.4vw,58px);max-width:15ch;margin-bottom:var(--space-4)}
-.hero p{font-size:clamp(15px,1.6vw,18px);max-width:56ch;opacity:.85;margin-bottom:var(--space-6)}
+.hero h1{font-size:clamp(30px,4.6vw,54px);max-width:20ch;margin-bottom:var(--space-4)}
+.hero p{font-size:clamp(16px,1.6vw,18px);max-width:58ch;color:var(--color-neutral-800);margin-bottom:var(--space-6)}
 .headshot-photo{width:100%;aspect-ratio:4/5;max-width:300px;margin-left:auto;border:1px solid var(--color-divider);
   object-fit:cover;object-position:center 20%;display:block}
-@media (max-width:760px){.hero{grid-template-columns:1fr}.headshot-photo{margin-inline:auto;max-width:220px}}
+@media (max-width:760px){.hero{grid-template-columns:1fr}.headshot-photo{margin-left:0;max-width:200px}}
 
-/* — reel — */
-#reel, #featured-reel{scroll-margin-top:64px}
-.reel-head{padding:clamp(20px,3vw,40px) clamp(20px,5vw,64px) clamp(12px,2vw,20px);
-  display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:12px}
-.reel-progress{font:600 12px var(--font-heading);color:var(--color-neutral-600)}
-.reel-body{flex:1;background:var(--color-neutral-900);position:relative;display:flex;flex-direction:column}
+/* — project contact sheets (film strips) — */
+#reel{scroll-margin-top:var(--nav-h)}
+.sheet-head{padding:clamp(28px,4vw,56px) clamp(20px,5vw,64px) clamp(12px,2vw,20px)}
+.sheet-head h2{margin:0}
+.sheet-head p{margin:var(--space-2) 0 0;color:var(--color-text-muted);max-width:60ch}
+.strip{background:var(--color-neutral-900);margin-bottom:var(--space-6)}
+.strip-title{color:var(--color-neutral-300);font-size:14px;letter-spacing:.1em;text-transform:uppercase;margin:0;padding:var(--space-4) clamp(20px,5vw,64px) var(--space-3)}
 .sprocket{height:16px;background-image:radial-gradient(circle, var(--color-bg) 30%, transparent 32%);
   background-size:32px 16px;background-repeat:repeat-x;background-position:10px center;opacity:.9}
-.reel-viewport{flex:1;overflow:hidden;display:flex;align-items:stretch;padding:14px 0}
-.reel-track{display:flex;gap:clamp(20px,3vw,40px);padding:0 clamp(20px,5vw,64px);will-change:transform}
-.frame{width:clamp(280px,34vw,420px);flex:none;height:100%;background:var(--color-bg);
-  padding:clamp(14px,2vw,22px);display:flex;flex-direction:column;gap:10px;overflow:hidden;text-decoration:none;color:inherit}
-.frame:hover{color:inherit}
-.frame-top{display:flex;justify-content:space-between;align-items:baseline;flex:none}
-.frame-num{font:600 12px var(--font-heading);color:var(--color-neutral-500)}
-.frame-fig{width:100%;height:clamp(80px,17vh,150px);flex:none;display:flex;align-items:center;justify-content:center;background:var(--color-neutral-100)}
+.sheet{display:grid;grid-template-columns:repeat(var(--cols,3),minmax(0,1fr));gap:clamp(16px,2.2vw,32px);padding:14px clamp(20px,5vw,64px)}
+.sheet-4{--cols:4}
+.sheet-3{--cols:3}
+@media (max-width:1100px){.sheet-4{--cols:2}}
+@media (max-width:900px){.sheet-3{--cols:2}}
+@media (max-width:600px){.sheet-4,.sheet-3{--cols:1}}
+.frame{background:var(--color-bg);padding:clamp(14px,1.8vw,22px);display:flex;flex-direction:column;gap:10px;text-decoration:none;color:inherit;border-top:3px solid transparent}
+.frame:hover{color:inherit;border-top-color:var(--color-accent)}
+.frame:focus-visible{outline:2px solid var(--color-bg);outline-offset:3px}
+.frame-top{display:flex;justify-content:space-between;align-items:baseline}
+.frame-num{font:600 13px var(--font-heading);color:var(--color-text-muted);font-variant-numeric:tabular-nums}
+.frame-fig{width:100%;height:clamp(120px,13vw,160px);display:flex;align-items:center;justify-content:center;background:var(--color-neutral-100)}
 .frame-fig svg{width:100%;height:100%}
 .frame-fig img{width:100%;height:100%;object-fit:cover}
-.frame h3{margin:0;flex:none;font-size:clamp(15px,1.8vw,19px)}
-.frame p{margin:0;font-size:12.5px;opacity:.8;flex:1;overflow:hidden}
-.frame .tag-row{display:flex;gap:6px;flex-wrap:wrap;flex:none}
-.frame .view-link{font:600 12px var(--font-heading);color:var(--color-neutral-900);flex:none}
+.frame h4{margin:0;font-size:clamp(17px,1.8vw,20px)}
+.frame p{margin:0;font-size:14px;color:var(--color-neutral-800)}
+.frame .frame-fact{color:var(--color-text-muted);font-variant-numeric:tabular-nums}
+.frame .frame-fact strong{color:var(--color-text);font-weight:800}
+.frame .tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto}
+.frame .view-link{font:600 14px var(--font-heading);color:var(--color-neutral-900)}
 
 /* — detail sections — */
-.project-section{display:none;padding:clamp(48px,7vw,88px) clamp(20px,5vw,64px);border-bottom:2px solid var(--color-divider);scroll-margin-top:64px}
+.project-section{display:none;padding:clamp(48px,7vw,88px) clamp(20px,5vw,64px);border-bottom:2px solid var(--color-divider);scroll-margin-top:var(--nav-h)}
 .project-section:target{display:block}
-.back-to-reel{font:600 12px var(--font-heading);color:var(--color-neutral-700);display:inline-block;margin-bottom:var(--space-3)}
+.back-to-reel{font:600 14px var(--font-heading);color:var(--color-text-muted);display:inline-block;margin-bottom:var(--space-3);padding:8px 0}
 .project-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:var(--space-2)}
 .project-head h2{max-width:22ch}
-.project-tagline{max-width:70ch;opacity:.85;font-size:16px}
-.subhead{color:var(--color-neutral-700);margin-top:var(--space-8)}
-.caution{font-size:12.5px;color:var(--color-accent-800);background:var(--color-accent-100);border:1px solid var(--color-accent);padding:9px 12px;max-width:64ch;margin:var(--space-3) 0}
+.project-tagline{max-width:70ch;color:var(--color-neutral-800);font-size:17px}
+.subhead{font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-text-muted);margin-top:var(--space-8)}
+.caution{font-size:14px;color:var(--color-accent-800);background:var(--color-accent-100);border:1px solid var(--color-accent);padding:9px 12px;max-width:64ch;margin:var(--space-3) 0}
+
+/* — title block (drawing-sheet convention) — */
+.titleblock{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--color-divider);
+  border:2px solid var(--color-divider);margin:var(--space-6) 0 var(--space-4);max-width:860px}
+.titleblock>div{background:var(--color-bg);padding:10px 14px}
+.tb-label{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-muted)}
+.tb-value{display:block;font-weight:800;font-size:15px}
 
 /* — about / skills — */
 .about{padding:clamp(48px,7vw,96px) clamp(20px,5vw,64px);display:grid;grid-template-columns:1.4fr 1fr;gap:clamp(28px,4vw,56px);border-bottom:2px solid var(--color-divider)}
 .about h2{max-width:18ch}
-.about p{font-size:16px;opacity:.85;max-width:60ch}
+.about p{font-size:17px;color:var(--color-neutral-800);max-width:60ch}
 .skills{padding:clamp(48px,7vw,96px) clamp(20px,5vw,64px);border-bottom:2px solid var(--color-divider)}
-.skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:clamp(20px,3vw,40px)}
-.skill-item{display:flex;align-items:center;gap:8px;font-size:14px}
+.skills-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(24px,3vw,40px)}
+.skills-list{display:flex;flex-direction:column;gap:8px;list-style:none;margin:0;padding:0}
+.skill-item{display:flex;align-items:center;gap:8px;font-size:15px}
 .skill-dot{width:6px;height:6px;background:var(--color-neutral-900);flex:none}
+@media (max-width:900px){.skills-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:760px){.about{grid-template-columns:1fr}}
+@media (max-width:520px){.skills-grid{grid-template-columns:1fr}}
 
 /* — resume band / contact / footer — */
 .resume-band{padding:clamp(48px,8vw,100px) clamp(20px,5vw,64px);background:var(--color-neutral-900);color:var(--color-bg);
   display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px}
-.resume-band h6{color:var(--color-neutral-400);margin-bottom:var(--space-2)}
+.resume-band h2{color:var(--color-bg);margin-bottom:var(--space-2)}
 .resume-band p{color:var(--color-neutral-300);font-size:18px;max-width:46ch;margin-bottom:0}
 .resume-band .btn{border:1px solid var(--color-bg);color:var(--color-bg)}
-.resume-band .btn:hover{background:color-mix(in srgb, var(--color-bg) 12%, transparent)}
+.resume-band .btn:hover{background:color-mix(in srgb, var(--color-bg) 12%, transparent);color:var(--color-bg)}
+.resume-band .btn-light{background:var(--color-bg);color:var(--color-neutral-900)}
+.resume-band .btn-light:hover{background:var(--color-neutral-200);color:var(--color-neutral-900)}
+.resume-band .btn:focus-visible{outline-color:var(--color-bg)}
 footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--color-divider);
-  display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--color-neutral-600)}
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:14px;color:var(--color-text-muted)}
 </style>
 </head>
 <body>
 
-<nav class="nav">
+<header>
+<nav class="nav" aria-label="Primary">
   <span class="nav-brand">ETHAN SIMON</span>
   <a href="#reel">Projects</a>
   <a href="#about">About</a>
-  <a href="#skills">Skills</a>
+  <a class="nav-skills" href="#skills">Skills</a>
   <a href="#contact">Contact</a>
-  <a class="btn btn-secondary" href="https://www.linkedin.com/in/ethansimon13" target="_blank" rel="noopener" style="margin-left:8px">LinkedIn ↗</a>
+  <a class="btn btn-secondary nav-linkedin" href="https://www.linkedin.com/in/ethansimon13" target="_blank" rel="noopener" style="margin-left:8px">LinkedIn <span aria-hidden="true">↗</span><span class="sr-only">(opens in new tab)</span></a>
 </nav>
+</header>
+
+<main>
+<noscript><p class="caution" style="margin:var(--space-4) clamp(20px,5vw,64px)">The charts, 3D models, and skills list on this page are drawn with JavaScript. The project text still reads without it.</p></noscript>
 
 <section class="hero">
   <div>
-    <h6 style="color:var(--color-neutral-700)">MECHANICAL ENGINEERING · CASE WESTERN RESERVE UNIVERSITY</h6>
-    <h1>Looking for internships for summer of 2027.</h1>
-    <p>CAD and manufacturing for real VTOL airframes, plus the simulation and diagnostic software that informs their design. Ten projects below.</p>
+    <h1>Ethan Simon designs VTOL airframes and writes the simulations that test them.</h1>
+    <p>I'm a mechanical engineering junior at Case Western Reserve and the mechanical team lead for CWRU VTOL. I draw the airframes in SolidWorks, then write the Python that says which motor, prop, and battery each one can actually carry. I'm looking for a summer 2027 internship.</p>
     <div style="display:flex;gap:var(--space-3);flex-wrap:wrap">
-      <a href="#reel" class="btn btn-primary">View all projects →</a>
-      <a href="https://github.com/exs783" target="_blank" rel="noopener" class="btn btn-secondary">GitHub ↗</a>
+      <a href="#reel" class="btn btn-primary">See the projects <span aria-hidden="true">→</span></a>
+      <a href="assets/Ethan_Simon_Resume.pdf" target="_blank" rel="noopener" class="btn btn-secondary">Resume <span aria-hidden="true">↗</span><span class="sr-only">(PDF, opens in new tab)</span></a>
     </div>
   </div>
-  <img class="headshot-photo grayscale" src="assets/ethan-simon-headshot.jpg" alt="Ethan Simon">
+  <img class="headshot-photo grayscale" src="assets/ethan-simon-headshot.jpg" alt="Ethan Simon" width="300" height="375" fetchpriority="high">
 </section>
 
-<section id="featured-reel">
-  <div class="reel-head">
-    <h2 style="margin:0">FEATURED PROJECTS</h2>
+<section id="reel" aria-labelledby="projects-title">
+  <div class="sheet-head">
+    <h2 id="projects-title">Projects</h2>
+    <p>Ten projects. Open a frame for the write-up, the math, and the figures.</p>
   </div>
-  <div class="reel-body">
-    <div class="sprocket"></div>
-    <div class="reel-viewport" style="overflow-x:auto">
-      <div class="reel-track" id="featured-track">
-        <a href="demos/log-dashboard.html" class="frame">
-          <div class="frame-top"><span class="tag tag-mono-outline">Featured</span></div>
-          <div class="frame-fig" data-fig="droneScopeFigure"></div>
-          <h3>Log Dashboard</h3>
-          <p>Parses real flight data so users can look at sensor errors or find ways to improve their designs.</p>
-          <div class="tag-row"><span class="tag tag-neutral">Flask</span><span class="tag tag-neutral">Plotly</span></div>
-          <span class="view-link">View project ↗</span>
-        </a>
-        <a href="#mission-model" class="frame">
-          <div class="frame-top"><span class="tag tag-mono-outline">Featured</span></div>
-          <div class="frame-fig" data-fig="missionProfileFigure"></div>
-          <h3>Mission Model</h3>
-          <p>Runs a mock DARPA Heavy Lift 2028 course and outputs feasible motor, rotor, battery, and aerostructure configurations.</p>
-          <div class="tag-row"><span class="tag tag-neutral">Python</span><span class="tag tag-neutral">Quaternion 6DOF</span></div>
-          <span class="view-link">View project ↗</span>
-        </a>
-        <a href="#hexacopter-drone" class="frame">
-          <div class="frame-top"><span class="tag tag-mono-outline">Featured</span></div>
-          <div class="frame-fig" data-fig="cadPhotoFigure"></div>
-          <h3>Hexacopter Drone</h3>
-          <p>Design, manufacturing, and testing of a hexacopter for the VFS DBVF competition — frame, motor mounts, sensor mounts, and payload mounts.</p>
-          <div class="tag-row"><span class="tag tag-neutral">SolidWorks</span><span class="tag tag-neutral">DBVF</span></div>
-          <span class="view-link">View project ↗</span>
-        </a>
-      </div>
-    </div>
-    <div class="sprocket"></div>
-  </div>
-</section>
 
-<section id="reel">
-  <div class="reel-head">
-    <h2 style="margin:0">ALL PROJECTS</h2>
-    <span class="reel-progress" id="reel-progress">01 / 10</span>
-  </div>
-  <div class="reel-body">
-    <div class="sprocket"></div>
-    <div class="reel-viewport" style="overflow-x:auto">
-      <div class="reel-track">
-        <a href="#hexacopter-drone" class="frame">
-            <div class="frame-top"><span class="tag tag-mono-outline">CAD</span><span class="frame-num">01 / 10</span></div>
-            <div class="frame-fig" data-fig="cadPhotoFigure"></div>
-            <h3>Hexacopter Drone</h3>
-            <p>Design, manufacturing, and testing of a hexacopter for the VFS DBVF competition — frame, motor mounts, sensor mounts, and payload mounts.</p>
-            <div class="tag-row"><span class="tag tag-neutral">SolidWorks</span><span class="tag tag-neutral">DBVF</span></div>
-            <span class="view-link">View project ↗</span>
-          </a>
-          <a href="#quadcopter" class="frame">
-            <div class="frame-top"><span class="tag tag-mono-outline">CAD</span><span class="frame-num">02 / 10</span></div>
-            <div class="frame-fig" data-fig="quadcopterOrthoFigure"></div>
-            <h3>Quadcopter</h3>
-            <p>A basic quadcopter build teaching newer VTOL members multirotor design fundamentals before they move on to transitioning airframes.</p>
-            <div class="tag-row"><span class="tag tag-neutral">SolidWorks</span><span class="tag tag-neutral">Teaching</span></div>
-            <span class="view-link">View project ↗</span>
-          </a>
-          <a href="#x8-tailsitter" class="frame">
-            <div class="frame-top"><span class="tag tag-mono-outline">CAD</span><span class="frame-num">03 / 10</span></div>
-            <div class="frame-fig" data-fig="x8TailsitterOrthoFigure"></div>
-            <h3>X-8 Tailsitter</h3>
-            <p>An adaptation of the hexacopter into an X-8 tailsitter frame — lift from a wing, and a high thrust-to-weight ratio.</p>
-            <div class="tag-row"><span class="tag tag-neutral">SolidWorks</span><span class="tag tag-neutral">Tailsitter</span></div>
-            <span class="view-link">View project ↗</span>
-          </a>
-          <a href="#tail-sitter-designs" class="frame">
-            <div class="frame-top"><span class="tag tag-mono-outline">CAD</span><span class="frame-num">04 / 10</span></div>
-            <div class="frame-fig" data-fig="tailSitterFigure"></div>
-            <h3>Tail Sitter Designs</h3>
-            <p>Ongoing project teaching younger VTOL members to design their own tail sitters and improve the club's transition-drone capability.</p>
-            <div class="tag-row"><span class="tag tag-neutral">SolidWorks</span><span class="tag tag-neutral">Teaching</span></div>
-            <span class="view-link">View project ↗</span>
-          </a>
-          <a href="#tilt-rotor-designs" class="frame">
-            <div class="frame-top"><span class="tag tag-mono-outline">CAD</span><span class="frame-num">05 / 10</span></div>
-            <div class="frame-fig" data-fig="tiltRotorFigure"></div>
-            <h3>Tilt Rotor Designs</h3>
-            <p>Teaching new VTOL members to design tilt rotors and build their own within a semester.</p>
-            <div class="tag-row"><span class="tag tag-neutral">SolidWorks</span><span class="tag tag-neutral">Teaching</span></div>
-            <span class="view-link">View project ↗</span>
-          </a>
-          <a href="#darpa-lift-2028" class="frame">
-            <div class="frame-top"><span class="tag tag-mono-outline">CAD</span><span class="frame-num">06 / 10</span></div>
-            <div class="frame-fig" data-fig="darpaLiftFigure"></div>
-            <h3>DARPA Lift 2028</h3>
-            <p>A drone to compete in the DARPA LIFT '28 challenge. Current design is a tail sitter with a low rotor count, being actively adapted.</p>
-            <div class="tag-row"><span class="tag tag-neutral">SolidWorks</span><span class="tag tag-neutral">In progress</span></div>
-            <span class="view-link">View project ↗</span>
-          </a>
-          <a href="#mission-model" class="frame">
-            <div class="frame-top"><span class="tag tag-mono-outline">Coding</span><span class="frame-num">07 / 10</span></div>
-            <div class="frame-fig" data-fig="missionProfileFigure"></div>
-            <h3>Mission Model</h3>
-            <p>Runs a mock DARPA Heavy Lift 2028 course and outputs feasible motor, rotor, battery, and aerostructure configurations.</p>
-            <div class="tag-row"><span class="tag tag-neutral">Python</span><span class="tag tag-neutral">Quaternion 6DOF</span></div>
-            <span class="view-link">View project ↗</span>
-          </a>
-          <a href="#wing-optimizer" class="frame">
-            <div class="frame-top"><span class="tag tag-mono-outline">Coding</span><span class="frame-num">08 / 10</span></div>
-            <div class="frame-fig" data-fig="wingPlanformFigure"></div>
-            <h3>Wing Optimizer</h3>
-            <p>Creates efficient lifting wings from constraints and outputs the equations needed to build them in CAD — built to support Mission Model.</p>
-            <div class="tag-row"><span class="tag tag-neutral">Python</span><span class="tag tag-neutral">NACA airfoils</span></div>
-            <span class="view-link">View project ↗</span>
-          </a>
-          <a href="demos/log-dashboard.html" class="frame">
-            <div class="frame-top"><span class="tag tag-mono-outline">Coding</span><span class="frame-num">09 / 10</span></div>
-            <div class="frame-fig" data-fig="droneScopeFigure"></div>
-            <h3>Log Dashboard</h3>
-            <p>Parses real flight data so users can look at sensor errors or find ways to improve their designs.</p>
-            <div class="tag-row"><span class="tag tag-neutral">Flask</span><span class="tag tag-neutral">Plotly</span></div>
-            <span class="view-link">View project ↗</span>
-          </a>
-          <a href="#liquid-rocket" class="frame">
-            <div class="frame-top"><span class="tag tag-mono-outline">Coding</span><span class="frame-num">10 / 10</span></div>
-            <div class="frame-fig" data-fig="rocketFigure"></div>
-            <h3>Liquid Rocket</h3>
-            <p>PyQt app to control and monitor a liquid rocket engine test stand.</p>
-            <div class="tag-row"><span class="tag tag-neutral">PyQt6</span><span class="tag tag-neutral">Real wire protocol</span></div>
-            <span class="view-link">View project ↗</span>
-          </a>
-      </div>
+  <div class="strip">
+    <h3 class="strip-title">Simulation and software</h3>
+    <div class="sprocket" aria-hidden="true"></div>
+    <div class="sheet sheet-4">
+      <a href="#mission-model" class="frame">
+        <div class="frame-top"><span class="tag tag-mono-outline">Coding</span><span class="frame-num">01</span></div>
+        <div class="frame-fig" data-fig="missionProfileFigure"></div>
+        <h4>Mission Model</h4>
+        <p>Flies a mock DARPA Heavy Lift 2028 course with every motor, propeller, and battery combination it has data for, and reports which ones finish it.</p>
+        <p class="frame-fact"><strong>2,793</strong> combinations swept across <strong>12</strong> vehicle configs.</p>
+        <div class="tag-row"><span class="tag tag-neutral">Python</span><span class="tag tag-neutral">Quaternion 6DOF</span></div>
+        <span class="view-link">View project <span aria-hidden="true">→</span></span>
+      </a>
+      <a href="#wing-optimizer" class="frame">
+        <div class="frame-top"><span class="tag tag-mono-outline">Coding</span><span class="frame-num">02</span></div>
+        <div class="frame-fig" data-fig="wingPlanformFigure"></div>
+        <h4>Wing Optimizer</h4>
+        <p>Sizes a wing from a lift requirement and a cruise speed, then writes the geometry out as SolidWorks equations. Built to support Mission Model.</p>
+        <p class="frame-fact">Balanced tailsitter: AR <strong>8.64</strong>, taper <strong>0.30</strong>, span <strong>6.463 m</strong>.</p>
+        <div class="tag-row"><span class="tag tag-neutral">Python</span><span class="tag tag-neutral">NACA airfoils</span></div>
+        <span class="view-link">View project <span aria-hidden="true">→</span></span>
+      </a>
+      <a href="demos/log-dashboard.html" class="frame">
+        <div class="frame-top"><span class="tag tag-mono-outline">Coding</span><span class="frame-num">03</span></div>
+        <div class="frame-fig" data-fig="droneScopeFigure"></div>
+        <h4>Log Dashboard</h4>
+        <p>Decodes a Pixhawk flight log into a score, an issues list, and every chart, so you can tell whether a flight was healthy before flying again.</p>
+        <p class="frame-fact">Sample flight scored <strong>65/100</strong> with <strong>7</strong> issues found.</p>
+        <div class="tag-row"><span class="tag tag-neutral">Flask</span><span class="tag tag-neutral">Plotly</span></div>
+        <span class="view-link">Open the live demo <span aria-hidden="true">→</span></span>
+      </a>
+      <a href="#liquid-rocket" class="frame">
+        <div class="frame-top"><span class="tag tag-mono-outline">Coding</span><span class="frame-num">04</span></div>
+        <div class="frame-fig" data-fig="rocketFigure"></div>
+        <h4>Liquid Rocket</h4>
+        <p>Ground-station software for a liquid rocket test stand: valve control, live gauges, and CSV logging in one PyQt6 app.</p>
+        <p class="frame-fact"><strong>9</strong> sensor channels: P0–P6, T0, L0.</p>
+        <div class="tag-row"><span class="tag tag-neutral">PyQt6</span><span class="tag tag-neutral">Real wire protocol</span></div>
+        <span class="view-link">View project <span aria-hidden="true">→</span></span>
+      </a>
     </div>
-    <div class="sprocket"></div>
+    <div class="sprocket" aria-hidden="true"></div>
+  </div>
+
+  <div class="strip">
+    <h3 class="strip-title">Airframes and CAD</h3>
+    <div class="sprocket" aria-hidden="true"></div>
+    <div class="sheet sheet-3">
+      <a href="#hexacopter-drone" class="frame">
+        <div class="frame-top"><span class="tag tag-mono-outline">CAD</span><span class="frame-num">05</span></div>
+        <div class="frame-fig" data-fig="cadPhotoFigure"></div>
+        <h4>Hexacopter Drone</h4>
+        <p>The competition hexacopter for VFS DBVF. I worked on the frame, motor mounts, sensor mounts, and payload mounts.</p>
+        <p class="frame-fact"><strong>7</strong> subassemblies mated into one SolidWorks assembly.</p>
+        <div class="tag-row"><span class="tag tag-neutral">SolidWorks</span><span class="tag tag-neutral">DBVF</span></div>
+        <span class="view-link">View project <span aria-hidden="true">→</span></span>
+      </a>
+      <a href="#x8-tailsitter" class="frame">
+        <div class="frame-top"><span class="tag tag-mono-outline">CAD</span><span class="frame-num">06</span></div>
+        <div class="frame-fig" data-fig="x8TailsitterOrthoFigure"></div>
+        <h4>X-8 Tailsitter</h4>
+        <p>The hexacopter reworked into an X-8 tailsitter: lift from a wing, and a high thrust-to-weight ratio.</p>
+        <p class="frame-fact"><strong>8</strong> motors under one wing.</p>
+        <div class="tag-row"><span class="tag tag-neutral">SolidWorks</span><span class="tag tag-neutral">Tailsitter</span></div>
+        <span class="view-link">View project <span aria-hidden="true">→</span></span>
+      </a>
+      <a href="#quadcopter" class="frame">
+        <div class="frame-top"><span class="tag tag-mono-outline">CAD</span><span class="frame-num">07</span></div>
+        <div class="frame-fig" data-fig="quadcopterOrthoFigure"></div>
+        <h4>Quadcopter</h4>
+        <p>A basic quadcopter build that teaches newer VTOL members multirotor design before they move on to transitioning airframes.</p>
+        <p class="frame-fact"><strong>5-inch</strong> frame, 4 arms, no wing.</p>
+        <div class="tag-row"><span class="tag tag-neutral">SolidWorks</span><span class="tag tag-neutral">Teaching</span></div>
+        <span class="view-link">View project <span aria-hidden="true">→</span></span>
+      </a>
+      <a href="#tail-sitter-designs" class="frame">
+        <div class="frame-top"><span class="tag tag-mono-outline">CAD</span><span class="frame-num">08</span></div>
+        <div class="frame-fig" data-fig="tailSitterFigure"></div>
+        <h4>Tail Sitter Designs</h4>
+        <p>An ongoing project teaching younger VTOL members to design their own tail sitters and improve the club's transition-drone capability.</p>
+        <p class="frame-fact"><strong>S1223</strong> weighed against NACA <strong>4412</strong> and <strong>6412</strong>.</p>
+        <div class="tag-row"><span class="tag tag-neutral">SolidWorks</span><span class="tag tag-neutral">Teaching</span></div>
+        <span class="view-link">View project <span aria-hidden="true">→</span></span>
+      </a>
+      <a href="#tilt-rotor-designs" class="frame">
+        <div class="frame-top"><span class="tag tag-mono-outline">CAD</span><span class="frame-num">09</span></div>
+        <div class="frame-fig" data-fig="tiltRotorFigure"></div>
+        <h4>Tilt Rotor Designs</h4>
+        <p>Teaching new VTOL members to design tilt rotors and build their own within a semester.</p>
+        <p class="frame-fact">Only the <strong>nacelles</strong> rotate; the fuselage stays level.</p>
+        <div class="tag-row"><span class="tag tag-neutral">SolidWorks</span><span class="tag tag-neutral">Teaching</span></div>
+        <span class="view-link">View project <span aria-hidden="true">→</span></span>
+      </a>
+      <a href="#darpa-lift-2028" class="frame">
+        <div class="frame-top"><span class="tag tag-mono-outline">CAD</span><span class="frame-num">10</span></div>
+        <div class="frame-fig" data-fig="darpaLiftFigure"></div>
+        <h4>DARPA Lift 2028</h4>
+        <p>The airframe Mission Model is meant to inform: a low-rotor-count tail sitter for the DARPA LIFT '28 challenge, still being adapted.</p>
+        <p class="frame-fact"><strong>2</strong> rotors chosen over 6.</p>
+        <div class="tag-row"><span class="tag tag-neutral">SolidWorks</span><span class="tag tag-neutral">In progress</span></div>
+        <span class="view-link">View project <span aria-hidden="true">→</span></span>
+      </a>
+    </div>
+    <div class="sprocket" aria-hidden="true"></div>
   </div>
 </section>
 
 <!-- ============================= MISSION MODEL ============================= -->
 <section class="project-section" id="mission-model">
-  <a class="back-to-reel" href="#reel">← Back to reel</a>
+  <a class="back-to-reel" href="#reel">← All projects</a>
   <div class="project-head">
-    <div>
-      <span class="tag tag-outline">Simulation · 2026</span>
-      <h2 style="margin-top:var(--space-2)">Mission Model</h2>
-    </div>
+    <h2>Mission Model</h2>
   </div>
   <p class="project-tagline">A mission-performance simulator that sweeps every motor, propeller, and battery combination it is given. The model runs a theoretical mission, the DARPA 2028 heavy lift, and returns the feasibility of each combination. It's state based, with the states of landed, take-off, transition, cruise, and land. The model runs a system of dynamics equations to model the motion of flight in every state except transition. In the transition state the drone uses a quaternion model to better represent its motion through the transition from vertical to horizontal flight.</p>
+  <div class="titleblock">
+    <div><span class="tb-label">Discipline</span><span class="tb-value">Simulation</span></div>
+    <div><span class="tb-label">Year</span><span class="tb-value">2026</span></div>
+    <div><span class="tb-label">Built with</span><span class="tb-value">Python, NumPy, SciPy</span></div>
+    <div><span class="tb-label">Repository</span><span class="tb-value">exs783/Log_Reader</span></div>
+  </div>
 
-  <h6 class="subhead">Overview</h6>
+  <h3 class="subhead">Overview</h3>
   <div class="method-copy">
     <p>Mission Model simulates the running of a course for a variety of airframes. The current iteration runs the following mission: takeoff to 100 ft, cruise 1 nautical mile, land, pick up cargo, takeoff, cruise 8 nm, land, drop cargo, takeoff, cruise 1 nm back, land. For every candidate airframe, it sweeps every motor × propeller × battery combination it has spec data for and reports which one actually completes the mission. It also reports back how much battery it has left over, and how long it can hover.</p>
     <p>The airframe list (Hexacopter, Quadcopter, x8, Tail Sitter) matches the real vehicle classes I work on as VTOL Mechanical Team Lead — this is the same kind of simulation-to-inform-design work as the MATLAB/Python scripts I write for the team, built out as a standalone public tool.</p>
   </div>
 
-  <h6 class="subhead">Method</h6>
+  <h3 class="subhead">Method</h3>
   <div class="method-copy">
     <p>Every TailSitter vehicle config is sized using Wing Optimizer's energy-based (hover + cruise) objective, evaluated at each tier's real governed cruise speed. The required wing area scales as 1/v², so getting the real cruise speed right has a large impact on the sizing result.</p>
-    <p>The mission simulation uses closed-form kinematics for wingless multirotors, <code>v̇ = a₀ − k·v²</code>, which has an exact tanh solution, so every accel/decel leg is solved in one evaluation instead of stepped through a simulation loop.</p>
+
+    <h4>Hover time</h4>
+    <p>Hover is the baseline number in the fleet chart. Each motor holds its share of the total mass, so I solve the motor's thrust curve for the throttle that does it, then divide the battery capacity by the current the whole rotor set draws at that throttle.</p>
+    <div class="eqn-block" tabindex="0" role="group" aria-label="Hover time equations">
+      <div class="eqn-label">Hover throttle and endurance</div>
+      <math display="block"><mrow><msub><mi>T</mi><mi>m</mi></msub><mo stretchy="false">(</mo><msub><mi>θ</mi><mi>h</mi></msub><mo stretchy="false">)</mo></mrow><mo>=</mo><mfrac><msub><mi>m</mi><mtext>tot</mtext></msub><mi>N</mi></mfrac></math><math display="block"><msub><mi>t</mi><mtext>hover</mtext></msub><mo>=</mo><mfrac><mrow><mn>60</mn><mo>·</mo><msub><mi>C</mi><mtext>Ah</mtext></msub></mrow><mrow><mi>N</mi><mo>·</mo><mi>I</mi><mo stretchy="false">(</mo><msub><mi>θ</mi><mi>h</mi></msub><mo stretchy="false">)</mo></mrow></mfrac><mspace width="0.6em"/><mtext>min</mtext></math>
+      <p class="eqn-note">T<sub>m</sub> is one motor's thrust curve, N the rotor count, C<sub>Ah</sub> the battery capacity, and I the per-motor current. I find θ<sub>h</sub> on 40–100% throttle with Brent's method against the continuous curve. If a motor can't reach m<sub>tot</sub>/N even at full throttle, hover time is zero.</p>
+    </div>
+
+    <h4>One equation for every takeoff and every multirotor leg</h4>
+    <p>A takeoff, and every leg a wingless multirotor flies, is the same differential equation: constant thrust against quadratic drag. It has an exact tanh solution, so every accel or decel leg is solved in one evaluation instead of stepped through a simulation loop.</p>
+    <div class="eqn-block" tabindex="0" role="group" aria-label="Drag-limited acceleration equations">
+      <div class="eqn-label">Thrust against quadratic drag</div>
+      <math display="block"><mfrac><mrow><mi>d</mi><mi>v</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><msub><mi>a</mi><mn>0</mn></msub><mo>−</mo><mi>k</mi><msup><mi>v</mi><mn>2</mn></msup></math><math display="block"><mi>k</mi><mo>=</mo><mfrac><mrow><mi>ρ</mi><msub><mi>C</mi><mi>d</mi></msub><mi>A</mi></mrow><mrow><mn>2</mn><mi>m</mi></mrow></mfrac></math>
+      <math display="block"><msub><mi>a</mi><mn>0</mn></msub><mo>=</mo><mfrac><mrow><mi>T</mi><mo>−</mo><mi>W</mi></mrow><mi>m</mi></mfrac><mspace width="0.6em"/><mtext>(takeoff)</mtext></math><math display="block"><msub><mi>a</mi><mn>0</mn></msub><mo>=</mo><mfrac><msqrt><mrow><msup><mi>T</mi><mn>2</mn></msup><mo>−</mo><msup><mi>W</mi><mn>2</mn></msup></mrow></msqrt><mi>m</mi></mfrac><mspace width="0.6em"/><mtext>(multirotor cruise)</mtext></math>
+      <div class="eqn-label" style="margin-top:var(--space-3)">Closed-form solution</div>
+      <math display="block"><mi>v</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>v</mi><mi>t</mi></msub><mi>tanh</mi><mo stretchy="false">(</mo><mi>k</mi><msub><mi>v</mi><mi>t</mi></msub><mi>t</mi><mo>+</mo><msub><mi>c</mi><mn>0</mn></msub><mo stretchy="false">)</mo></math><math display="block"><mi>x</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mi>ln</mi><mspace width="0.17em"/><mi>cosh</mi><mo stretchy="false">(</mo><mi>k</mi><msub><mi>v</mi><mi>t</mi></msub><mi>t</mi><mo>+</mo><msub><mi>c</mi><mn>0</mn></msub><mo stretchy="false">)</mo><mo>−</mo><mi>ln</mi><mspace width="0.17em"/><mi>cosh</mi><mo stretchy="false">(</mo><msub><mi>c</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow><mi>k</mi></mfrac></math>
+      <math display="block"><msub><mi>v</mi><mi>t</mi></msub><mo>=</mo><msqrt><mfrac><msub><mi>a</mi><mn>0</mn></msub><mi>k</mi></mfrac></msqrt></math><math display="block"><msub><mi>c</mi><mn>0</mn></msub><mo>=</mo><mi>artanh</mi><mo>(</mo><mfrac><msub><mi>v</mi><mn>0</mn></msub><msub><mi>v</mi><mi>t</mi></msub></mfrac><mo>)</mo></math>
+      <p class="eqn-note">v<sub>t</sub> is the terminal velocity where thrust and drag balance. Each leg stops at whichever comes first, the target speed or the distance cap. Reaching v* takes t = [artanh(v*/v<sub>t</sub>) − c<sub>0</sub>]/(k·v<sub>t</sub>), and covering a distance d takes u<sub>d</sub> = arcosh(cosh c<sub>0</sub> · e<sup>kd</sup>). I compute ln cosh x as |x| − ln 2 + ln(1 + e<sup>−2|x|</sup>) so an underpowered vehicle with a large k·d doesn't overflow.</p>
+    </div>
+
+    <h4>Cruise speed is an output of the throttle</h4>
+    <p>I don't prescribe a cruise speed. Each leg settles at the speed where drag balances the forward thrust the throttle leaves over. Tilting the rotors to push forward costs weight support, so forward thrust is what remains after supporting the weight the wing doesn't carry, and the tilt inflates the frontal area that drag sees.</p>
+    <div class="eqn-block" tabindex="0" role="group" aria-label="Equilibrium speed equations">
+      <div class="eqn-label">Equilibrium speed under tilt and wing lift</div>
+      <math display="block"><msub><mi>T</mi><mi>h</mi></msub><mo>=</mo><msqrt><mrow><msup><mi>T</mi><mn>2</mn></msup><mo>−</mo><msup><mrow><mo stretchy="false">(</mo><mi>W</mi><mo>−</mo><mi>L</mi><mo stretchy="false">)</mo></mrow><mn>2</mn></msup></mrow></msqrt></math><math display="block"><mi>L</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>ρ</mi><msub><mi>C</mi><mi>L</mi></msub><mi>S</mi><msup><mi>v</mi><mn>2</mn></msup></math>
+      <math display="block"><msub><mi>A</mi><mtext>eff</mtext></msub><mo>=</mo><mi>A</mi><mfrac><mi>T</mi><msub><mi>T</mi><mi>h</mi></msub></mfrac><mo>+</mo><mfrac><mrow><msub><mi>C</mi><mrow><mi>D</mi><mn>0</mn></mrow></msub><mi>S</mi></mrow><msub><mi>C</mi><mi>d</mi></msub></mfrac></math><math display="block"><msub><mi>T</mi><mi>h</mi></msub><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>ρ</mi><msub><mi>C</mi><mi>d</mi></msub><msub><mi>A</mi><mtext>eff</mtext></msub><msubsup><mi>v</mi><mtext>eq</mtext><mn>2</mn></msubsup></math>
+      <p class="eqn-note">I solve the right-hand equation for v<sub>eq</sub> with Brent's method, and fly each leg at min(0.995·v<sub>eq</sub>, v<sub>max</sub>). The cap v<sub>max</sub> is 18 m/s (about 35 kt): a bare thrust-drag balance comes out at triple-digit speeds for these small frontal areas, which no cargo VTOL in this weight class will fly.</p>
+    </div>
+
+    <h4>Braking uses the rotors</h4>
+    <p>The decel leg is the accel equation with the thrust pointed the other way, so it has a closed form too. I first let the vehicle coast down on drag alone, but a coast takes time proportional to 1/k, so a lower-drag vehicle took longer to finish a leg. That's backwards for a VTOL that can brake with its rotors.</p>
+    <div class="eqn-block" tabindex="0" role="group" aria-label="Powered braking equations">
+      <div class="eqn-label">Powered braking down to the approach speed</div>
+      <math display="block"><mfrac><mrow><mi>d</mi><mi>v</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mo>−</mo><mo stretchy="false">(</mo><msub><mi>a</mi><mn>0</mn></msub><mo>+</mo><mi>k</mi><msup><mi>v</mi><mn>2</mn></msup><mo stretchy="false">)</mo></math><math display="block"><mi>b</mi><mo>=</mo><msqrt><mfrac><msub><mi>a</mi><mn>0</mn></msub><mi>k</mi></mfrac></msqrt></math>
+      <math display="block"><mi>x</mi><mo>=</mo><mfrac><mn>1</mn><mrow><mn>2</mn><mi>k</mi></mrow></mfrac><mi>ln</mi><mspace width="0.17em"/><mfrac><mrow><msub><mi>a</mi><mn>0</mn></msub><mo>+</mo><mi>k</mi><msubsup><mi>v</mi><mn>0</mn><mn>2</mn></msubsup></mrow><mrow><msub><mi>a</mi><mn>0</mn></msub><mo>+</mo><mi>k</mi><msubsup><mi>v</mi><mi>f</mi><mn>2</mn></msubsup></mrow></mfrac></math><math display="block"><mi>t</mi><mo>=</mo><mfrac><mrow><mi>arctan</mi><mo stretchy="false">(</mo><msub><mi>v</mi><mn>0</mn></msub><mo>/</mo><mi>b</mi><mo stretchy="false">)</mo><mo>−</mo><mi>arctan</mi><mo stretchy="false">(</mo><msub><mi>v</mi><mi>f</mi></msub><mo>/</mo><mi>b</mi><mo stretchy="false">)</mo></mrow><mrow><mi>k</mi><mi>b</mi></mrow></mfrac></math>
+      <p class="eqn-note">v<sub>0</sub> is the cruise speed the leg starts from, and v<sub>f</sub> is the 1 m/s landing-approach floor.</p>
+    </div>
+
+    <h4>Energy and feasibility</h4>
+    <p>Battery use is current times time, with the current read off the same throttle curve as the thrust. A configuration is feasible if the legs together stay inside the battery's rated capacity. Energy adds across legs and no leg's time budget constrains another, so maximizing leftover energy is the same as minimizing each of the six powered legs (three takeoffs, three cruises) on its own. That turns one joint throttle search into six one-dimensional sweeps over 40–100% throttle.</p>
+    <div class="eqn-block" tabindex="0" role="group" aria-label="Energy and feasibility equations">
+      <div class="eqn-label">Per-leg energy and the feasibility test</div>
+      <math display="block"><msub><mi>E</mi><mtext>leg</mtext></msub><mo>=</mo><mi>N</mi><mo>·</mo><mi>I</mi><mo stretchy="false">(</mo><mi>θ</mi><mo stretchy="false">)</mo><mo>·</mo><mfrac><msub><mi>t</mi><mtext>leg</mtext></msub><mn>3600</mn></mfrac></math><math display="block"><munder><mo>∑</mo><mtext>legs</mtext></munder><msub><mi>E</mi><mtext>leg</mtext></msub><mo>≤</mo><msub><mi>C</mi><mtext>rated</mtext></msub></math>
+      <p class="eqn-note">E in mAh. Landing isn't optimized: descent is prescribed at 5 m/s down to 10 ft and 1 m/s below that, drawing the 40%-throttle current scaled linearly to 30% and then 20% throttle. The payload rides the outbound 8 nm leg only.</p>
+    </div>
+    <p>The limit I know about: capacity is the rated mAh, flat. Peukert derating is a lead-acid effect that barely touches Li-ion at drone C-rates, but voltage sag under load can trip the cutoff before the rated capacity is drawn. For a high-current or aged pack I'd expect roughly 10–30% less usable capacity. That range is an order-of-magnitude estimate from hobbyist sources, and modeling it properly needs internal-resistance data I don't have.</p>
+
+    <h4>The transition leg</h4>
     <p>A winged tailsitter's hover-to-cruise transition can't take that shortcut. The rotor thrust has to physically rotate from vertical to horizontal as the wing builds lift with airspeed, so the required thrust angle and the drag area both keep changing through the maneuver. I integrate that leg as a full quaternion 6DOF rigid body, position, velocity, attitude, and angular rate together. Attitude kinematics: <code>q̇ = ½ q ⊗ [0, ω]</code> (Hamilton, scalar-first), alongside the rotational dynamics <code>I ω̇ = τ − ω × (Iω)</code>. I use quaternions specifically because Euler angles hit a gimbal-lock singularity right at the 90° pitch-over a tailsitter transition goes through.</p>
     <p>Lift points along the wing's own body-fixed axis and scales with the velocity component perpendicular to it, rather than pointing straight up and scaling with raw airspeed the way a simpler model would. That distinction matters most mid-transition, when the vehicle is neither purely hovering nor purely cruising and a fixed lift direction isn't a safe approximation.</p>
+    <div class="eqn-block" tabindex="0" role="group" aria-label="Attitude control and lift equations">
+      <div class="eqn-label">Attitude controller, lift direction, and inertia</div>
+      <math display="block"><mi>e</mi><mo>=</mo><mi>log</mi><mo stretchy="false">(</mo><msup><mi>q</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>⊗</mo><msub><mi>q</mi><mtext>target</mtext></msub><mo stretchy="false">)</mo></math><math display="block"><mi>τ</mi><mo>=</mo><mi>clip</mi><mo stretchy="false">(</mo><msub><mi>k</mi><mi>p</mi></msub><mi>I</mi><mi>e</mi><mo>−</mo><msub><mi>k</mi><mi>d</mi></msub><mi>I</mi><mi>ω</mi><mo>,</mo><mo>±</mo><msub><mi>τ</mi><mtext>max</mtext></msub><mo stretchy="false">)</mo></math>
+      <math display="block"><mover><mi>L</mi><mo>→</mo></mover><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>ρ</mi><msub><mi>C</mi><mi>L</mi></msub><mi>S</mi><msup><mrow><mo stretchy="false">|</mo><msub><mi>v</mi><mo>⊥</mo></msub><mo stretchy="false">|</mo></mrow><mn>2</mn></msup><mover><mi>a</mi><mo>^</mo></mover></math><math display="block"><msub><mi>v</mi><mo>⊥</mo></msub><mo>=</mo><mi>v</mi><mo>−</mo><mo stretchy="false">(</mo><mi>v</mi><mo>·</mo><mover><mi>a</mi><mo>^</mo></mover><mo stretchy="false">)</mo><mover><mi>a</mi><mo>^</mo></mover></math>
+      <math display="block"><msub><mi>I</mi><mi>x</mi></msub><mo>=</mo><mi>m</mi><msup><mrow><mo stretchy="false">(</mo><mn>0.25</mn><mfrac><mi>b</mi><mn>2</mn></mfrac><mo stretchy="false">)</mo></mrow><mn>2</mn></msup></math><math display="block"><msub><mi>I</mi><mi>y</mi></msub><mo>=</mo><mi>m</mi><msup><mrow><mo stretchy="false">(</mo><mn>0.35</mn><mfrac><mi>l</mi><mn>2</mn></mfrac><mo stretchy="false">)</mo></mrow><mn>2</mn></msup></math><math display="block"><msub><mi>I</mi><mi>z</mi></msub><mo>=</mo><msub><mi>I</mi><mi>x</mi></msub><mo>+</mo><msub><mi>I</mi><mi>y</mi></msub></math>
+      <p class="eqn-note">The log map returns the shortest-path rotation vector, an angle of 2·atan2(|v|, w) wrapped to ±π. The lift axis â is the body −x axis, which points straight up at cruise attitude and edge-on at hover. Inertia comes from Roskam's radii of gyration for light aircraft (b is wingspan, l is body length), and τ<sub>max</sub> is the single-motor thrust range times a half-length arm, with yaw authority set to 20% of pitch. Those are estimates until CAD gives real principal moments, and I can override them per vehicle. I integrate with an adaptive solver (rtol 1e-6, max step 0.5 s) until forward speed reaches the target or the distance cap.</p>
+    </div>
   </div>
 
-  <h6 class="subhead">Outcome</h6>
+  <h3 class="subhead">Outcome</h3>
   <div class="figure-card">
     <div class="figure-title">The fixed 11-leg course</div>
     <div data-fig="missionCourseFigure"></div>
@@ -385,41 +463,63 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
       <span class="tradespace-legend-item"><span class="tradespace-dot" style="background:var(--color-accent)"></span>Infeasible (<span id="tradespaceInfeasN"></span>)</span>
     </div>
     <div class="tradespace-canvas-wrap">
-      <canvas id="tradespaceCanvas"></canvas>
+      <canvas id="tradespaceCanvas" role="img" aria-label="Scatter plot of all 2,793 motor, propeller, and battery configurations, colored feasible or infeasible. Use the axis buttons above to change the plotted pair."></canvas>
       <div class="tradespace-tooltip" id="tradespaceTooltip"></div>
     </div>
     <div class="tradespace-axis-label" id="tradespaceXLabel"></div>
-    <div style="margin-top:var(--space-3)"><a class="btn btn-secondary" href="demos/mission-model-tradespace.html" target="_blank" rel="noopener">Open 3D tradespace ↗</a></div>
+    <div style="margin-top:var(--space-3)"><a class="btn btn-secondary" href="demos/mission-model-tradespace.html" target="_blank" rel="noopener">Open 3D tradespace <span aria-hidden="true">↗</span><span class="sr-only">(opens in new tab)</span></a></div>
   </div>
 
-  <div style="margin-top:var(--space-4)"><a class="btn btn-secondary" href="https://github.com/exs783/Log_Reader" target="_blank" rel="noopener">View repo ↗</a></div>
+  <div style="margin-top:var(--space-4)"><a class="btn btn-secondary" href="https://github.com/exs783/Log_Reader" target="_blank" rel="noopener">View repo <span aria-hidden="true">↗</span><span class="sr-only">(opens in new tab)</span></a></div>
 </section>
 
 <!-- ============================= WING OPTIMIZER ============================= -->
 <section class="project-section" id="wing-optimizer">
-  <a class="back-to-reel" href="#reel">← Back to reel</a>
+  <a class="back-to-reel" href="#reel">← All projects</a>
   <div class="project-head">
-    <div>
-      <span class="tag tag-outline">Optimization tool · 2026</span>
-      <h2 style="margin-top:var(--space-2)">Wing Optimizer</h2>
-    </div>
+    <h2>Wing Optimizer</h2>
   </div>
   <p class="project-tagline">A wing-sizing tool that searches lift coefficient, aspect ratio, and taper ratio for whichever combination minimizes structural mass, cruise drag, or total mission energy. Three of its search objectives are grounded in real aerostructural optimization papers. It doesn't claim to replicate methods like RANS CFD, nonlinear FE, or flight test — a standalone script can't actually run those.</p>
+  <div class="titleblock">
+    <div><span class="tb-label">Discipline</span><span class="tb-value">Optimization tool</span></div>
+    <div><span class="tb-label">Year</span><span class="tb-value">2026</span></div>
+    <div><span class="tb-label">Built with</span><span class="tb-value">Python</span></div>
+    <div><span class="tb-label">Repository</span><span class="tb-value">exs783/Log_Reader</span></div>
+  </div>
 
-  <h6 class="subhead">Overview</h6>
+  <h3 class="subhead">Overview</h3>
   <div class="method-copy">
     <p><code>wing_optimizer.py</code> sizes a wing from mission requirements alone. It takes how much weight the wing has to lift and how fast the aircraft cruises, then searches lift coefficient, aspect ratio, and (for the energy objective) taper ratio for whichever combination minimizes structural mass, cruise drag, or total mission energy. It emits the winning geometry as SolidWorks-ready NACA equations or point-cloud curves, plus a <code>vehicle_configs</code>-style JSON entry Mission Model can load directly.</p>
     <p>Three of its objectives are each grounded in one real aerostructural optimization paper. The method below covers what carried over from each paper, and what I deliberately left out of scope.</p>
   </div>
 
-  <h6 class="subhead">Method</h6>
+  <h3 class="subhead">Method</h3>
   <div class="method-copy">
     <p><strong>Aerodynamic-center reporting</strong> is inspired by Grimm, Price &amp; Ahmad's flight-tested flying-wing optimization (<em>Aerospace Systems</em>, 2026), which treats longitudinal stability as the primary design objective. <code>wing_mac_and_ac()</code> reports the wing's own mean aerodynamic chord and where its aerodynamic center sits relative to the root leading edge. Both come straight from closed-form wing-theory integrals for the linear-taper and elliptical planform, not from a table: <code>c̄ = (2/3)c_root(1+λ+λ²)/(1+λ)</code>, <code>x_AC = ȳ·tan(Λ) + 0.25c̄</code>. This only covers the wing's own half of a stability check. A real static margin also needs the aircraft's CG and any tail, which is out of scope for a wing-only script.</p>
     <p><strong>Two wing-mass models.</strong> <code>--mass-model empirical</code> is a single fitted AR^0.5 exponent. <code>--mass-model beam</code> is inspired by Zhao et al.'s finite-element model updating for a composite flying-wing (AIAA SciTech 2019, 2019-1814), which calibrates mass and stiffness against real vibration-test data. It makes two real structural drivers explicit instead: ultimate load factor and airfoil thickness ratio, through a first-order beam-bending scaling, <code>m ∝ (AR/AR_ref)^1.5 · (n/n_ref) · (t/c_ref ÷ t/c)^0.5</code>. The AR penalty is steeper, load factor enters linearly, and thinner airfoils cost more mass. It's a physically-derived scaling, not a named curve fit, so it isn't borrowing anyone else's exact coefficients.</p>
     <p><strong>Joint taper search.</strong> <code>--objective combined</code> searches taper jointly with cl and aspect ratio, inspired by Bombardieri et al.'s coupled aerostructural wing optimization (<em>Structural and Multidisciplinary Optimization</em>, 2021). Their central finding is that optimizing aerodynamics and structure separately misses real gains a coupled search finds. Taper's only channel into this model is bending relief to wing mass to hover energy, <code>η_bend = 2(1+2λ)/(3(1+λ))</code>, weighed against induced drag from the Oswald-efficiency estimate, <code>e₀ = 4.61(1−0.045·AR^0.68)cos(Λ)^0.15 − 3.1</code>, <code>C_Di = C_L²/(π·AR·e₀)</code>. That's a narrower coupling than the paper's full aero-structural one, but it's real: a taper that trades structural weight for nothing in cruise drag gets evaluated by the same objective as cl and AR, not decided in a separate step.</p>
+
+    <h4>Sizing the wing</h4>
+    <p>Everything starts from the lift equation. The wing has to carry the lift mass at cruise speed, so the lift coefficient fixes the required area, and the aspect ratio then splits that area into span and chord.</p>
+    <div class="eqn-block" tabindex="0" role="group" aria-label="Wing sizing equations">
+      <div class="eqn-label">Area, span, and chord</div>
+      <math display="block"><mi>S</mi><mo>=</mo><mfrac><mrow><mn>2</mn><mi>m</mi><mi>g</mi></mrow><mrow><mi>ρ</mi><msub><mi>C</mi><mi>L</mi></msub><msup><mi>v</mi><mn>2</mn></msup></mrow></mfrac></math><math display="block"><mi>b</mi><mo>=</mo><msqrt><mrow><mi>A</mi><mi>R</mi><mo>·</mo><mi>S</mi></mrow></msqrt></math><math display="block"><mover><mi>c</mi><mo>¯</mo></mover><mo>=</mo><mfrac><mi>S</mi><mi>b</mi></mfrac></math>
+      <math display="block"><msub><mi>c</mi><mtext>root</mtext></msub><mo>=</mo><mfrac><mrow><mn>2</mn><mover><mi>c</mi><mo>¯</mo></mover></mrow><mrow><mn>1</mn><mo>+</mo><mi>λ</mi></mrow></mfrac></math><math display="block"><msub><mi>c</mi><mtext>tip</mtext></msub><mo>=</mo><mi>λ</mi><msub><mi>c</mi><mtext>root</mtext></msub></math><math display="block"><mtext>(elliptical:</mtext><mspace width="0.4em"/><msub><mi>c</mi><mtext>root</mtext></msub><mo>=</mo><mfrac><mrow><mn>4</mn><mi>S</mi></mrow><mrow><mi>π</mi><mi>b</mi></mrow></mfrac><mtext>)</mtext></math>
+      <p class="eqn-note">Area scales as 1/v², the same relationship that makes Mission Model's cruise speed matter so much. Mean chord is S/b regardless of taper; taper only changes how that mean splits between root and tip.</p>
+    </div>
+
+    <h4>The energy objective</h4>
+    <p>The energy objective adds two costs that pull in opposite directions. A higher aspect ratio cuts induced drag, which saves cruise energy. It also makes the wing heavier, and a heavier wing costs more energy to hover. The search finds where those cancel.</p>
+    <div class="eqn-block" tabindex="0" role="group" aria-label="Energy objective equations">
+      <div class="eqn-label">Total mission energy for one candidate wing</div>
+      <math display="block"><mi>E</mi><mo>=</mo><mi>D</mi><mo>·</mo><mi>v</mi><mo>·</mo><msub><mi>t</mi><mtext>cruise</mtext></msub><mo>+</mo><msub><mi>P</mi><mtext>hover</mtext></msub><mo>·</mo><msub><mi>t</mi><mtext>hover</mtext></msub></math>
+      <math display="block"><mi>D</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>ρ</mi><msup><mi>v</mi><mn>2</mn></msup><mi>S</mi><mo stretchy="false">(</mo><msub><mi>C</mi><mrow><mi>D</mi><mn>0</mn></mrow></msub><mo>+</mo><msub><mi>C</mi><mrow><mi>D</mi><mi>i</mi></mrow></msub><mo stretchy="false">)</mo></math><math display="block"><msub><mi>C</mi><mrow><mi>D</mi><mi>i</mi></mrow></msub><mo>=</mo><mfrac><msubsup><mi>C</mi><mi>L</mi><mn>2</mn></msubsup><mrow><mi>π</mi><mo>·</mo><mi>A</mi><mi>R</mi><mo>·</mo><msub><mi>e</mi><mn>0</mn></msub></mrow></mfrac></math>
+      <math display="block"><msub><mi>P</mi><mtext>hover</mtext></msub><mo>=</mo><mfrac><msup><mrow><mo>[</mo><mo stretchy="false">(</mo><mi>m</mi><mo>+</mo><msub><mi>m</mi><mtext>wing</mtext></msub><mo stretchy="false">)</mo><mi>g</mi><mo>]</mo></mrow><mrow><mn>3</mn><mo>/</mo><mn>2</mn></mrow></msup><mrow><mi>F</mi><mi>M</mi><mo>·</mo><msqrt><mrow><mn>2</mn><mi>ρ</mi><msub><mi>A</mi><mtext>disk</mtext></msub></mrow></msqrt></mrow></mfrac></math><math display="block"><msub><mi>A</mi><mtext>disk</mtext></msub><mo>=</mo><mfrac><mi>m</mi><mtext>disk loading</mtext></mfrac></math>
+      <p class="eqn-note">The hover term is ideal momentum-theory induced power divided by a figure of merit. FM = 0.6, from a multicopter endurance paper that states typical propellers land between 0.5 and 0.7 (arXiv:2109.04741). The disk is fixed hardware sized once at the baseline mass, so a heavier wing changes the weight the disk lifts, not its area. e₀ is Raymer's fit up to AR 13, and above that I switch to Obert's e₀ = 1/(1.05 + 0.007π·AR), because Raymer's fit crosses zero near AR 18.5. The search is a 100 × 100 grid over C<sub>L</sub> and AR, with a 20-step taper search added under the combined objective.</p>
+    </div>
   </div>
 
-  <h6 class="subhead">Outcome</h6>
+  <h3 class="subhead">Outcome</h3>
   <div class="figure-card">
     <div class="figure-title">Search landscape</div>
     <div data-fig="heatmapFigure"></div>
@@ -441,35 +541,55 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     <div class="figure-caption">Computed live from the same closed-form thickness/camber equations naca4_airfoil_point() uses — the exact surface, not a traced shape. Dashed line is the camber line; camber and thickness are what --naca hands to SolidWorks as parametric equations.</div>
   </div>
 
-  <div style="margin-top:var(--space-4)"><a class="btn btn-secondary" href="https://github.com/exs783/Log_Reader" target="_blank" rel="noopener">View repo ↗</a></div>
+  <div style="margin-top:var(--space-4)"><a class="btn btn-secondary" href="https://github.com/exs783/Log_Reader" target="_blank" rel="noopener">View repo <span aria-hidden="true">↗</span><span class="sr-only">(opens in new tab)</span></a></div>
 </section>
 
 <!-- ============================= LOG DASHBOARD ============================= -->
 <section class="project-section" id="log-dashboard">
-  <a class="back-to-reel" href="#reel">← Back to reel</a>
+  <a class="back-to-reel" href="#reel">← All projects</a>
   <div class="project-head">
-    <div>
-      <span class="tag tag-outline">Flight-data tooling · 2026</span>
-      <h2 style="margin-top:var(--space-2)">Log Dashboard</h2>
-    </div>
-    <a class="btn btn-primary" href="demos/log-dashboard.html">Live demo ↗</a>
+    <h2>Log Dashboard</h2>
+    <a class="btn btn-primary" href="demos/log-dashboard.html">Live demo <span aria-hidden="true">→</span></a>
   </div>
   <p class="project-tagline">A Flask + Plotly dashboard that decodes ArduCopter/PX4 flight logs into a full diagnostic report. Upload your own flight log below and get back the score, the issues list, and every chart, real.</p>
+  <div class="titleblock">
+    <div><span class="tb-label">Discipline</span><span class="tb-value">Flight-data tooling</span></div>
+    <div><span class="tb-label">Year</span><span class="tb-value">2026</span></div>
+    <div><span class="tb-label">Built with</span><span class="tb-value">Python, Flask, Plotly, pymavlink</span></div>
+    <div><span class="tb-label">Repository</span><span class="tb-value">exs783/Log_Reader</span></div>
+  </div>
 
-  <h6 class="subhead">Overview</h6>
+  <h3 class="subhead">Overview</h3>
   <div class="method-copy">
     <p>Every ArduPilot-based flight controller (Pixhawk and compatibles) writes a binary <code>.BIN</code> log of everything it measured mid-flight, hundreds of message types at up to a few hundred Hz. Reading that raw log to answer "was this flight okay, and if not, why" normally means a separate desktop tool (MAVExplorer) and manual digging. This dashboard does that automatically. Upload a log and get back attitude tracking, vibration spectra, motor balance, PID tracking, GPS track, battery health, and barometer/magnetometer data across dedicated tabs, plus one overall flight-quality verdict.</p>
     <p>It's built for the same audience Mission Model is: someone who just flew a real airframe and needs to know whether the motors, frame, or tuning are actually behaving before flying again, not a generic telemetry viewer.</p>
   </div>
 
-  <h6 class="subhead">Method</h6>
+  <h3 class="subhead">Method</h3>
   <div class="method-copy">
-    <p>The backend (<code>python_backend.py</code>) reads a raw <code>.BIN</code> log with <code>pymavlink</code>, walks its message stream, and classifies the airframe from its frame-type parameter (quad/hex/octo/X8/tri/Y3/Y6). Vibration channels get an FFT pass, <code>X(f) = ℱ{a(t)} = ∫ a(t)·e^(−i2πft) dt</code>, mirroring the analysis MAVExplorer does for ArduPilot logs.</p>
+    <p>The backend (<code>python_backend.py</code>) reads a raw <code>.BIN</code> log with <code>pymavlink</code>, walks its message stream, and classifies the airframe from its frame-type parameter (quad/hex/octo/X8/tri/Y3/Y6). Vibration comes from the IMU's three accelerometer axes, and I look at it two ways: how big it is, and what frequency it lives at.</p>
     <p>Ten analysis passes run per log: IMU, vibration, attitude, battery, motors, PID/rate controller, GPS, barometer, magnetometer, and discrete flight events (mode changes, arming, errors), each producing its own stats block. A summary pass then scores the flight 0–100 and lists specific issues (e.g. "poor roll stability," "motor sync issues") instead of just dumping charts and leaving the reader to spot problems.</p>
     <p>The dashboard (<code>log_dashboard.html</code>) renders the decoded series with Plotly, plus a Custom Plot tab that lets you overlay any two decoded variables against time regardless of category. That's useful for correlating, say, vibration against throttle.</p>
+
+    <h4>Vibration</h4>
+    <p>I estimate the sample rate from the median gap between timestamps. Size comes from combining the three axes into one magnitude and taking its RMS, which I grade against fixed thresholds. Frequency comes from Welch's method, which averages the spectra of overlapping segments and gives a smoother estimate than one raw FFT, plus a raw FFT to pick out the strongest peak in the 20–500 Hz motor band.</p>
+    <div class="eqn-block" tabindex="0" role="group" aria-label="Vibration analysis equations">
+      <div class="eqn-label">Magnitude, sample rate, and the dominant frequency</div>
+      <math display="block"><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow><mo>=</mo><msqrt><mrow><msubsup><mi>a</mi><mi>x</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>a</mi><mi>y</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>a</mi><mi>z</mi><mn>2</mn></msubsup></mrow></msqrt></math><math display="block"><msub><mi>a</mi><mtext>rms</mtext></msub><mo>=</mo><msqrt><mrow><mo stretchy="false">⟨</mo><msup><mrow><mo stretchy="false">|</mo><mi>a</mi><mo stretchy="false">|</mo></mrow><mn>2</mn></msup><mo stretchy="false">⟩</mo></mrow></msqrt></math><math display="block"><msub><mi>f</mi><mi>s</mi></msub><mo>=</mo><mfrac><msup><mn>10</mn><mn>6</mn></msup><mrow><mi>median</mi><mo stretchy="false">(</mo><mi mathvariant="normal">Δ</mi><msub><mi>t</mi><mtext>µs</mtext></msub><mo stretchy="false">)</mo></mrow></mfrac></math>
+      <math display="block"><mi>X</mi><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo><mo>=</mo><mrow><mo stretchy="false">|</mo><mi>ℱ</mi><mo stretchy="false">{</mo><mi>a</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo stretchy="false">}</mo><mo stretchy="false">|</mo></mrow><mo>=</mo><mrow><mo stretchy="false">|</mo><mo>∫</mo><mi>a</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>i</mi><mn>2</mn><mi>π</mi><mi>f</mi><mi>t</mi></mrow></msup><mi>d</mi><mi>t</mi><mo stretchy="false">|</mo></mrow></math><math display="block"><msup><mi>f</mi><mo>*</mo></msup><mo>=</mo><munder><mi>argmax</mi><mrow><mn>20</mn><mo>≤</mo><mi>f</mi><mo>≤</mo><mn>500</mn></mrow></munder><msub><mi>X</mi><mi>z</mi></msub><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo></math>
+      <p class="eqn-note">a<sub>rms</sub> under 30 m/s² grades good, 30–60 elevated, and above 60 critical. Each Welch segment is about two seconds of samples, never fewer than 256, and I plot the square root of the PSD so the axis reads closer to acceleration units. The Z-axis peak f* is what the dashboard suggests as a notch-filter frequency. This is the same analysis MAVExplorer does for ArduPilot logs, run automatically.</p>
+    </div>
+
+    <h4>The flight-quality score</h4>
+    <p>The score is a deduction ledger, not a learned model. It starts at 100 and every check that trips subtracts a fixed penalty, so you can always trace a number back to the finding that cost it.</p>
+    <div class="eqn-block" tabindex="0" role="group" aria-label="Flight-quality score equation">
+      <div class="eqn-label">Score and verdict</div>
+      <math display="block"><mi>S</mi><mo>=</mo><mi>max</mi><mo stretchy="false">(</mo><mn>0</mn><mo>,</mo><mn>100</mn><mo>−</mo><munder><mo>∑</mo><mi>i</mi></munder><msub><mi>p</mi><mi>i</mi></msub><mo stretchy="false">)</mo></math><math display="block"><msub><mi>p</mi><mi>i</mi></msub><mo>∈</mo><mo stretchy="false">{</mo><mn>5</mn><mo>,</mo><mn>10</mn><mo>,</mo><mn>15</mn><mo>,</mo><mn>20</mn><mo stretchy="false">}</mo></math>
+      <p class="eqn-note">Penalties: critical vibration −20 (elevated −10); accelerometer noise above 15 m/s² −10 per axis; attitude error RMS above 5 −5 per axis; voltage sag above 2 V −10; minimum voltage below 10 V −15; motor imbalance above 15% −10; motor sync error above 5 −5; motor correlation below 0.85 −5; rate-controller error RMS above 10 −5 per axis; more than 5 flight events −10. Verdicts: 90 and up Excellent, 75 Good, 60 Fair, 40 Poor, below that Critical. The sample flight lost 35 points across 7 findings and scored 65, Fair.</p>
+    </div>
   </div>
 
-  <h6 class="subhead">Outcome</h6>
+  <h3 class="subhead">Outcome</h3>
   <div class="figure-card">
     <div class="figure-title">Attitude tracking</div>
     <div data-fig="attitudeTrackFigure"></div>
@@ -483,29 +603,32 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 
   <div style="margin-top:var(--space-4);display:flex;gap:var(--space-3);flex-wrap:wrap">
     <a class="btn btn-primary" href="demos/log-dashboard.html">Live demo</a>
-    <a class="btn btn-secondary" href="https://github.com/exs783/Log_Reader" target="_blank" rel="noopener">View repo ↗</a>
+    <a class="btn btn-secondary" href="https://github.com/exs783/Log_Reader" target="_blank" rel="noopener">View repo <span aria-hidden="true">↗</span><span class="sr-only">(opens in new tab)</span></a>
   </div>
 </section>
 
 <!-- ============================= LIQUID ROCKET ============================= -->
 <section class="project-section" id="liquid-rocket">
-  <a class="back-to-reel" href="#reel">← Back to reel</a>
+  <a class="back-to-reel" href="#reel">← All projects</a>
   <div class="project-head">
-    <div>
-      <span class="tag tag-outline">CWRU Liquid Propulsion Team · 2026</span>
-      <h2 style="margin-top:var(--space-2)">Liquid Rocket</h2>
-    </div>
+    <h2>Liquid Rocket</h2>
   </div>
   <p class="project-tagline">Ground-station software for CWRU's Liquid Propulsion Team, rebuilt from two prototypes that were never actually integrated into one working app, one of them my own original hot-fire GUI.</p>
+  <div class="titleblock">
+    <div><span class="tb-label">Team</span><span class="tb-value">CWRU Liquid Propulsion</span></div>
+    <div><span class="tb-label">Year</span><span class="tb-value">2026</span></div>
+    <div><span class="tb-label">Built with</span><span class="tb-value">PyQt6</span></div>
+    <div><span class="tb-label">Repository</span><span class="tb-value">exs783/Liquid-Rocket</span></div>
+  </div>
 
-  <h6 class="subhead">Overview</h6>
+  <h3 class="subhead">Overview</h3>
   <div class="method-copy">
     <p>On CWRU's Liquid Propulsion Team (Aug 2025 – Jan 2026) I designed the mechanical thrust-control hardware for hot-fire tests, solenoids and servos regulating propellant flow, and built the PyQt5 control GUI that ran the hot-fire sequences against it.</p>
     <p>A liquid rocket static test (or hot-fire test) needs a ground station: software running on a laptop near the test stand that shows the person running the test what's happening in real time, tank and chamber pressures, temperatures, thrust (via a load cell), and lets them open or close valves and fire the igniter without touching the hardware directly. Every reading also needs to be logged, since post-test analysis (did the chamber pressure spike, did a valve stick) depends on having the full data, not just what was visible live.</p>
     <p>This app is that ground station, rebuilt: a P&amp;ID (piping-and-instrumentation diagram) view for valve control, a live-gauge view for the 9 real sensor channels, and a logging view that records a full test session to CSV.</p>
   </div>
 
-  <h6 class="subhead">Method</h6>
+  <h3 class="subhead">Method</h3>
   <div class="method-copy">
     <p>The repo held two separate PyQt prototypes on incompatible Qt bindings: my own original PyQt5 data-logging page (<code>main_v2.py</code>) from the actual hot-fire tests, and a separate PyQt6 P&amp;ID valve-control page. Its own readme said as much: "still needs to be integrated with the other page."</p>
     <p>I rebuilt it as one PyQt6 app (<code>ground_station/</code>) sharing a single sensor/valve state across three tabs: Controls (the real P&amp;ID diagram plus working valve toggles), Live Data (one gauge per real sensor channel), and Logging (start/stop to the documented raw + interpolated CSV pair).</p>
@@ -513,7 +636,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     <p>The live demo linked below is a from-scratch JavaScript port of that same protocol and gauge math, not a screen recording. It runs the identical random-walk sensor simulation and the identical SVG gauge/valve drawing code the Python app uses, so what you click there is what the desktop app actually does with no hardware attached.</p>
   </div>
 
-  <h6 class="subhead">Outcome</h6>
+  <h3 class="subhead">Outcome</h3>
   <div class="figure-card">
     <div class="figure-title">Data flow</div>
     <div data-fig="flowFigure"></div>
@@ -529,35 +652,39 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 
   <div style="margin-top:var(--space-4);display:flex;gap:var(--space-3);flex-wrap:wrap">
     <a class="btn btn-primary" href="demos/liquid-rocket.html">Live demo</a>
-    <a class="btn btn-secondary" href="https://github.com/exs783/Liquid-Rocket" target="_blank" rel="noopener">View repo ↗</a>
+    <a class="btn btn-secondary" href="https://github.com/exs783/Liquid-Rocket" target="_blank" rel="noopener">View repo <span aria-hidden="true">↗</span><span class="sr-only">(opens in new tab)</span></a>
   </div>
 </section>
 
 <!-- ============================= HEXACOPTER DRONE ============================= -->
 <section class="project-section" id="hexacopter-drone">
-  <a class="back-to-reel" href="#reel">← Back to reel</a>
+  <a class="back-to-reel" href="#reel">← All projects</a>
   <div class="project-head">
-    <div>
-      <span class="tag tag-outline">SolidWorks CAD · VFS DBVF</span>
-      <h2 style="margin-top:var(--space-2)">Hexacopter Drone</h2>
-    </div>
+    <h2>Hexacopter Drone</h2>
   </div>
   <p class="project-tagline">Design, manufacturing, and testing of a hexacopter drone for the VFS DBVF competition. I contributed to the frame, motor mounts, sensor mounts, and payload mounts.</p>
+  <div class="titleblock">
+    <div><span class="tb-label">Discipline</span><span class="tb-value">CAD</span></div>
+    <div><span class="tb-label">Built with</span><span class="tb-value">SolidWorks</span></div>
+    <div><span class="tb-label">Competition</span><span class="tb-value">VFS DBVF</span></div>
+    <div><span class="tb-label">Assembly</span><span class="tb-value">CompDrone2025</span></div>
+  </div>
 
-  <h6 class="subhead">Overview</h6>
+  <h3 class="subhead">Overview</h3>
   <div class="method-copy">
     <p>CompDrone2025 is the full hexacopter assembly built for the VFS Design-Build-Vertical-Flight competition: carbon-fiber tube arms, a machined frame, RTK GPS and Pixhawk avionics mounts, a servo-actuated payload-drop mechanism, and folding landing gear, all as real mated SolidWorks assemblies. The model below is the actual assembly, exported to glTF so it's something you can rotate rather than a fixed render. It also doubles as the shared platform CWRU VTOL's Payload, Carbon Fiber, and Flight Testing teams integrate against.</p>
   </div>
 
-  <h6 class="subhead">Method</h6>
+  <h3 class="subhead">Method</h3>
   <div class="method-copy">
     <p>The assembly is organized the way a real drone build actually breaks down: <code>ARM</code> (carbon-fiber tube, motor mount plate/ring, prop), <code>FRM</code> (top/bottom plates, payload mount, protective dome), <code>LGR</code> (landing-gear struts, TPU feet), <code>BATT</code> (battery + velcro strap + printed mount), <code>CAM</code>, <code>PAYLOAD</code> (servo, horn, clamp body, water-bottle attachment), and <code>ELEC</code> (Pixhawk 6X, RTK GPS, baseboard) — seven subassemblies mated into one top-level <code>.SLDASM</code>, each with real vendor parts (T-Motor, Amass, Pixhawk) modeled or imported alongside the machined/printed parts.</p>
   </div>
 
-  <h6 class="subhead">Outcome</h6>
+  <h3 class="subhead">Outcome</h3>
   <div class="figure-card">
     <div class="figure-title">CompDrone2025 — interactive model</div>
     <div data-fig="modelFigureCad"></div>
+    <div class="figure-caption">Click the image to load the interactive 3D model (2.2 MB), then drag to rotate.</div>
   </div>
 
 
@@ -565,68 +692,76 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 
 <!-- ============================= X-8 TAILSITTER ============================= -->
 <section class="project-section" id="x8-tailsitter">
-  <a class="back-to-reel" href="#reel">← Back to reel</a>
+  <a class="back-to-reel" href="#reel">← All projects</a>
   <div class="project-head">
-    <div>
-      <span class="tag tag-outline">SolidWorks CAD</span>
-      <h2 style="margin-top:var(--space-2)">X-8 Tailsitter</h2>
-    </div>
+    <h2>X-8 Tailsitter</h2>
   </div>
   <p class="project-tagline">An adaptation of the Hexacopter Drone into an X-8 tailsitter frame, focused on generating lift from a wing and a high thrust-to-weight ratio.</p>
+  <div class="titleblock">
+    <div><span class="tb-label">Discipline</span><span class="tb-value">CAD</span></div>
+    <div><span class="tb-label">Built with</span><span class="tb-value">SolidWorks</span></div>
+    <div><span class="tb-label">Derived from</span><span class="tb-value">Hexacopter Drone</span></div>
+  </div>
 
-  <h6 class="subhead">Overview</h6>
+  <h3 class="subhead">Overview</h3>
   <div class="method-copy">
     <p>Designed as a derivative of the hexacopter platform. Rather than six rotors on a flat frame, the X-8 layout pairs eight motors (coaxial or square-8 arrangement) beneath a wing so the airframe can pitch over into wing-borne cruise. The design goal is a high thrust-to-weight ratio so the vehicle can still transition and recover reliably even before the wing is generating full lift.</p>
   </div>
 
-  <h6 class="subhead">Outcome</h6>
+  <h3 class="subhead">Outcome</h3>
   <div class="figure-card">
     <div class="figure-title">X-8 Tailsitter</div>
     <div data-fig="x8TiltMotorFigure"></div>
+    <div class="figure-caption">Click the image to load the interactive 3D model (1.4 MB), then drag to rotate.</div>
   </div>
 </section>
 
 <!-- ============================= QUADCOPTER ============================= -->
 <section class="project-section" id="quadcopter">
-  <a class="back-to-reel" href="#reel">← Back to reel</a>
+  <a class="back-to-reel" href="#reel">← All projects</a>
   <div class="project-head">
-    <div>
-      <span class="tag tag-outline">SolidWorks CAD · Teaching</span>
-      <h2 style="margin-top:var(--space-2)">Quadcopter</h2>
-    </div>
+    <h2>Quadcopter</h2>
   </div>
   <p class="project-tagline">A basic quadcopter build teaching newer VTOL members multirotor design fundamentals before they move on to transitioning airframes.</p>
+  <div class="titleblock">
+    <div><span class="tb-label">Discipline</span><span class="tb-value">CAD, teaching</span></div>
+    <div><span class="tb-label">Built with</span><span class="tb-value">SolidWorks</span></div>
+    <div><span class="tb-label">Frame</span><span class="tb-value">5-inch, 4 motors</span></div>
+  </div>
 
-  <h6 class="subhead">Overview</h6>
+  <h3 class="subhead">Overview</h3>
   <div class="method-copy">
     <p>A standard 5-inch quadcopter frame — four arms, four motors, no wing or transition mechanism — used as the entry point for members who haven't designed a multirotor before. Getting comfortable with a basic frame, motor mount, and landing-gear layout here is what makes the added complexity of Tail Sitter Designs and Tilt Rotor Designs approachable later.</p>
   </div>
 
-  <h6 class="subhead">Outcome</h6>
+  <h3 class="subhead">Outcome</h3>
   <div class="figure-card">
     <div class="figure-title">5-inch drone frame</div>
     <div data-fig="quadcopterFigure"></div>
+    <div class="figure-caption">Click the image to load the interactive 3D model (0.7 MB), then drag to rotate.</div>
   </div>
 </section>
 
 <!-- ============================= TAIL SITTER DESIGNS ============================= -->
 <section class="project-section" id="tail-sitter-designs">
-  <a class="back-to-reel" href="#reel">← Back to reel</a>
+  <a class="back-to-reel" href="#reel">← All projects</a>
   <div class="project-head">
-    <div>
-      <span class="tag tag-outline">SolidWorks CAD · Teaching</span>
-      <h2 style="margin-top:var(--space-2)">Tail Sitter Designs</h2>
-    </div>
+    <h2>Tail Sitter Designs</h2>
   </div>
   <p class="project-tagline">An ongoing project teaching younger VTOL members how to design their own tail sitters and improving the club's ability to design successful transition drones.</p>
+  <div class="titleblock">
+    <div><span class="tb-label">Discipline</span><span class="tb-value">CAD, teaching</span></div>
+    <div><span class="tb-label">Built with</span><span class="tb-value">SolidWorks</span></div>
+    <div><span class="tb-label">Status</span><span class="tb-value">Ongoing</span></div>
+  </div>
 
-  <h6 class="subhead">Overview</h6>
+  <h3 class="subhead">Overview</h3>
   <div class="method-copy">
     <p>Tail-sitters are the simplest wing-based VTOL transition mechanism. The whole airframe pitches over rather than tilting individual motors or wing sections, which makes them the right starting point for members who haven't designed a transitioning aircraft before. The current design under review is a biplane tail-sitter: a small quadcopter core with foils that double as landing gear, weighing an S1223 airfoil against NACA 4412/6412 candidates.</p>
     <p>Design decisions worked through with the team include 2 vs. 4 rotors, one wing vs. two, and how the wings attach to the frame (a matching profile clamp, bolted to the frame). Transition logic gets validated in PX4 + Gazebo SITL simulation before any hardware flies.</p>
   </div>
 
-  <h6 class="subhead">Outcome</h6>
+  <h3 class="subhead">Outcome</h3>
   <div class="figure-card">
     <div class="figure-title">Transition mechanism</div>
     <div data-fig="tailSitterFigure"></div>
@@ -636,21 +771,23 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 
 <!-- ============================= TILT ROTOR DESIGNS ============================= -->
 <section class="project-section" id="tilt-rotor-designs">
-  <a class="back-to-reel" href="#reel">← Back to reel</a>
+  <a class="back-to-reel" href="#reel">← All projects</a>
   <div class="project-head">
-    <div>
-      <span class="tag tag-outline">SolidWorks CAD · Teaching</span>
-      <h2 style="margin-top:var(--space-2)">Tilt Rotor Designs</h2>
-    </div>
+    <h2>Tilt Rotor Designs</h2>
   </div>
   <p class="project-tagline">Similar to Tail Sitter Designs. Teaching new VTOL members how to design tilt rotors and build their own within a semester.</p>
+  <div class="titleblock">
+    <div><span class="tb-label">Discipline</span><span class="tb-value">CAD, teaching</span></div>
+    <div><span class="tb-label">Built with</span><span class="tb-value">SolidWorks</span></div>
+    <div><span class="tb-label">Status</span><span class="tb-value">CAD not yet finalized</span></div>
+  </div>
 
-  <h6 class="subhead">Overview</h6>
+  <h3 class="subhead">Overview</h3>
   <div class="method-copy">
     <p>Where a tail-sitter pitches the whole airframe, a tilt-rotor only rotates the motors from vertical to near-horizontal, letting the fuselage stay level through the transition. That's more mechanically complex than a tail-sitter, but easier on payloads and sensors that need to stay upright. It's the natural next step once members have a tail-sitter under their belt.</p>
   </div>
 
-  <h6 class="subhead">Outcome</h6>
+  <h3 class="subhead">Outcome</h3>
   <div class="figure-card">
     <div class="figure-title">Transition mechanism</div>
     <div data-fig="tiltRotorFigure"></div>
@@ -660,21 +797,24 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 
 <!-- ============================= DARPA LIFT 2028 ============================= -->
 <section class="project-section" id="darpa-lift-2028">
-  <a class="back-to-reel" href="#reel">← Back to reel</a>
+  <a class="back-to-reel" href="#reel">← All projects</a>
   <div class="project-head">
-    <div>
-      <span class="tag tag-outline">SolidWorks CAD · In progress</span>
-      <h2 style="margin-top:var(--space-2)">DARPA Lift 2028</h2>
-    </div>
+    <h2>DARPA Lift 2028</h2>
   </div>
   <p class="project-tagline">A drone built to compete in the DARPA LIFT '28 challenge. The current design is a tail sitter with a low rotor count, being actively adapted.</p>
+  <div class="titleblock">
+    <div><span class="tb-label">Discipline</span><span class="tb-value">CAD</span></div>
+    <div><span class="tb-label">Built with</span><span class="tb-value">SolidWorks</span></div>
+    <div><span class="tb-label">Competition</span><span class="tb-value">DARPA LIFT '28</span></div>
+    <div><span class="tb-label">Status</span><span class="tb-value">In progress</span></div>
+  </div>
 
-  <h6 class="subhead">Overview</h6>
+  <h3 class="subhead">Overview</h3>
   <div class="method-copy">
     <p>The CAD counterpart to <a href="#mission-model">Mission Model</a>, which sweeps motor/prop/battery combinations against a mock DARPA Heavy Lift 2028 mission. This is the physical airframe that mission analysis is meant to inform. Current direction is a low-rotor-count tail sitter, prioritizing hover efficiency and cruise range for the heavy-lift mission profile over the redundancy a higher rotor count would buy.</p>
   </div>
 
-  <h6 class="subhead">Outcome</h6>
+  <h3 class="subhead">Outcome</h3>
   <div class="figure-card">
     <div class="figure-title">Rotor-count trade-off</div>
     <div data-fig="darpaLiftFigure"></div>
@@ -684,7 +824,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 
 <section class="about" id="about">
   <div>
-    <h6 style="color:var(--color-neutral-700)">ABOUT</h6>
     <h2>Third year Mechanical Engineering student working on drone projects and software to support them.</h2>
     <p>I have previously worked at Tylok Engineering as a Mechanical Engineer Co-Op and at a battery control group at the University of Michigan. Outside of engineering I enjoy classical art, specifically from the impressionist era, as well as fishing, playing sports, and weightlifting.</p>
   </div>
@@ -701,30 +840,79 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 </section>
 
 <section class="skills" id="skills">
-  <h6 style="color:var(--color-neutral-700)">SKILLS &amp; TOOLS</h6>
   <h2 style="margin-bottom:var(--space-6)">What I build and test with</h2>
-  <div class="skills-grid" id="skills-grid"></div>
+  <div class="skills-grid">
+    <div>
+      <h3 style="font-size:16px;margin-bottom:var(--space-3)">Programming &amp; Analysis</h3>
+      <ul class="skills-list">
+        <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>Python (NumPy/SciPy)</li>
+        <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>MATLAB</li>
+        <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>Flask / Plotly</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="font-size:16px;margin-bottom:var(--space-3)">Simulation Tools</h3>
+      <ul class="skills-list">
+        <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>SolidWorks Simulation</li>
+        <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>SolidWorks fluid simulation</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="font-size:16px;margin-bottom:var(--space-3)">CAD &amp; Design</h3>
+      <ul class="skills-list">
+        <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>SolidWorks</li>
+        <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>Assembly modeling (SLDASM)</li>
+        <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>GD&amp;T</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="font-size:16px;margin-bottom:var(--space-3)">Fabrication</h3>
+      <ul class="skills-list">
+        <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>Composite layup</li>
+        <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>3D printing</li>
+        <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>Milling</li>
+        <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>Turning</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="font-size:16px;margin-bottom:var(--space-3)">Machining &amp; Assembly</h3>
+      <ul class="skills-list">
+        <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>Waterjet</li>
+        <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>MIG welding</li>
+        <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>Jigs</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="font-size:16px;margin-bottom:var(--space-3)">Testing &amp; Instrumentation</h3>
+      <ul class="skills-list">
+        <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>ASTM fatigue testing</li>
+        <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>Flight-log analysis (pymavlink)</li>
+        <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>Strain testing / gauge reading</li>
+        <li class="skill-item"><span class="skill-dot" aria-hidden="true"></span>Pressure reading</li>
+      </ul>
+    </div>
+  </div>
 </section>
 
-<section class="resume-band" id="contact">
+<section class="resume-band" id="contact" aria-labelledby="contact-title">
   <div>
-    <h6>CONTACT</h6>
-    <p>Currently looking for opportunities in Mechanical or Aerospace Engineering, but open to opportunities of any kind. Project logs and test data on request.</p>
+    <h2 id="contact-title">Contact</h2>
+    <p>I'm looking for a summer 2027 internship in mechanical or aerospace engineering. Project logs and test data on request.</p>
   </div>
-  <div style="display:flex;gap:var(--space-3);flex-wrap:wrap">
-    <a href="mailto:exs783@case.edu" class="btn btn-lg">exs783@case.edu</a>
-    <a href="https://www.linkedin.com/in/ethansimon13" target="_blank" rel="noopener" class="btn btn-lg">LinkedIn ↗</a>
-    <a href="https://github.com/exs783" target="_blank" rel="noopener" class="btn btn-lg">GitHub ↗</a>
-    <a href="assets/Ethan_Simon_Resume.pdf" target="_blank" class="btn btn-lg">Resume ↗</a>
+  <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;align-items:center">
+    <a href="mailto:exs783@case.edu" class="btn btn-lg btn-light">exs783@case.edu</a>
+    <a href="assets/Ethan_Simon_Resume.pdf" target="_blank" rel="noopener" class="btn btn-lg">Resume <span aria-hidden="true">↗</span><span class="sr-only">(opens in new tab)</span></a>
+    <a href="https://www.linkedin.com/in/ethansimon13" target="_blank" rel="noopener" class="btn">LinkedIn <span aria-hidden="true">↗</span><span class="sr-only">(opens in new tab)</span></a>
+    <a href="https://github.com/exs783" target="_blank" rel="noopener" class="btn">GitHub <span aria-hidden="true">↗</span><span class="sr-only">(opens in new tab)</span></a>
   </div>
 </section>
+</main>
 
 <footer>
   <span>© 2026 Ethan Simon — Mechanical Engineering</span>
   <span>Every number on this page is real, sourced from an actual repo, test run, or data file.</span>
 </footer>
 
-<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js" defer></script>
 <script>
 (function(){
   "use strict";
@@ -1167,15 +1355,25 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     });
     return modelViewerLoading;
   }
-  function modelFigure(src, alt){
-    ensureModelViewerLoaded();
+  function modelFigure(src, alt, poster){
     const mv = document.createElement("model-viewer");
     mv.setAttribute("src", src); mv.setAttribute("alt", alt);
-    mv.setAttribute("camera-controls", ""); mv.setAttribute("auto-rotate", "");
+    if (poster) mv.setAttribute("poster", poster);
+    // The model only downloads once the visitor clicks the poster image.
+    mv.setAttribute("loading", "lazy"); mv.setAttribute("reveal", "interaction");
+    mv.setAttribute("camera-controls", "");
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) mv.setAttribute("auto-rotate", "");
     mv.setAttribute("shadow-intensity", "1"); mv.setAttribute("exposure", "1");
     mv.setAttribute("style", "background-color:var(--color-surface);");
     return mv;
   }
+  // The <model-viewer> library is only fetched once a section that contains a model is open.
+  function loadModelViewerIfShown(){
+    let t = null;
+    try { t = location.hash.length > 1 && document.getElementById(decodeURIComponent(location.hash.slice(1))); } catch (e) { /* malformed hash: nothing to load */ }
+    if (t && t.querySelector("model-viewer")) ensureModelViewerLoaded();
+  }
+  addEventListener("hashchange", loadModelViewerIfShown);
 
   /* ============ real data ============ */
   const TIER_COMPARE = [
@@ -1211,14 +1409,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     [48,-2.8,-4.7],[49,-4.5,-5.0],[50,3.9,-1.0],[51,4.2,3.0],[52,-2.8,-13.2],
   ];
 
-  const SKILL_GROUPS = [
-    { name: "Programming & Analysis", items: ["Python (NumPy/SciPy)", "MATLAB", "Flask / Plotly"] },
-    { name: "Simulation Tools", items: ["SolidWorks Simulation", "SolidWorks fluid simulation"] },
-    { name: "CAD & Design", items: ["SolidWorks", "Assembly modeling (SLDASM)", "GD&T"] },
-    { name: "Fabrication", items: ["Composite layup", "3D printing", "Milling", "Turning"] },
-    { name: "Machining & Assembly", items: ["Waterjet", "MIG welding", "Jigs"] },
-    { name: "Testing & Instrumentation", items: ["ASTM fatigue testing", "Flight-log analysis (pymavlink)", "Strain testing / gauge reading", "Pressure reading"] },
-  ];
 
   /* ============ wire real figures into their slots ============ */
   const FIGURE_MAP = {
@@ -1227,7 +1417,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     wingPlanformFigureFull: () => wingPlanformFigure(true),
     droneScopeFigure: () => droneScopeFigure(7),
     rocketFigure: () => rocketFigure(),
-    cadPhotoFigure: () => imgFigure("assets/compdrone2025-render.png", "CompDrone2025 hexacopter render"),
+    cadPhotoFigure: () => imgFigure("assets/compdrone2025-render.webp", "CompDrone2025 hexacopter render"),
     missionCourseFigure: () => missionCourseFigure(),
     tierCompareFigure: () => groupedBarFigure(TIER_COMPARE, "old_area", "new_area"),
     fleetHoverFigure: () => hbarFigure(FLEET_HOVER, "hover", v => v.toFixed(1) + " min"),
@@ -1239,9 +1429,9 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     scopeFigureTall: () => scopeFigure(11, true),
     flowFigure: () => flowFigure(),
     sensorPanelFigure: () => sensorPanelFigure(),
-    modelFigureCad: () => modelFigure("assets/compdrone2025.glb", "CompDrone2025 hexacopter SolidWorks assembly"),
-    quadcopterFigure: () => modelFigure("assets/quadcopter-5in-drone.glb", "Quadcopter 5-inch drone frame"),
-    x8TiltMotorFigure: () => modelFigure("assets/x8-tailsitter-tilt-motor-assem.glb", "X-8 tailsitter tilt motor assembly"),
+    modelFigureCad: () => modelFigure("assets/compdrone2025.glb", "CompDrone2025 hexacopter SolidWorks assembly", "assets/compdrone2025-render.webp"),
+    quadcopterFigure: () => modelFigure("assets/quadcopter-5in-drone.glb", "Quadcopter 5-inch drone frame", "assets/quadcopter-orthographic.png"),
+    x8TiltMotorFigure: () => modelFigure("assets/x8-tailsitter-tilt-motor-assem.glb", "X-8 tailsitter tilt motor assembly", "assets/x8-tailsitter-orthographic.png"),
     quadcopterOrthoFigure: () => imgFigure("assets/quadcopter-orthographic.png", "Quadcopter top-down orthographic view"),
     x8TailsitterOrthoFigure: () => imgFigure("assets/x8-tailsitter-orthographic.png", "X-8 tailsitter top-down orthographic view"),
     tailSitterFigure: () => tailSitterFigure(),
@@ -1251,7 +1441,16 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   document.querySelectorAll("[data-fig]").forEach(el => {
     const fn = FIGURE_MAP[el.dataset.fig];
     if (fn) el.appendChild(fn());
+    // Charts get a text alternative from their card's title and caption; project-frame thumbnails are decorative.
+    el.querySelectorAll("svg").forEach(svg => {
+      if (el.closest(".frame")) { svg.setAttribute("aria-hidden", "true"); return; }
+      const card = el.closest(".figure-card");
+      const t = card && card.querySelector(".figure-title"), c = card && card.querySelector(".figure-caption");
+      svg.setAttribute("role", "img");
+      svg.setAttribute("aria-label", [t && t.textContent, c && c.textContent].filter(Boolean).join(". "));
+    });
   });
+  loadModelViewerIfShown();
 
   /* ============ mission model: full trade space (interactive) ============ */
   (function initTradespace(){
@@ -1364,38 +1563,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     window.addEventListener("resize", resize);
     resize();
   })();
-
-  const skillsGrid = document.getElementById("skills-grid");
-  SKILL_GROUPS.forEach(g => {
-    const col = document.createElement("div");
-    const h5 = document.createElement("h5");
-    h5.style.marginBottom = "var(--space-3)";
-    h5.textContent = g.name;
-    col.appendChild(h5);
-    const list = document.createElement("div");
-    list.style.cssText = "display:flex;flex-direction:column;gap:8px";
-    g.items.forEach(s => {
-      const row = document.createElement("div");
-      row.className = "skill-item";
-      row.innerHTML = '<span class="skill-dot"></span>';
-      row.append(s);
-      list.appendChild(row);
-    });
-    col.appendChild(list);
-    skillsGrid.appendChild(col);
-  });
-
-  const reelViewport = document.querySelector("#reel .reel-viewport");
-  const reelProgress = document.getElementById("reel-progress");
-  const reelCardCount = document.querySelectorAll("#reel .frame").length;
-  function updateReelProgress(){
-    const maxScroll = reelViewport.scrollWidth - reelViewport.clientWidth;
-    const ratio = maxScroll > 0 ? reelViewport.scrollLeft / maxScroll : 0;
-    const idx = Math.min(reelCardCount, Math.round(ratio * (reelCardCount - 1)) + 1);
-    reelProgress.textContent = String(idx).padStart(2, "0") + " / " + reelCardCount;
-  }
-  reelViewport.addEventListener("scroll", updateReelProgress, {passive: true});
-  updateReelProgress();
 
 })();
 </script>
