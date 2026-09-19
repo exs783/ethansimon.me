@@ -19,10 +19,8 @@ is decorated — alignment and the strength of the dividers do the
 organizing.
 
 Kept from the reference canvas: sticky top nav, a big bold hero statement,
-a scroll-driven horizontal "reel" of project frames pinned full-viewport
-while the track shifts sideways, per-project detail sections below the
-reel, a dark near-black résumé/contact CTA band, zero-radius flat buttons
-and tags.
+a reel of project frames (now drawing-sheet grids, see Components),
+per-project detail sections below the reel, a dark near-black résumé/contact CTA band, zero-radius flat buttons.
 
 Not kept: the canvas's own fictional content (bio, project list, headshot)
 and its Design-Canvas-editor-specific templating (`{{ }}` expressions,
@@ -45,12 +43,12 @@ new-work.md's redesign rule.
 | `--color-bg` | `#f3f2f2` | page ground |
 | `--color-surface` | `#eae9e9` | card / figure-card fill |
 | `--color-text` | `#201e1d` | primary text |
-| `--color-accent` | `#ec3013` | the one accent — category tags, focus ring, chart accent marks; used sparingly |
+| `--color-accent` | `#ec3013` | the one accent — key numbers on project frames, focus ring, chart accent marks; used sparingly |
 | `--color-divider` | `color-mix(in srgb, #201e1d 40%, transparent)` | 2px section rules, card borders |
 | `--color-neutral-100…900` | OKLCH tonal ramp | tag fills, muted text, the dark résumé band (`--color-neutral-900`) |
 
-Mono scheme: one accent, used sparingly (tags, focus rings, a handful of
-chart marker dots) — primary CTA buttons deliberately use ink
+Mono scheme: one accent, used sparingly (key numbers on project frames, focus rings, hover rule, a
+handful of chart marker dots) — primary CTA buttons deliberately use ink
 (`--color-neutral-900`) rather than the accent, matching the reference
 canvas's own local override of the design system's default red-fill
 primary button. Single light theme, zero radius everywhere
@@ -72,20 +70,28 @@ changes to their drawing code.
 
 ## Components
 
-- **Nav**: sticky top, brand wordmark left, text links (Projects/About/
-  Skills/Contact) plus one outlined LinkedIn button, 2px bottom divider.
-- **Hero**: large bold headline + tagline, two CTAs (primary ink button to
-  the reel, secondary outlined GitHub link), a real grayscale-filtered
-  headshot photo (bordered, zero radius, matching the figure-card treatment).
-- **Projects (film contact sheets)**: `#reel` is one section holding two
-  dark near-black film strips, "Simulation and software" (4 frames) and
-  "Airframes and CAD" (6 frames). Each strip keeps the canvas's
-  sprocket-hole bars top and bottom, but the frames sit in a plain CSS grid
-  (4 / 3 columns, collapsing to 2 then 1) instead of a horizontally
-  scrolling track, so all ten projects are visible without any hidden
-  scroll. Each frame has a category tag, a frame number, the project's own
-  figure, a short description, one real key number, and tags. Supersedes the
-  earlier pinned scroll-driven reel and the later overflow-x reel.
+- **Nav**: sticky top (the `<header>` is the sticky element, since sticky is
+  bounded by its parent; `--nav-h` is the measured 66px), brand wordmark left,
+  text links (Projects/About/Skills/Contact) plus one outlined LinkedIn button,
+  2px bottom divider.
+- **Hero**: a concrete first-person claim (what he designs, simulates, builds),
+  one short line about the internship search, two CTAs (primary ink button to
+  the reel, secondary outlined Resume link), and one real piece of work on the
+  right: the CompDrone2025 render in a bordered figure with a two-cell
+  titleblock caption. The grayscale headshot now lives in About.
+- **Projects (drawing-sheet grids)**: `#reel` holds three bordered "sheet sets"
+  in place of the earlier dark film strips (sprocket holes removed: a cinema
+  metaphor beside an engineering titleblock). Featured (4 frames), More (4
+  frames), and a Team teaching and concept work list (4 compact rows, no
+  thumbnails). Frames sit in a grid whose 2px gaps show a divider-colored
+  background, the same technique as `.titleblock`. Each frame carries a sheet
+  number, the project's own figure, a short description, and a titleblock
+  footer: Discipline / Built with / Result, with the one real key number in
+  accent-700. The accent is used for those key numbers, focus rings, and the
+  hover top rule. Featured order alternates hardware and software: Flexural
+  Fatigue Test Machine (Tylok), Mission Model, Hexacopter Drone (CompDrone),
+  Log Dashboard. Every frame links to its in-page `:target` write-up; the Log
+  Dashboard live demo is a button inside its section.
 - **Detail sections**: one per project, `scroll-margin-top: var(--nav-h)` so the
   sticky nav doesn't cover the anchor target. Each opens with a drawing-style
   title block (`.titleblock`: discipline, year, built with, repository) and
