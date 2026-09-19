@@ -3,8 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ethan Simon</title>
-<meta name="description" content="Mechanical engineering portfolio — mission-performance simulation, flight-log analysis, and rocket ground-station software.">
+<title>Ethan Simon, Mechanical Engineering</title>
+<meta name="description" content="Mechanical engineering portfolio: a flexural fatigue test machine, VTOL mission simulation, flight-log analysis, and drone airframes.">
+<meta name="theme-color" content="#f3f2f2">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://ethansimon.me/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Ethan Simon, Mechanical Engineering">
+<meta property="og:description" content="A flexural fatigue test machine, VTOL mission simulation, flight-log analysis, and drone airframes.">
+<meta property="og:url" content="https://ethansimon.me/">
+<meta property="og:image" content="https://ethansimon.me/assets/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap" rel="stylesheet">
@@ -58,6 +67,9 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em}
 ::selection{background:color-mix(in srgb, var(--color-accent) 25%, transparent)}
 .grayscale{filter:grayscale(1) contrast(1.08)}
 .wrap{padding-inline:clamp(20px,5vw,64px)}
+.skip{position:absolute;left:-9999px;top:8px;z-index:100;background:var(--color-neutral-900);color:var(--color-bg);padding:12px 16px;font-weight:800;text-decoration:none}
+.skip:hover,.skip:focus{color:var(--color-bg)}
+.skip:focus{left:16px}
 .sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 
 /* — rules — */
@@ -75,7 +87,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em}
 
 /* — cards / figures / facts — */
 .card{padding:var(--space-4);border:1px solid var(--color-divider);background:var(--color-surface);border-radius:0}
-.figure-card{border:1px solid var(--color-divider);background:var(--color-surface);padding:var(--space-4);margin:var(--space-3) 0;border-radius:0}
+.figure-card{border:1px solid var(--color-divider);background:var(--color-surface);padding:var(--space-4);margin:var(--space-3) 0;border-radius:0;overflow-x:auto;scrollbar-color:var(--color-neutral-600) transparent}
 .figure-card svg{width:100%;max-width:460px;height:auto;display:block;margin-inline:auto}
 .figure-card img{width:100%;max-width:520px;height:auto;display:block;margin-inline:auto}
 .figure-card model-viewer{width:100%;height:380px;display:block;--poster-color:transparent}
@@ -87,7 +99,9 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em}
 .tradespace-legend-item{display:inline-flex;align-items:center;gap:6px}
 .tradespace-dot{width:8px;height:8px;display:inline-block}
 .tradespace-canvas-wrap{position:relative}
-.tradespace-canvas-wrap canvas{width:100%;height:340px;display:block;touch-action:none}
+.tradespace-canvas-wrap canvas{width:100%;height:340px;display:block;touch-action:pan-y}
+.tradespace-canvas-wrap canvas:focus-visible{outline-offset:-2px}
+.tradespace-hint{font-size:13px;color:var(--color-text-muted);margin-top:4px;max-width:70ch}
 .tradespace-axis-label{font-size:12px;color:var(--color-text-muted);text-align:center;margin-top:4px}
 .tradespace-tooltip{position:absolute;pointer-events:none;background:var(--color-bg);border:1px solid var(--color-divider);padding:6px 9px;font-size:12px;line-height:1.5;color:var(--color-text);white-space:nowrap;opacity:0;transition:opacity .1s;font-variant-numeric:tabular-nums}
 .tradespace-tooltip .t-veh{font-weight:700}
@@ -174,7 +188,7 @@ header{position:sticky;top:0;z-index:40}
 /* — detail sections — */
 .project-section{display:none;padding:clamp(48px,7vw,88px) clamp(20px,5vw,64px);border-bottom:2px solid var(--color-divider);scroll-margin-top:var(--nav-h)}
 .project-section:target{display:block}
-.back-to-reel{font:600 14px var(--font-heading);color:var(--color-text-muted);display:inline-block;margin-bottom:var(--space-3);padding:8px 0}
+.back-to-reel{font:600 14px var(--font-heading);color:var(--color-text-muted);display:inline-flex;align-items:center;min-height:44px;margin-bottom:var(--space-2);padding:0 8px 0 0}
 .project-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:var(--space-2)}
 .project-head h2{max-width:22ch}
 .project-tagline{max-width:70ch;color:var(--color-neutral-800);font-size:17px}
@@ -219,6 +233,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 </style>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 
 <header>
 <nav class="nav" aria-label="Primary">
@@ -231,7 +246,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 </nav>
 </header>
 
-<main>
+<main id="main" tabindex="-1">
 <noscript><p class="caution" style="margin:var(--space-4) clamp(20px,5vw,64px)">The charts, 3D models, and skills list on this page are drawn with JavaScript. The project text still reads without it.</p></noscript>
 
 <section class="hero">
@@ -262,10 +277,10 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   <div class="sheetset">
     <div class="sheetset-head"><h3>Featured projects</h3><span>Sheets 01–04</span></div>
     <div class="sheet">
-      <a href="#tylok-fatigue-machine" class="frame">
+      <a href="#tylok-fatigue-machine" class="frame" aria-labelledby="t-tylok-fatigue-machine">
         <span class="frame-num">Sheet 01</span>
         <div class="frame-fig" data-fig="tylokPhotoFigure"></div>
-        <h4>Flexural Fatigue Test Machine</h4>
+        <h4 id="t-tylok-fatigue-machine">Flexural Fatigue Test Machine</h4>
         <p>The fatigue test machine I designed, manufactured, and put into service as a co-op at Tylok International. Built to ASTM F1387 A6 to test a variety of parts and sizes.</p>
         <div class="frame-tb">
           <div><span class="tb-label">Discipline</span><span class="tb-value">Mechanical testing</span></div>
@@ -274,10 +289,10 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
         </div>
         <span class="view-link">View project <span aria-hidden="true">→</span></span>
       </a>
-      <a href="#mission-model" class="frame">
+      <a href="#mission-model" class="frame" aria-labelledby="t-mission-model">
         <span class="frame-num">Sheet 02</span>
         <div class="frame-fig" data-fig="missionProfileFigure"></div>
-        <h4>Mission Model</h4>
+        <h4 id="t-mission-model">Mission Model</h4>
         <p>Flies a mock DARPA Heavy Lift 2028 course with every motor, propeller, and battery combination it has data for, and reports which ones finish it.</p>
         <div class="frame-tb">
           <div><span class="tb-label">Discipline</span><span class="tb-value">Simulation</span></div>
@@ -286,10 +301,10 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
         </div>
         <span class="view-link">View project <span aria-hidden="true">→</span></span>
       </a>
-      <a href="#hexacopter-drone" class="frame">
+      <a href="#hexacopter-drone" class="frame" aria-labelledby="t-hexacopter-drone">
         <span class="frame-num">Sheet 03</span>
         <div class="frame-fig" data-fig="cadPhotoFigure"></div>
-        <h4>Hexacopter Drone</h4>
+        <h4 id="t-hexacopter-drone">Hexacopter Drone</h4>
         <p>The competition hexacopter for VFS DBVF. I worked on the frame, motor mounts, sensor mounts, and payload mounts.</p>
         <div class="frame-tb">
           <div><span class="tb-label">Discipline</span><span class="tb-value">CAD</span></div>
@@ -298,10 +313,10 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
         </div>
         <span class="view-link">View project <span aria-hidden="true">→</span></span>
       </a>
-      <a href="#log-dashboard" class="frame">
+      <a href="#log-dashboard" class="frame" aria-labelledby="t-log-dashboard">
         <span class="frame-num">Sheet 04</span>
         <div class="frame-fig" data-fig="droneScopeFigure"></div>
-        <h4>Log Dashboard</h4>
+        <h4 id="t-log-dashboard">Log Dashboard</h4>
         <p>Decodes a Pixhawk flight log into a score, an issues list, and every chart, so you can tell whether a flight was healthy before flying again.</p>
         <div class="frame-tb">
           <div><span class="tb-label">Discipline</span><span class="tb-value">Flight-data tooling</span></div>
@@ -316,10 +331,10 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   <div class="sheetset">
     <div class="sheetset-head"><h3>More projects</h3><span>Sheets 05–08</span></div>
     <div class="sheet">
-      <a href="#wing-optimizer" class="frame">
+      <a href="#wing-optimizer" class="frame" aria-labelledby="t-wing-optimizer">
         <span class="frame-num">Sheet 05</span>
         <div class="frame-fig" data-fig="wingPlanformFigure"></div>
-        <h4>Wing Optimizer</h4>
+        <h4 id="t-wing-optimizer">Wing Optimizer</h4>
         <p>Sizes a wing from a lift requirement and a cruise speed, then writes the geometry out as SolidWorks equations. Built to support Mission Model.</p>
         <div class="frame-tb">
           <div><span class="tb-label">Discipline</span><span class="tb-value">Optimization tool</span></div>
@@ -328,10 +343,10 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
         </div>
         <span class="view-link">View project <span aria-hidden="true">→</span></span>
       </a>
-      <a href="#liquid-rocket" class="frame">
+      <a href="#liquid-rocket" class="frame" aria-labelledby="t-liquid-rocket">
         <span class="frame-num">Sheet 06</span>
         <div class="frame-fig" data-fig="rocketFigure"></div>
-        <h4>Liquid Rocket</h4>
+        <h4 id="t-liquid-rocket">Liquid Rocket</h4>
         <p>Ground-station software for a liquid rocket test stand: valve control, live gauges, and CSV logging in one PyQt6 app.</p>
         <div class="frame-tb">
           <div><span class="tb-label">Discipline</span><span class="tb-value">Ground-station software</span></div>
@@ -340,10 +355,10 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
         </div>
         <span class="view-link">View project <span aria-hidden="true">→</span></span>
       </a>
-      <a href="#naca-solidworks" class="frame">
+      <a href="#naca-solidworks" class="frame" aria-labelledby="t-naca-solidworks">
         <span class="frame-num">Sheet 07</span>
         <div class="frame-fig" data-fig="nacaAirfoilFigure"></div>
-        <h4>NACA to SolidWorks</h4>
+        <h4 id="t-naca-solidworks">NACA to SolidWorks</h4>
         <p>Turns a NACA airfoil number and a chord length into the XYZ point files SolidWorks reads as curves. Runs in the browser, nothing uploaded.</p>
         <div class="frame-tb">
           <div><span class="tb-label">Discipline</span><span class="tb-value">CAD tooling</span></div>
@@ -352,10 +367,10 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
         </div>
         <span class="view-link">View project <span aria-hidden="true">→</span></span>
       </a>
-      <a href="#x8-tailsitter" class="frame">
+      <a href="#x8-tailsitter" class="frame" aria-labelledby="t-x8-tailsitter">
         <span class="frame-num">Sheet 08</span>
         <div class="frame-fig" data-fig="x8TailsitterOrthoFigure"></div>
-        <h4>X-8 Tailsitter</h4>
+        <h4 id="t-x8-tailsitter">X-8 Tailsitter</h4>
         <p>The hexacopter reworked into an X-8 tailsitter: lift from a wing, and a high thrust-to-weight ratio.</p>
         <div class="frame-tb">
           <div><span class="tb-label">Discipline</span><span class="tb-value">CAD</span></div>
@@ -370,27 +385,27 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   <div class="sheetset">
     <div class="sheetset-head"><h3>Team teaching and concept work</h3><span>Sheets 09–12</span></div>
     <div class="sheet-rows">
-      <a href="#quadcopter" class="row">
+      <a href="#quadcopter" class="row" aria-labelledby="t-quadcopter">
         <span class="frame-num">Sheet 09</span>
-        <h4>Quadcopter</h4>
+        <h4 id="t-quadcopter">Quadcopter</h4>
         <p>I use a basic 5-inch quadcopter build to teach newer VTOL members multirotor design before they move on to transitioning airframes.</p>
         <span class="row-meta">CAD · Teaching <span aria-hidden="true">→</span></span>
       </a>
-      <a href="#tail-sitter-designs" class="row">
+      <a href="#tail-sitter-designs" class="row" aria-labelledby="t-tail-sitter-designs">
         <span class="frame-num">Sheet 10</span>
-        <h4>Tail Sitter Designs</h4>
+        <h4 id="t-tail-sitter-designs">Tail Sitter Designs</h4>
         <p>I'm teaching newer VTOL members to design their own tail sitters, so the club can design successful transition drones.</p>
         <span class="row-meta">Concept · Teaching <span aria-hidden="true">→</span></span>
       </a>
-      <a href="#tilt-rotor-designs" class="row">
+      <a href="#tilt-rotor-designs" class="row" aria-labelledby="t-tilt-rotor-designs">
         <span class="frame-num">Sheet 11</span>
-        <h4>Tilt Rotor Designs</h4>
+        <h4 id="t-tilt-rotor-designs">Tilt Rotor Designs</h4>
         <p>I teach newer VTOL members to design tilt rotors and build their own within a semester.</p>
         <span class="row-meta">Concept · Teaching <span aria-hidden="true">→</span></span>
       </a>
-      <a href="#darpa-lift-2028" class="row">
+      <a href="#darpa-lift-2028" class="row" aria-labelledby="t-darpa-lift-2028">
         <span class="frame-num">Sheet 12</span>
-        <h4>DARPA Lift 2028</h4>
+        <h4 id="t-darpa-lift-2028">DARPA Lift 2028</h4>
         <p>The airframe Mission Model is meant to inform: a low-rotor-count tail sitter for the DARPA LIFT '28 challenge, still being adapted.</p>
         <span class="row-meta">Concept · In progress <span aria-hidden="true">→</span></span>
       </a>
@@ -504,16 +519,18 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   </div>
   <div class="figure-card">
     <div class="figure-title">Full trade space, interactive</div>
-    <div class="figure-caption" style="margin-top:0;margin-bottom:var(--space-3)">All 2,793 configurations. Toggle the axis pair; hover a point for its vehicle and exact values — real output of <code>plot_results()</code>, not a static snapshot.</div>
+    <div class="figure-caption" style="margin-top:0;margin-bottom:var(--space-3)">All 2,793 configurations. Toggle the axis pair; tap or hover a point for its vehicle and exact values — real output of <code>plot_results()</code>, not a static snapshot.</div>
     <div class="tradespace-tabs" id="tradespaceTabs"></div>
     <div class="tradespace-legend">
       <span class="tradespace-legend-item"><span class="tradespace-dot" style="background:var(--color-text)"></span>Feasible (<span id="tradespaceFeasN"></span>)</span>
       <span class="tradespace-legend-item"><span class="tradespace-dot" style="background:var(--color-accent)"></span>Infeasible (<span id="tradespaceInfeasN"></span>)</span>
     </div>
     <div class="tradespace-canvas-wrap">
-      <canvas id="tradespaceCanvas" role="img" aria-label="Scatter plot of all 2,793 motor, propeller, and battery configurations, colored feasible or infeasible. Use the axis buttons above to change the plotted pair."></canvas>
+      <canvas id="tradespaceCanvas" role="img" tabindex="0" aria-label="Scatter plot of all 2,793 motor, propeller, and battery configurations, colored feasible or infeasible. Use the axis buttons above to change the plotted pair. Focus the chart and use the left and right arrow keys to step through points in order along the horizontal axis; Shift with an arrow jumps 25 points."></canvas>
       <div class="tradespace-tooltip" id="tradespaceTooltip"></div>
     </div>
+    <div class="sr-only" id="tradespaceLive" aria-live="polite"></div>
+    <div class="tradespace-hint">Tap or hover a point for its values. With the chart focused, the arrow keys step through points and Shift+arrow jumps 25.</div>
     <div class="tradespace-axis-label" id="tradespaceXLabel"></div>
     <div style="margin-top:var(--space-3)"><a class="btn btn-secondary" href="demos/mission-model-tradespace.html" target="_blank" rel="noopener">Open 3D tradespace <span aria-hidden="true">↗</span><span class="sr-only">(opens in new tab)</span></a></div>
   </div>
@@ -1071,7 +1088,8 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   const rootStyle = getComputedStyle(document.documentElement);
   const cssVar = (name, fallback) => (rootStyle.getPropertyValue(name) || fallback).trim();
   const INK = cssVar("--ink", "#201e1d"), INK2 = cssVar("--ink-2", "#7d7979"),
-        LINE = cssVar("--line", "#c9c6c6"), ACCENT = cssVar("--accent", "#ec3013");
+        LINE = cssVar("--line", "#c9c6c6"), ACCENT = cssVar("--accent", "#ec3013"),
+        PAPER = cssVar("--color-neutral-100", "#f8f4f4");
 
   /* ============ real-data chart functions (unchanged drawing logic) ============ */
 
@@ -1369,14 +1387,14 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
       x = endX + 14;
     });
     ground(root, 6, 294, base);
-    dots.forEach(([cx, c]) => root.appendChild(svg("circle", {cx, cy:base, r:4, fill:c, stroke:"#fff", "stroke-width":1.5})));
+    dots.forEach(([cx, c]) => root.appendChild(svg("circle", {cx, cy:base, r:4, fill:c, stroke:PAPER, "stroke-width":1.5})));
     return root;
   }
 
   function rocketFigure(){
     const root = svgRoot("0 0 300 120");
     const cx = 150;
-    root.appendChild(svg("path", { d: `M ${cx} 10 L ${cx-16} 46 L ${cx-16} 82 L ${cx+16} 82 L ${cx+16} 46 Z`, fill: "#fff", stroke: INK, "stroke-width": 2.5, "stroke-linejoin":"round" }));
+    root.appendChild(svg("path", { d: `M ${cx} 10 L ${cx-16} 46 L ${cx-16} 82 L ${cx+16} 82 L ${cx+16} 46 Z`, fill: PAPER, stroke: INK, "stroke-width": 2.5, "stroke-linejoin":"round" }));
     root.appendChild(svg("line", {x1:cx, y1:10, x2:cx, y2:82, stroke:LINE, "stroke-width":1}));
     root.appendChild(svg("path", {d:`M ${cx-16} 66 L ${cx-32} 90 L ${cx-16} 82 Z`, fill:INK}));
     root.appendChild(svg("path", {d:`M ${cx+16} 66 L ${cx+32} 90 L ${cx+16} 82 Z`, fill:INK}));
@@ -1392,7 +1410,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     const rootChordPx = 0.3087 * scale, tipChordPx = 0.0925 * scale, halfSpanPx = 0.8666 * scale;
     const rootTeY = leY + rootChordPx, tipTeY = leY + tipChordPx;
     [1, -1].forEach(s => {
-      root.appendChild(svg("polygon", { points: `${cx},${leY} ${cx + s*halfSpanPx},${leY} ${cx + s*halfSpanPx},${tipTeY} ${cx},${rootTeY}`, fill: "#fff", stroke: INK, "stroke-width": 2, "stroke-linejoin": "round" }));
+      root.appendChild(svg("polygon", { points: `${cx},${leY} ${cx + s*halfSpanPx},${leY} ${cx + s*halfSpanPx},${tipTeY} ${cx},${rootTeY}`, fill: PAPER, stroke: INK, "stroke-width": 2, "stroke-linejoin": "round" }));
       root.appendChild(svg("line", { x1: cx, y1: leY + 0.25*rootChordPx, x2: cx + s*halfSpanPx, y2: leY + 0.25*tipChordPx, stroke: INK2, "stroke-width": 1, "stroke-dasharray": "3,3" }));
     });
     const acX = cx + 0.3555 * scale, acY = leY + 0.0555 * scale;
@@ -1413,12 +1431,12 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     const rootC = 0.3087*scale, tipC = 0.0925*scale, half = 0.8666*scale;
     [1, -1].forEach(sd => {
       root.appendChild(svg("polygon", {points:`${cx},${leY} ${cx + sd*half},${leY} ${cx + sd*half},${leY + tipC} ${cx},${leY + rootC}`, fill, stroke:INK, "stroke-width":1.2, "stroke-linejoin":"round"}));
-      root.appendChild(svg("line", {x1:cx, y1:leY + .25*rootC, x2:cx + sd*half, y2:leY + .25*tipC, stroke:"#fff", "stroke-opacity":.55, "stroke-width":1, "stroke-dasharray":"3,3"}));
+      root.appendChild(svg("line", {x1:cx, y1:leY + .25*rootC, x2:cx + sd*half, y2:leY + .25*tipC, stroke:PAPER, "stroke-opacity":.55, "stroke-width":1, "stroke-dasharray":"3,3"}));
     });
     root.appendChild(svg("rect", {x:cx - 5, y:leY - 12, width:10, height:rootC + 26, rx:5, fill:GRAPH_HI}));
     const dy = leY + rootC + 24;
     root.appendChild(svg("path", {d:`M ${cx - half} ${dy} H ${cx + half} M ${cx - half} ${dy - 5} V ${dy + 5} M ${cx + half} ${dy - 5} V ${dy + 5}`, fill:"none", stroke:INK2, "stroke-width":1.2}));
-    root.appendChild(svg("circle", {cx:cx + .3555*scale, cy:leY + .0555*scale, r:4, fill:ACCENT, stroke:"#fff", "stroke-width":1.5}));
+    root.appendChild(svg("circle", {cx:cx + .3555*scale, cy:leY + .0555*scale, r:4, fill:ACCENT, stroke:PAPER, "stroke-width":1.5}));
     return root;
   }
 
@@ -1483,7 +1501,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     defs.appendChild(marker);
     root.appendChild(defs);
     boxes.forEach((b,i) => {
-      root.appendChild(svg("rect", {x:b.x, y:b.y, width:b.w, height:b.h, fill:"#fff", stroke:INK, "stroke-width":1.5}));
+      root.appendChild(svg("rect", {x:b.x, y:b.y, width:b.w, height:b.h, fill:PAPER, stroke:INK, "stroke-width":1.5}));
       const t = svg("text", {x:b.x+b.w/2, y:b.y+b.h/2+4, "text-anchor":"middle", "font-size":"10.5", "font-family":"Archivo", fill:INK});
       t.textContent = b.label; root.appendChild(t);
       if (i < boxes.length-1){
@@ -1494,7 +1512,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     const tabs = ["Controls","Live Data","Logging"];
     tabs.forEach((label,i) => {
       const x = 106 + i*30;
-      root.appendChild(svg("rect", {x, y:100, width:26, height:18, fill: i===0 ? INK : "#fff", stroke:INK, "stroke-width":1}));
+      root.appendChild(svg("rect", {x, y:100, width:26, height:18, fill: i===0 ? INK : PAPER, stroke:INK, "stroke-width":1}));
     });
     const cap = svg("text", {x:150, y:132, "text-anchor":"middle", "font-size":"9.5", "font-family":"Archivo", fill:INK2});
     cap.textContent = "3-tab PyQt6 app, one shared state";
@@ -1515,7 +1533,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     channels.forEach((c,i) => {
       const col = i%cols, row = Math.floor(i/cols);
       const x = col*(cw+gap), y = row*(ch+gap);
-      root.appendChild(svg("rect", {x, y, width:cw, height:ch, fill:"#fff", stroke:LINE, "stroke-width":1.5}));
+      root.appendChild(svg("rect", {x, y, width:cw, height:ch, fill:PAPER, stroke:LINE, "stroke-width":1.5}));
       const id = svg("text", {x:x+10, y:y+24, "font-size":"12", "font-family":"Archivo", "font-weight":"800", fill: c.id[0]==="P" ? ACCENT : INK});
       id.textContent = c.id; root.appendChild(id);
       const lbl = svg("text", {x:x+10, y:y+40, "font-size":"9", "font-family":"Archivo", fill:INK2});
@@ -1524,10 +1542,11 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     return root;
   }
 
-  function imgFigure(src, alt, cls){
+  function imgFigure(src, alt, cls, dims){
     const img = document.createElement("img");
     img.src = src; img.alt = alt; img.loading = "lazy";
     if (cls) img.className = cls;
+    if (dims) { img.width = dims[0]; img.height = dims[1]; }
     return img;
   }
 
@@ -1563,7 +1582,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     try { t = location.hash.length > 1 && document.getElementById(decodeURIComponent(location.hash.slice(1))); } catch (e) { /* malformed hash: nothing to load */ }
     if (t && t.querySelector("model-viewer")) ensureModelViewerLoaded();
   }
-  addEventListener("hashchange", loadModelViewerIfShown);
 
   /* ============ real data ============ */
   const TIER_COMPARE = [
@@ -1607,9 +1625,9 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     wingPlanformFigureFull: () => wingPlanformFigure(true),
     droneScopeFigure: () => droneScopeFigure(),
     rocketFigure: () => rocketFigure(),
-    cadPhotoFigure: () => imgFigure("assets/compdrone2025-render.webp", "CompDrone2025 hexacopter render"),
-    tylokPhotoFigure: () => imgFigure("assets/tylok-fatigue-machine.jpg", "Tylok ASTM F1387 A6 flexural fatigue test machine", "grayscale"),
-    tylokFigure: () => imgFigure("assets/tylok-fatigue-machine.jpg", "Tylok ASTM F1387 A6 flexural fatigue test machine: two opposed air cylinders, a test fixture, and a controller with a display", "grayscale"),
+    cadPhotoFigure: () => imgFigure("assets/compdrone2025-render-600.webp", "CompDrone2025 hexacopter render"),
+    tylokPhotoFigure: () => imgFigure("assets/tylok-fatigue-machine-800.webp", "Tylok ASTM F1387 A6 flexural fatigue test machine", "grayscale"),
+    tylokFigure: () => imgFigure("assets/tylok-fatigue-machine-1200.webp", "Tylok ASTM F1387 A6 flexural fatigue test machine: two opposed air cylinders, a test fixture, and a controller with a display", "grayscale", [1200, 900]),
     missionCourseFigure: () => missionCourseFigure(),
     tierCompareFigure: () => groupedBarFigure(TIER_COMPARE, "old_area", "new_area"),
     fleetHoverFigure: () => hbarFigure(FLEET_HOVER, "hover", v => v.toFixed(1) + " min"),
@@ -1630,18 +1648,69 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     tiltRotorFigure: () => tiltRotorFigure(),
     darpaLiftFigure: () => darpaLiftFigure(),
   };
-  document.querySelectorAll("[data-fig]").forEach(el => {
+  const FLOOR = 10; // smallest rendered chart text, in px
+  function buildFig(el){
+    if (el.dataset.built) return;
+    el.dataset.built = "1";
     const fn = FIGURE_MAP[el.dataset.fig];
     if (fn) el.appendChild(fn());
-    // Charts get a text alternative from their card's title and caption; project-frame thumbnails are decorative.
     el.querySelectorAll("svg").forEach(svg => {
-      if (el.closest(".frame")) { svg.setAttribute("aria-hidden", "true"); return; }
+      // Project-frame thumbnails are decorative and too small for labels, so they carry none.
+      if (el.closest(".frame")) { svg.setAttribute("aria-hidden", "true"); svg.querySelectorAll("text").forEach(t => t.remove()); return; }
+      // Charts get a text alternative from their card's title and caption.
       const card = el.closest(".figure-card");
       const t = card && card.querySelector(".figure-title"), c = card && card.querySelector(".figure-caption");
       svg.setAttribute("role", "img");
       svg.setAttribute("aria-label", [t && t.textContent, c && c.textContent].filter(Boolean).join(". "));
     });
-  });
+  }
+  // Keep chart text at least FLOOR px: widen the chart, and let its card scroll sideways when the screen is narrower.
+  function fitCharts(){
+    document.querySelectorAll(".figure-card").forEach(card => {
+      if (!card.offsetWidth) return; // section not open
+      const cs = getComputedStyle(card);
+      const cw = card.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      card.querySelectorAll("svg").forEach(svg => {
+        const vb = svg.viewBox.baseVal, texts = [...svg.querySelectorAll("text")];
+        if (!vb || !vb.width || !texts.length) return;
+        texts.forEach(t => {
+          if (!t.dataset.fs) t.dataset.fs = t.getAttribute("font-size") || parseFloat(getComputedStyle(t).fontSize);
+          t.setAttribute("font-size", t.dataset.fs);
+        });
+        svg.style.width = ""; svg.style.maxWidth = "";
+        const minFs = Math.min(...texts.map(t => +t.dataset.fs));
+        if (minFs * Math.min(cw, 460) / vb.width >= FLOOR) return; // already legible at the default size
+        const need = vb.width * FLOOR / minFs;
+        svg.style.maxWidth = "none";
+        if (need > cw && need <= cw * 1.15) { // small shortfall: enlarge the labels instead of scrolling
+          const scale = cw / vb.width;
+          texts.forEach(t => t.setAttribute("font-size", Math.max(+t.dataset.fs, FLOOR / scale)));
+          svg.style.width = cw + "px";
+        } else svg.style.width = need + "px";
+      });
+      const title = card.querySelector(".figure-title");
+      if (card.scrollWidth > card.clientWidth + 1) { // scrollable region needs keyboard access and a name
+        card.tabIndex = 0; card.setAttribute("role", "group");
+        card.setAttribute("aria-label", (title ? title.textContent : "Figure") + " (scrolls sideways)");
+      } else { card.removeAttribute("tabindex"); card.removeAttribute("role"); card.removeAttribute("aria-label"); }
+    });
+  }
+  // Charts in a project write-up are drawn when that project is opened, not on page load.
+  // :target is not applied yet while this script runs during parsing, so read the hash directly.
+  function openId(){ try { return decodeURIComponent(location.hash.slice(1)); } catch (e) { return ""; } }
+  function buildFigures(){
+    document.querySelectorAll("[data-fig]").forEach(el => {
+      const sec = el.closest(".project-section");
+      if (!sec || sec.id === openId()) buildFig(el);
+    });
+    fitCharts();
+  }
+  buildFigures();
+  addEventListener("hashchange", () => { buildFigures(); loadModelViewerIfShown(); });
+  let fitTimer = null;
+  addEventListener("resize", () => { clearTimeout(fitTimer); fitTimer = setTimeout(fitCharts, 120); });
+  addEventListener("load", fitCharts);
+  if (document.fonts) document.fonts.ready.then(fitCharts);
   loadModelViewerIfShown();
 
   /* ============ mission model: full trade space (interactive) ============ */
@@ -1660,13 +1729,13 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
       {label:"Mass / Hover", xi:0, yi:2, xl:"Total mass (kg)", yl:"Hover time (min)"},
       {label:"Energy / Cost", xi:1, yi:3, xl:"Mission energy used (mAh)", yl:"Total cost (USD)"},
     ];
-    let currentView = VIEWS[0];
+    let currentView = VIEWS[0], selected = -1, order = null;
     VIEWS.forEach((v,i) => {
       const b = document.createElement("button");
       b.className = "tradespace-tab"; b.type = "button"; b.textContent = v.label;
       b.setAttribute("aria-pressed", i===0 ? "true" : "false");
       b.addEventListener("click", () => {
-        currentView = v;
+        currentView = v; selected = -1; order = null; tooltip.style.opacity = 0; live.textContent = "";
         [...tabsEl.children].forEach(c => c.setAttribute("aria-pressed", c===b ? "true" : "false"));
         draw();
       });
@@ -1718,6 +1787,10 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
         ctx.beginPath(); ctx.arc(x,y,2.4,0,Math.PI*2); ctx.fill();
       }
       ctx.globalAlpha = 1;
+      if (selected >= 0 && pointScreen[selected]) {
+        ctx.strokeStyle = INK; ctx.lineWidth = 2; ctx.beginPath();
+        ctx.arc(pointScreen[selected][0], pointScreen[selected][1], 6, 0, Math.PI*2); ctx.stroke(); ctx.lineWidth = 1;
+      }
       xLabelEl.textContent = currentView.xl + "  ·  " + currentView.yl + " (vertical)";
     }
     function resize(){
@@ -1727,31 +1800,62 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
       ctx.setTransform(dpr,0,0,dpr,0,0);
       draw();
     }
+    const live = document.getElementById("tradespaceLive");
+    function nearest(mx, my){
+      let best = -1, bestD = 14*14;
+      for (let i=0;i<pointScreen.length;i++){
+        const [x,y] = pointScreen[i];
+        const d = (x-mx)*(x-mx)+(y-my)*(y-my);
+        if (d < bestD){ bestD = d; best = i; }
+      }
+      return best;
+    }
+    function place(i){
+      const r = TRADESPACE.rows[i], veh = TRADESPACE.vehicles[r[5]];
+      tooltip.innerHTML = `<div class="t-veh">${veh}</div>` +
+        `<div>mass ${r[0].toFixed(2)} kg &middot; energy ${Math.round(r[1]).toLocaleString()} mAh</div>` +
+        `<div>hover ${r[2].toFixed(1)} min &middot; cost $${Math.round(r[3]).toLocaleString()}</div>` +
+        `<div class="t-status" style="color:${r[4]?INK:ACCENT}">${r[4]?"Feasible":"Infeasible"}</div>`;
+      const [px,py] = pointScreen[i];
+      tooltip.style.left = Math.max(0, Math.min(px+12, W-tooltip.offsetWidth)) + "px";
+      tooltip.style.top = Math.max(py-8, 0) + "px";
+      tooltip.style.opacity = 1;
+      return `${veh}: mass ${r[0].toFixed(2)} kg, energy ${Math.round(r[1]).toLocaleString()} mAh, hover ${r[2].toFixed(1)} min, cost $${Math.round(r[3]).toLocaleString()}, ${r[4]?"feasible":"infeasible"}`;
+    }
+    function select(i){ selected = i; live.textContent = place(i); draw(); }
+    function pointerXY(e){ const rect = canvas.getBoundingClientRect(); return [e.clientX-rect.left, e.clientY-rect.top]; }
     let raf = null;
-    canvas.addEventListener("mousemove", e => {
+    canvas.addEventListener("pointermove", e => {
+      if (e.pointerType !== "mouse") return;
       if (raf) cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
-        const rect = canvas.getBoundingClientRect();
-        const mx = e.clientX-rect.left, my = e.clientY-rect.top;
-        let best = -1, bestD = 12*12;
-        for (let i=0;i<pointScreen.length;i++){
-          const [x,y] = pointScreen[i];
-          const d = (x-mx)*(x-mx)+(y-my)*(y-my);
-          if (d < bestD){ bestD = d; best = i; }
-        }
-        if (best === -1){ tooltip.style.opacity = 0; return; }
-        const r = TRADESPACE.rows[best], veh = TRADESPACE.vehicles[r[5]];
-        tooltip.innerHTML = `<div class="t-veh">${veh}</div>` +
-          `<div>mass ${r[0].toFixed(2)} kg &middot; energy ${Math.round(r[1]).toLocaleString()} mAh</div>` +
-          `<div>hover ${r[2].toFixed(1)} min &middot; cost $${Math.round(r[3]).toLocaleString()}</div>` +
-          `<div class="t-status" style="color:${r[4]?INK:ACCENT}">${r[4]?"Feasible":"Infeasible"}</div>`;
-        const [px,py] = pointScreen[best];
-        tooltip.style.left = Math.min(px+12, W-160) + "px";
-        tooltip.style.top = Math.max(py-8, 0) + "px";
-        tooltip.style.opacity = 1;
+        const best = nearest(...pointerXY(e));
+        if (best >= 0) place(best); else if (selected >= 0) place(selected); else tooltip.style.opacity = 0;
       });
     });
-    canvas.addEventListener("mouseleave", () => { tooltip.style.opacity = 0; });
+    canvas.addEventListener("pointerleave", e => {
+      if (e.pointerType !== "mouse") return;
+      if (selected >= 0) place(selected); else tooltip.style.opacity = 0;
+    });
+    // Tap, click, or press to pin a point; touch works because the canvas only claims vertical panning.
+    canvas.addEventListener("pointerdown", e => {
+      const best = nearest(...pointerXY(e));
+      if (best >= 0) select(best); else { selected = -1; tooltip.style.opacity = 0; live.textContent = ""; draw(); }
+    });
+    // Keyboard: step through points in order along the horizontal axis.
+    canvas.addEventListener("keydown", e => {
+      const jump = {ArrowRight:1, ArrowLeft:-1, PageDown:100, PageUp:-100}[e.key];
+      if (jump === undefined && e.key !== "Home" && e.key !== "End") return;
+      e.preventDefault();
+      if (!order) { const xi = currentView.xi; order = TRADESPACE.rows.map((_, i) => i).sort((a, b) => TRADESPACE.rows[a][xi] - TRADESPACE.rows[b][xi]); }
+      let pos = selected < 0 ? Math.floor(order.length/2) : order.indexOf(selected);
+      if (e.key === "Home") pos = 0;
+      else if (e.key === "End") pos = order.length - 1;
+      else if (selected >= 0) pos = Math.max(0, Math.min(order.length-1, pos + jump * (e.shiftKey && Math.abs(jump) === 1 ? 25 : 1)));
+      select(order[pos]);
+    });
+    addEventListener("hashchange", () => requestAnimationFrame(resize)); // the section is hidden until opened
+    addEventListener("load", resize);
     window.addEventListener("resize", resize);
     resize();
   })();

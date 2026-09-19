@@ -120,6 +120,21 @@ so repointing the `--ink`/`--ink-2`/`--line`/`--accent` aliases at the
 Modernist palette was the only change needed for them to repaint
 correctly.
 
+### Chart behavior
+
+- Chart text is held to a 10px rendered floor: a chart is widened to reach it,
+  and a card that is then wider than the screen scrolls sideways (it gets
+  `tabindex="0"`, a group role and a name only while it actually scrolls).
+  Project-frame thumbnails carry no text.
+- A project's figures are drawn when its section is opened (hash-driven), not
+  on page load. Read `location.hash` for this: `:target` is not applied yet
+  while the inline script runs during parsing.
+- The tradespace canvas is operable by mouse, touch (`touch-action:pan-y`, tap
+  to pin a point) and keyboard (arrow keys step along the x axis, Shift jumps
+  25, Home/End), with values announced through a polite live region.
+- Chart colors read tokens through `cssVar()`, including `PAPER`
+  (`--color-neutral-100`) for white fills.
+
 ## CAD assets (real media, not generated)
 
 Unchanged from the prior direction: `assets/compdrone2025.glb` (real

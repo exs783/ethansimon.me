@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Liquid Rocket Ground Station — Live Demo</title>
 <meta name="description" content="In-browser port of the real ground_station PyQt6 app: same sensor protocol, same gauge math, same valve logic.">
@@ -47,7 +48,7 @@
   @media (max-width:800px){ .cols{ grid-template-columns:1fr; } }
 
   .card{ background:var(--bezel); border:1px solid var(--hairline); border-radius:8px; padding:16px 18px; }
-  .card h3{ margin:0 0 12px; font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--phosphor); font-family:var(--font-mono); }
+  .card h2{ margin:0 0 12px; font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--phosphor); font-family:var(--font-mono); }
 
   .schematic{ width:100%; background:#000; border-radius:6px; overflow:hidden; }
   .schematic img{ width:100%; display:block; }
@@ -106,11 +107,11 @@
   <section class="page active" id="page-controls">
     <div class="cols">
       <div class="card">
-        <h3>P&amp;ID — Rocket_P&amp;ID_GUI1.svg</h3>
+        <h2>P&amp;ID — Rocket_P&amp;ID_GUI1.svg</h2>
         <div class="schematic"><img src="Rocket_PID_GUI1.svg" alt="Rocket P&ID schematic"></div>
       </div>
       <div class="card">
-        <h3>Manual Overrides</h3>
+        <h2>Manual Overrides</h2>
         <div id="valve-list"></div>
       </div>
     </div>
@@ -122,7 +123,7 @@
 
   <section class="page" id="page-logging">
     <div class="card" style="max-width:420px">
-      <h3>Session Recorder</h3>
+      <h2>Session Recorder</h2>
       <button class="log-btn" id="log-btn">START LOGGING</button>
       <div class="log-status" id="log-status">Idle — no session recording.</div>
       <div class="log-download" id="log-download"></div>
