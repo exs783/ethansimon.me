@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NACA Airfoil to SolidWorks Curves</title>
-<meta name="description" content="Type a NACA 4- or 5-digit airfoil and a chord length, download XYZ point files for SolidWorks Curve Through XYZ Points. Runs in your browser.">
+<meta name="description" content="Type a NACA 4- or 5-digit airfoil and a chord length in meters or feet, get ready-to-paste SolidWorks equation driven curves. Runs in your browser.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap" rel="stylesheet">
@@ -15,6 +15,7 @@
     --divider:color-mix(in srgb, #201e1d 40%, transparent);
     --font:'Archivo', system-ui, sans-serif;
     --font-math:"STIX Two Math","Latin Modern Math","Cambria Math",math,serif;
+    --font-code:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   }
   *{ box-sizing:border-box; border-radius:0; }
   body{ margin:0; background:var(--bg); color:var(--text); font:400 16px/1.55 var(--font); padding-inline:clamp(16px,4vw,48px); }
@@ -23,35 +24,44 @@
   .back{ display:inline-block; margin-bottom:24px; font-weight:600; text-decoration:none; }
   h1{ font-weight:800; font-size:clamp(1.8rem,4vw,2.6rem); line-height:1.1; margin:0 0 8px; letter-spacing:-.01em; }
   h2{ font-weight:800; font-size:1.2rem; margin:40px 0 8px; padding-top:16px; border-top:2px solid var(--text); }
+  h3{ font-weight:800; font-size:1rem; margin:0 0 8px; }
   .lede{ color:var(--muted); max-width:62ch; margin:0 0 24px; }
   form{ display:flex; flex-wrap:wrap; gap:16px; align-items:end; padding:16px 0; border-block:2px solid var(--text); }
   label{ display:grid; gap:4px; font-weight:600; font-size:.85rem; text-transform:uppercase; letter-spacing:.05em; }
-  input{ font:inherit; font-size:1.1rem; padding:8px 10px; border:2px solid var(--text); background:var(--bg); color:var(--text); width:11em; }
-  input:focus-visible, .btn:focus-visible{ outline:3px solid var(--accent); outline-offset:2px; }
+  input, select{ font:inherit; font-size:1.1rem; padding:8px 10px; border:2px solid var(--text); background:var(--bg); color:var(--text); }
+  input{ width:11em; } select{ width:6em; }
+  input:focus-visible, select:focus-visible, .btn:focus-visible, summary:focus-visible{ outline:3px solid var(--accent); outline-offset:2px; }
   #err{ min-height:1.6em; margin:12px 0 0; color:var(--accent-700); font-weight:600; }
   .fig{ border:2px solid var(--text); background:var(--surface); padding:8px; margin:12px 0; }
   .fig svg{ width:100%; height:auto; display:block; }
   .fig .cap{ font-size:.85rem; color:var(--muted); padding:4px 4px 0; }
   .btns{ display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
-  .btn{ font:600 1rem var(--font); padding:10px 16px; border:2px solid var(--text); background:var(--text); color:var(--bg); cursor:pointer; }
+  .btn{ font:600 .9rem var(--font); padding:8px 14px; border:2px solid var(--text); background:var(--text); color:var(--bg); cursor:pointer; }
   .btn.alt{ background:transparent; color:var(--text); }
   .btn:hover:not(:disabled){ background:var(--muted); color:var(--bg); border-color:var(--muted); }
   .btn:disabled{ opacity:.4; cursor:not-allowed; }
+  .curve{ border:2px solid var(--text); background:var(--surface); padding:12px 16px; margin:12px 0; }
+  .row{ display:grid; grid-template-columns:3.2rem 1fr auto; gap:8px; align-items:start; margin:6px 0; }
+  .row b{ font-family:var(--font-code); font-size:.9rem; padding-top:6px; }
+  .row code{ font-family:var(--font-code); font-size:.85rem; background:var(--bg); border:1px solid var(--divider); padding:6px 8px; overflow-wrap:anywhere; user-select:all; }
+  details{ margin:12px 0; } summary{ cursor:pointer; font-weight:600; }
   ol{ padding-left:1.2em; } li{ margin:4px 0; }
   .eqn{ border:1px solid var(--divider); background:var(--surface); padding:12px 16px; margin:12px 0; overflow-x:auto; }
   .eqn math{ font-family:var(--font-math); font-size:1.2em; margin:.35em 0; }
   small, .note{ color:var(--muted); }
+  @media (max-width:560px){ .row{ grid-template-columns:1fr; } .row b{ padding-top:0; } }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <a class="back" href="../index.html#naca-solidworks">← ethansimon.me</a>
+  <a class="back" href="../index.html#wing-optimizer">← ethansimon.me</a>
   <h1>NACA airfoil to SolidWorks curves</h1>
-  <p class="lede">Enter a NACA 4-digit (2412) or 5-digit (23012) airfoil and a chord length. You get XYZ point files that SolidWorks turns into splines. Everything runs in your browser; nothing is uploaded.</p>
+  <p class="lede">Enter a NACA 4-digit (2412) or 5-digit (23012) airfoil, a chord length, and meters or feet. You get equation driven curves to paste straight into SolidWorks, so there is nothing to download. Everything runs in your browser.</p>
 
   <form id="f" novalidate>
     <label>NACA number <input id="naca" value="2412" inputmode="numeric" autocomplete="off" aria-describedby="err"></label>
-    <label>Chord length <input id="chord" value="100" inputmode="decimal" autocomplete="off" aria-describedby="err"></label>
+    <label>Chord length <input id="chord" value="1" inputmode="decimal" autocomplete="off" aria-describedby="err"></label>
+    <label>Units <select id="unit"><option value="m">m</option><option value="ft">ft</option></select></label>
   </form>
   <p id="err" role="alert"></p>
 
@@ -60,28 +70,34 @@
     <div class="cap" id="cap"></div>
   </div>
 
-  <div class="btns">
-    <button class="btn" data-part="upper">Download upper</button>
-    <button class="btn" data-part="lower">Download lower</button>
-    <button class="btn alt" data-part="full">Download full loop</button>
-  </div>
-  <p class="note"><b>upper</b> and <b>lower</b> are two open curves from nose to tail. <b>full</b> is one closed loop (tail, nose, tail) with a sharp trailing edge. Units are whatever you typed for chord; SolidWorks reads them in your document units.</p>
-
-  <h2>In SolidWorks</h2>
+  <h2>Equation driven curves</h2>
   <ol>
-    <li>Open a part. Insert &gt; Curve &gt; Curve Through XYZ Points.</li>
-    <li>Browse, pick the downloaded <code>.txt</code>, and OK. The curve lies in the Front plane (Z = 0).</li>
-    <li>For upper and lower, repeat once each and join them at the nose and tail with a sketch line. Or use the full loop as a single curve.</li>
+    <li>Open a sketch on the Front Plane. Tools &gt; Sketch Entities &gt; Equation Driven Curve.</li>
+    <li>Choose <b>Parametric</b>. Paste <b>x(t)</b> and <b>y(t)</b>, and type the <b>t₁</b> and <b>t₂</b> values.</li>
+    <li>Repeat for each curve below, then make the ends coincident (nose and tail). Set the document units to <b id="docunit">m</b> so the size comes out right.</li>
   </ol>
+  <div id="eqs"></div>
+  <p class="note">The parameter is <code>t</code> with <code>x = c·t²</code>, so the nose has no square root and the curves stay smooth there.</p>
+
+  <details>
+    <summary>Or download point files instead</summary>
+    <div class="btns">
+      <button class="btn" data-part="upper">Download upper</button>
+      <button class="btn" data-part="lower">Download lower</button>
+      <button class="btn alt" data-part="full">Download full loop</button>
+    </div>
+    <p class="note">Insert &gt; Curve &gt; Curve Through XYZ Points &gt; Browse. <b>upper</b> and <b>lower</b> are open curves from nose to tail; <b>full</b> is one closed loop with a sharp tail. Numbers are in the units chosen above.</p>
+  </details>
 
   <h2>The math</h2>
-  <p>Thickness is the NACA polynomial with the last coefficient set to <code>−0.1036</code> instead of <code>−0.1015</code>, which closes the trailing edge exactly so CAD gets a sharp tail. Points are cosine spaced (80 per surface), dense at the nose where the curvature is.</p>
+  <p>Thickness is the NACA polynomial with the last coefficient set to <code>−0.1036</code> instead of <code>−0.1015</code>, which closes the trailing edge exactly so CAD gets a sharp tail. The point files are cosine spaced (80 per surface), dense at the nose where the curvature is.</p>
   <div class="eqn">
     <math display="block"><msub><mi>y</mi><mi>t</mi></msub><mo>=</mo><mn>5</mn><mi>t</mi><mo stretchy="false">(</mo><mn>0.2969</mn><msqrt><mi>x</mi></msqrt><mo>−</mo><mn>0.1260</mn><mi>x</mi><mo>−</mo><mn>0.3516</mn><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>0.2843</mn><msup><mi>x</mi><mn>3</mn></msup><mo>−</mo><mn>0.1036</mn><msup><mi>x</mi><mn>4</mn></msup><mo stretchy="false">)</mo></math>
     <math display="block"><mi>θ</mi><mo>=</mo><mi>arctan</mi><mfrac><mrow><mi>d</mi><msub><mi>y</mi><mi>c</mi></msub></mrow><mrow><mi>d</mi><mi>x</mi></mrow></mfrac></math>
     <math display="block"><msub><mi>x</mi><mi>u,l</mi></msub><mo>=</mo><mi>x</mi><mo>∓</mo><msub><mi>y</mi><mi>t</mi></msub><mi>sin</mi><mi>θ</mi></math>
     <math display="block"><msub><mi>y</mi><mi>u,l</mi></msub><mo>=</mo><msub><mi>y</mi><mi>c</mi></msub><mo>±</mo><msub><mi>y</mi><mi>t</mi></msub><mi>cos</mi><mi>θ</mi></math>
   </div>
+  <p>The pasted equations use <code>sin θ = y′/√(1+y′²)</code> and <code>cos θ = 1/√(1+y′²)</code>, so no arctangent is needed, and the cambered airfoils split at the point where the camber line changes formula (<code>p</code> for 4-digit, <code>r</code> for 5-digit).</p>
   <p>The 4-digit camber line uses the max camber <code>m</code> and its position <code>p</code>. The 5-digit series (standard <code>2p0</code> and reflex <code>2p1</code>) uses NACA's published constants <code>r</code>, <code>k₁</code>, <code>k₂/k₁</code>. I checked the constants against thin-airfoil theory: every <code>2xx</code> camber line should have a design lift coefficient of 0.3. The 230, 240 and 250 lines give 0.300; 210 and the reflex lines land within about 3% because NACA's published constants are rounded.</p>
   <p class="note">Not supported: 6-series and other families. They need a numerical solve, and the tool says so instead of guessing.</p>
 </div>
@@ -89,6 +105,7 @@
 <script>
 // --- generator ---
 const N = 80;  // points per surface, cosine spaced
+const CHORD_ERR = "Chord must be a number between 0.001 and 100000.";
 const T5 = {   // 5-digit camber-line constants [r, k1, k2/k1], by reflex flag then position digit
   0: {1:[.0580,361.4,0], 2:[.1260,51.64,0], 3:[.2025,15.957,0], 4:[.2900,6.643,0], 5:[.3910,3.230,0]},
   1: {2:[.1300,51.99,.000764], 3:[.2170,15.793,.00677], 4:[.3180,6.520,.0303], 5:[.4410,3.191,.1355]}
@@ -115,33 +132,39 @@ function parseNaca(str){
   return s;
 }
 
-function camber(s, x){  // -> [yc, dyc/dx]
+// Camber line as cubic segments in x: yc = c0 + c1 x + c2 x^2 + c3 x^3 on [x0, x1]
+function camberSegs(s){
   if (s.kind === 4){
-    const {m, p} = s;
-    if (x < p) return [m/(p*p)*(2*p*x - x*x), 2*m/(p*p)*(p - x)];
-    const q = 1 - p;
-    return [m/(q*q)*((1 - 2*p) + 2*p*x - x*x), 2*m/(q*q)*(p - x)];
+    const {m, p} = s, q = 1 - p;
+    return [{x0:0, x1:p, c:[0, 2*m/p, -m/(p*p), 0]},
+            {x0:p, x1:1, c:[m*(1 - 2*p)/(q*q), 2*m*p/(q*q), -m/(q*q), 0]}];
   }
   if (s.kind === 5){  // one form covers reflex and non-reflex (k21 = 0)
     const {r, k21} = s, k = s.k1/6, a = k21*(1 - r)**3, r3 = r**3;
-    return x < r
-      ? [k*((x-r)**3 - a*x - r3*x + r3), k*(3*(x-r)**2 - a - r3)]
-      : [k*(k21*(x-r)**3 - a*x - r3*x + r3), k*(3*k21*(x-r)**2 - a - r3)];
+    return [{x0:0, x1:r, c:[0, k*(3*r*r - a - r3), -3*k*r, k]},
+            {x0:r, x1:1, c:[k*(r3 - k21*r3), k*(3*k21*r*r - a - r3), -3*k*k21*r, k*k21]}];
   }
-  return [0, 0];
+  return [{x0:0, x1:1, c:[0, 0, 0, 0]}];
 }
 
-// -> {error} or {name, up, lo, mid} (LE -> TE, scaled by chord)
+function camber(segs, x){  // -> [yc, dyc/dx]
+  const [c0, c1, c2, c3] = (segs.length > 1 && x >= segs[1].x0 ? segs[1] : segs[0]).c;
+  return [c0 + x*(c1 + x*(c2 + x*c3)), c1 + x*(2*c2 + x*3*c3)];
+}
+
+const parseChord = str => { const c = str.trim() === "" ? NaN : Number(str); return c >= 0.001 && c <= 100000 ? c : NaN; };
+
+// -> {error} or {name, chord, up, lo, mid} (LE -> TE, scaled by chord)
 function nacaGen(str, chordStr){
   const s = parseNaca(str);
   if (s.error) return s;
-  const chord = chordStr.trim() === "" ? NaN : Number(chordStr);
-  if (!(chord >= 0.001 && chord <= 100000)) return {error:"Chord must be a number between 0.001 and 100000."};
-  const up = [], lo = [], mid = [];
+  const chord = parseChord(chordStr);
+  if (isNaN(chord)) return {error:CHORD_ERR};
+  const segs = camberSegs(s), up = [], lo = [], mid = [];
   for (let i = 0; i < N; i++){
     const x = 0.5*(1 - Math.cos(Math.PI*i/(N - 1)));
     const yt = 5*s.t*(0.2969*Math.sqrt(x) - 0.1260*x - 0.3516*x**2 + 0.2843*x**3 - 0.1036*x**4);
-    const [yc, dy] = camber(s, x), th = Math.atan(dy), st = Math.sin(th), ct = Math.cos(th);
+    const [yc, dy] = camber(segs, x), th = Math.atan(dy), st = Math.sin(th), ct = Math.cos(th);
     up.push([(x - yt*st)*chord, (yc + yt*ct)*chord]);
     lo.push([(x + yt*st)*chord, (yc - yt*ct)*chord]);
     mid.push([x*chord, yc*chord]);
@@ -151,42 +174,123 @@ function nacaGen(str, chordStr){
   return {name:s.name, chord, up, lo, mid};
 }
 
+// Number -> plain decimal text (no exponent; SolidWorks won't parse 1e-7)
+const g = (v, d = 7) => { const t = Number(v.toPrecision(d)); return String(t).includes("e") ? t.toFixed(14).replace(/\.?0+$/, "") : String(t); };
+// [[coef, power of t], ...] -> "a*t^2 - b*t" (zero terms dropped)
+function poly(pairs){
+  let out = "";
+  for (const [c, p] of pairs){
+    if (Math.abs(c) < 1e-14) continue;
+    const mag = g(Math.abs(c)), term = p === 0 ? mag : p === 1 ? `${mag}*t` : `${mag}*t^${p}`;
+    out += out ? (c < 0 ? " - " : " + ") + term : (c < 0 ? "-" : "") + term;
+  }
+  return out || "0";
+}
+
+// Parametric equation driven curves, x = c t^2 so the nose sqrt disappears.
+// -> {error} or {curves:[{title, x, y, t1, t2}]}
+function eqCurves(str, chordStr){
+  const s = parseNaca(str);
+  if (s.error) return s;
+  const C = parseChord(chordStr);
+  if (isNaN(C)) return {error:CHORD_ERR};
+  const segs = camberSegs(s), T = 5*s.t*C, curves = [];
+  const YT = poly([[.2969*T, 1], [-.1260*T, 2], [-.3516*T, 4], [.2843*T, 6], [-.1036*T, 8]]);
+  const X = poly([[C, 2]]);
+  segs.forEach((sg, i) => {
+    const [c0, c1, c2, c3] = sg.c;
+    const part = segs.length > 1 ? (i ? ", rear" : ", front") : "";
+    const range = { t1: g(Math.sqrt(sg.x0), 8), t2: g(Math.sqrt(sg.x1), 8) };
+    const span = segs.length > 1 ? ` (x from ${g(sg.x0 * C)} to ${g(sg.x1 * C)})` : "";
+    if (s.kind === 0){
+      curves.push({title:"Upper surface", x:X, y:YT, ...range}, {title:"Lower surface", x:X, y:`-(${YT})`, ...range});
+      return;
+    }
+    const YC = poly([[c0*C, 0], [c1*C, 2], [c2*C, 4], [c3*C, 6]]);
+    const D = poly([[c1, 0], [2*c2, 2], [3*c3, 4]]);
+    const Nn = `sqr(1+(${D})^2)`;
+    curves.push(
+      {title:`Upper surface${part}${span}`, x:`${X} - (${YT})*(${D})/${Nn}`, y:`${YC} + (${YT})/${Nn}`, ...range},
+      {title:`Lower surface${part}${span}`, x:`${X} + (${YT})*(${D})/${Nn}`, y:`${YC} - (${YT})/${Nn}`, ...range});
+  });
+  return {curves};
+}
+
 const fmt = v => { const t = v.toFixed(5); return t === "-0.00000" ? "0.00000" : t; };
 const toTxt = pts => pts.map(([x, y]) => `${fmt(x)}\t${fmt(y)}\t0.00000`).join("\r\n") + "\r\n";
-function partText(g, part){
-  if (part === "upper") return toTxt(g.up);
-  if (part === "lower") return toTxt(g.lo);
-  return toTxt([...g.up].reverse().concat(g.lo.slice(1)));  // tail -> nose -> tail
+function partText(gen, part){
+  if (part === "upper") return toTxt(gen.up);
+  if (part === "lower") return toTxt(gen.lo);
+  return toTxt([...gen.up].reverse().concat(gen.lo.slice(1)));  // tail -> nose -> tail
 }
 // --- end generator ---
 
 const $ = id => document.getElementById(id);
 let cur = null;
 
+function el(tag, cls, text){
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function copyBtn(text){
+  const b = el("button", "btn alt", "Copy");
+  b.type = "button";
+  b.onclick = async () => {
+    try { await navigator.clipboard.writeText(text); b.textContent = "Copied"; }
+    catch { b.textContent = "Select and copy"; }
+    setTimeout(() => b.textContent = "Copy", 1500);
+  };
+  return b;
+}
+
+function renderEqs(str, chordStr){
+  const box = $("eqs");
+  box.replaceChildren();
+  const r = eqCurves(str, chordStr);
+  if (r.error) return;
+  for (const c of r.curves){
+    const card = el("div", "curve");
+    card.append(el("h3", "", c.title));
+    for (const [label, val] of [["x(t)", c.x], ["y(t)", c.y], ["t₁", c.t1], ["t₂", c.t2]]){
+      const row = el("div", "row");
+      row.append(el("b", "", label), el("code", "", val), copyBtn(val));
+      card.append(row);
+    }
+    box.append(card);
+  }
+}
+
 function render(){
-  const g = nacaGen($("naca").value, $("chord").value);
-  $("err").textContent = g.error || "";
-  document.querySelectorAll("[data-part]").forEach(b => b.disabled = !!g.error);
-  if (g.error){ cur = null; return; }
-  cur = g;
-  const c = g.chord;
+  const unit = $("unit").value;
+  $("docunit").textContent = unit;
+  const g0 = nacaGen($("naca").value, $("chord").value);
+  $("err").textContent = g0.error || "";
+  document.querySelectorAll("[data-part]").forEach(b => b.disabled = !!g0.error);
+  if (g0.error){ cur = null; $("eqs").replaceChildren(); return; }
+  cur = g0;
+  renderEqs($("naca").value, $("chord").value);
+  const c = g0.chord;
   let hy = 0, ly = 0;
-  for (let i = 0; i < N; i++){ hy = Math.max(hy, g.up[i][1]); ly = Math.min(ly, g.lo[i][1]); }
+  for (let i = 0; i < N; i++){ hy = Math.max(hy, g0.up[i][1]); ly = Math.min(ly, g0.lo[i][1]); }
   const pad = c*0.03, sw = c*0.004;
   const pts = a => a.map(([x, y]) => `${x},${y}`).join(" ");
   $("plot").setAttribute("viewBox", `${-pad} ${-(hy + pad)} ${c + 2*pad} ${hy - ly + 2*pad}`);
   $("plot").innerHTML =
     `<g transform="scale(1,-1)">` +
-    `<polygon points="${pts(g.up.concat(g.lo.slice(1, -1).reverse()))}" fill="#fff" stroke="#201e1d" stroke-width="${sw}" stroke-linejoin="round"/>` +
-    `<polyline points="${pts(g.mid)}" fill="none" stroke="#ec3013" stroke-width="${sw*0.6}" stroke-dasharray="${sw*3},${sw*3}"/></g>`;
-  $("cap").textContent = `NACA ${g.name}, chord ${c}. Dashed line is the camber line.`;
+    `<polygon points="${pts(g0.up.concat(g0.lo.slice(1, -1).reverse()))}" fill="#fff" stroke="#201e1d" stroke-width="${sw}" stroke-linejoin="round"/>` +
+    `<polyline points="${pts(g0.mid)}" fill="none" stroke="#ec3013" stroke-width="${sw*0.6}" stroke-dasharray="${sw*3},${sw*3}"/></g>`;
+  const other = unit === "m" ? `${(c/0.3048).toPrecision(4)} ft` : `${(c*0.3048).toPrecision(4)} m`;
+  $("cap").textContent = `NACA ${g0.name}, chord ${c} ${unit} (${other}). Dashed line is the camber line.`;
 }
 
 document.querySelectorAll("[data-part]").forEach(b => b.onclick = () => {
   if (!cur) return;
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([partText(cur, b.dataset.part)], {type:"text/plain"}));
-  a.download = `naca${cur.name}_${cur.chord}_${b.dataset.part}.txt`;
+  a.download = `naca${cur.name}_${cur.chord}${$("unit").value}_${b.dataset.part}.txt`;
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 });
