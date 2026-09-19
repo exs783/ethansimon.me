@@ -384,7 +384,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   <div class="method-copy">
     <p><strong>Aerodynamic-center reporting</strong>, inspired by Grimm, Price &amp; Ahmad's flight-tested flying-wing optimization (<em>Aerospace Systems</em>, 2026), which treats longitudinal stability as the primary design objective. <code>wing_mac_and_ac()</code> reports the wing's own mean aerodynamic chord and where its aerodynamic center sits relative to the root leading edge, derived directly from closed-form wing-theory integrals for both the linear-taper and elliptical planform rather than quoted from a table: <code>c̄ = (2/3)c_root(1+λ+λ²)/(1+λ)</code>, <code>x_AC = ȳ·tan(Λ) + 0.25c̄</code>. This only covers the wing's own half of a stability check — a real static margin also needs the aircraft's CG and any tail, which is out of scope for a wing-only script.</p>
     <p><strong>Two wing-mass models.</strong> <code>--mass-model empirical</code> is a single fitted AR^0.5 exponent. <code>--mass-model beam</code>, inspired by Zhao et al.'s finite-element model updating for a composite flying-wing (AIAA SciTech 2019, 2019-1814) which calibrates mass and stiffness against real vibration-test data, makes two real structural drivers explicit instead: ultimate load factor and airfoil thickness ratio, through a first-order beam-bending scaling, <code>m ∝ (AR/AR_ref)^1.5 · (n/n_ref) · (t/c_ref ÷ t/c)^0.5</code>. The AR penalty is steeper, load factor enters linearly, and thinner airfoils cost more mass — a physically-derived scaling rather than a named curve fit, so it isn't borrowing anyone else's exact coefficients.</p>
-    <p><strong>Joint taper search.</strong> <code>--objective combined</code> searches taper jointly with cl and aspect ratio, inspired by Bombardieri et al.'s coupled aerostructural wing optimization (<em>Structural and Multidisciplinary Optimization</em>, 2021) — their central finding is that optimizing aerodynamics and structure separately misses real gains a coupled search finds. Taper's only channel into this model is bending relief → wing mass → hover energy, <code>η_bend = (1+2λ)/3</code>, weighed against induced drag from the Oswald-efficiency estimate, <code>e₀ = 4.61(1−0.045·AR^0.68)cos(Λ)^0.15 − 3.1</code>, <code>C_Di = C_L²/(π·AR·e₀)</code>. That's a narrower coupling than the paper's full aero-structural one, but it's real: a taper that trades structural weight for nothing in cruise drag gets evaluated by the same objective as cl and AR, not decided in a separate step.</p>
+    <p><strong>Joint taper search.</strong> <code>--objective combined</code> searches taper jointly with cl and aspect ratio, inspired by Bombardieri et al.'s coupled aerostructural wing optimization (<em>Structural and Multidisciplinary Optimization</em>, 2021) — their central finding is that optimizing aerodynamics and structure separately misses real gains a coupled search finds. Taper's only channel into this model is bending relief → wing mass → hover energy, <code>η_bend = 2(1+2λ)/(3(1+λ))</code>, weighed against induced drag from the Oswald-efficiency estimate, <code>e₀ = 4.61(1−0.045·AR^0.68)cos(Λ)^0.15 − 3.1</code>, <code>C_Di = C_L²/(π·AR·e₀)</code>. That's a narrower coupling than the paper's full aero-structural one, but it's real: a taper that trades structural weight for nothing in cruise drag gets evaluated by the same objective as cl and AR, not decided in a separate step.</p>
   </div>
 
   <h6 class="subhead">Outcome</h6>
@@ -396,12 +396,12 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   <div class="figure-card">
     <div class="figure-title">Bending relief vs. taper ratio</div>
     <div data-fig="bendingReliefFigure"></div>
-    <div class="figure-caption">η_bend = (1+2λ)/3, computed over the full taper range — this is the one number taper actually moves in the model, weighed against induced drag to find the joint optimum. Marker is the search's real result for this tier, λ = 0.30.</div>
+    <div class="figure-caption">η_bend = 2(1+2λ)/(3(1+λ)), computed over the full taper range — this is the one number taper actually moves in the model, weighed against induced drag to find the joint optimum. Marker is the search's real result for the TailSitter Balanced tier, λ = 0.30 → η = 0.82.</div>
   </div>
   <div class="figure-card">
     <div class="figure-title">Example wing with joint taper search</div>
     <div data-fig="wingPlanformFigureFull"></div>
-    <div class="figure-caption">Real output of --objective combined --taper-min 0.3 --taper-max 1.0: AR 8.56, taper ratio 0.30 (root 0.312 m / tip 0.093 m chord), span 1.73 m. Marker is the reported aerodynamic center — MAC 0.222 m, 0.056 m aft of the root leading edge, 0.356 m out along the span.</div>
+    <div class="figure-caption">Real output of --objective combined --taper-min 0.3 --taper-max 1.0 for the TailSitter Balanced tier (92.5 kg lift mass, 18.8 m/s cruise): AR 8.64, taper ratio 0.30 (root 1.151 m / tip 0.345 m chord), span 6.463 m. Marker is the reported aerodynamic center — MAC 0.820 m, 0.205 m aft of the root leading edge, 1.326 m out along the span.</div>
   </div>
   <div class="figure-card">
     <div class="figure-title">NACA 2412 — the file's own --naca example</div>
@@ -855,9 +855,9 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     const W = 300, H = 150, M = {l:36, r:10, t:14, b:34};
     const plotW = W-M.l-M.r, plotH = H-M.t-M.b;
     const root = svgRoot(`0 0 ${W} ${H}`);
-    const etaAt = lam => (1 + 2*lam) / 3;
+    const etaAt = lam => 2*(1 + 2*lam) / (3*(1 + lam));
     const toX = lam => M.l + lam*plotW;
-    const toY = eta => M.t + plotH - ((eta - 1/3) / (2/3)) * plotH;
+    const toY = eta => M.t + plotH - ((eta - 2/3) / (1/3)) * plotH;
     const n = 40, pts = [];
     for (let i = 0; i <= n; i++){ const lam = i/n; pts.push(`${toX(lam).toFixed(1)},${toY(etaAt(lam)).toFixed(1)}`); }
     root.appendChild(svg("line", {x1:M.l, x2:W-M.r, y1:M.t+plotH, y2:M.t+plotH, stroke:LINE}));
@@ -874,7 +874,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
       t.textContent = lam.toFixed(1);
       root.appendChild(t);
     });
-    [1/3, 2/3, 1].forEach(eta => {
+    [2/3, 5/6, 1].forEach(eta => {
       const y = toY(eta);
       const t = svg("text", {x:M.l-6, y:y+3, "text-anchor":"end", "font-size":"8.5", "font-family":"Archivo", fill:INK2});
       t.textContent = eta.toFixed(2);
@@ -1004,7 +1004,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     const root = svgRoot("0 0 300 100");
     const scale = 150;
     const cx = 150, leY = 14;
-    const rootChordPx = 0.3115 * scale, tipChordPx = 0.0935 * scale, halfSpanPx = 0.8666 * scale;
+    const rootChordPx = 0.3087 * scale, tipChordPx = 0.0925 * scale, halfSpanPx = 0.8666 * scale;
     const rootTeY = leY + rootChordPx, tipTeY = leY + tipChordPx;
     [1, -1].forEach(s => {
       root.appendChild(svg("polygon", { points: `${cx},${leY} ${cx + s*halfSpanPx},${leY} ${cx + s*halfSpanPx},${tipTeY} ${cx},${rootTeY}`, fill: "#fff", stroke: INK, "stroke-width": 2, "stroke-linejoin": "round" }));
@@ -1016,7 +1016,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
       const acLabel = svg("text", {x: acX + 7, y: acY + 3, "font-size": "9", "font-family": "Archivo", fill: ACCENT});
       acLabel.textContent = "AC"; root.appendChild(acLabel);
       const cap = svg("text", {x: 150, y: 94, "text-anchor": "middle", "font-size": "9.5", "font-family": "Archivo", fill: INK2});
-      cap.textContent = "AR 8.56, taper 0.30 (joint search)"; root.appendChild(cap);
+      cap.textContent = "AR 8.64, taper 0.30 (joint search)"; root.appendChild(cap);
     }
     return root;
   }
