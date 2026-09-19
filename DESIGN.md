@@ -74,8 +74,8 @@ changes to their drawing code.
   bounded by its parent; `--nav-h` is the measured 66px), brand wordmark left,
   text links (Projects/About/Skills/Contact) plus one outlined LinkedIn button,
   2px bottom divider.
-- **Hero**: a concrete first-person claim (what he designs, simulates, builds),
-  one short line about the internship search, two CTAs (primary ink button to
+- **Hero**: a one-line background statement (mechanical engineering, electronic
+  integration, testing), one short line about the internship search, two CTAs (primary ink button to
   the reel, secondary outlined Resume link), and one real piece of work on the
   right: the CompDrone2025 render in a bordered figure with a two-cell
   titleblock caption. The grayscale headshot now lives in About.

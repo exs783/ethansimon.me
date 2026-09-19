@@ -122,7 +122,7 @@ header{position:sticky;top:0;z-index:40}
 /* — hero — */
 .hero{padding:clamp(48px,9vw,110px) clamp(20px,5vw,64px) clamp(40px,6vw,72px);
   display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(24px,4vw,56px);align-items:center;border-bottom:2px solid var(--color-divider)}
-.hero h1{font-size:clamp(30px,4.6vw,54px);max-width:22ch;margin-bottom:var(--space-4)}
+.hero h1{font-size:clamp(28px,3.6vw,46px);max-width:26ch;margin-bottom:var(--space-4)}
 .hero p{font-size:clamp(16px,1.6vw,18px);max-width:58ch;color:var(--color-neutral-800);margin-bottom:var(--space-6)}
 .hero-figure{display:block;width:100%;max-width:520px;margin-left:auto;border:1px solid var(--color-divider);background:var(--color-neutral-100);text-decoration:none;color:inherit}
 .hero-figure:hover{color:inherit}
@@ -234,7 +234,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 
 <section class="hero">
   <div>
-    <h1>I design drone airframes, simulate their missions, and build test machines.</h1>
+    <h1>Background in mechanical engineering, with experience in electronic integration, and testing</h1>
     <p>Mechanical engineering student at Case Western Reserve, looking for a summer 2027 internship. The projects below are what I've built so far.</p>
     <div style="display:flex;gap:var(--space-3);flex-wrap:wrap">
       <a href="#reel" class="btn btn-primary">See the projects <span aria-hidden="true">→</span></a>
@@ -266,7 +266,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
         <p>The fatigue test machine I designed, manufactured, and put into service as a co-op at Tylok International, built to test a range of part sizes.</p>
         <div class="frame-tb">
           <div><span class="tb-label">Discipline</span><span class="tb-value">Mechanical testing</span></div>
-          <div><span class="tb-label">Built with</span><span class="tb-value">Air cylinders, controller</span></div>
+          <div><span class="tb-label">Built with</span><span class="tb-value">Dewesoft, air cylinders</span></div>
           <div class="tb-wide"><span class="tb-label">Result</span><span class="tb-result">Built to <strong>ASTM F1387 A6</strong>, Jan–Aug 2026.</span></div>
         </div>
         <span class="view-link">View project <span aria-hidden="true">→</span></span>
@@ -809,15 +809,24 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 
   <h3 class="subhead">Overview</h3>
   <div class="method-copy">
-    <p>The machine is for internal testing, built in accordance with ASTM standards to handle a variety of parts and sizes. I did the whole job: the design, the manufacturing, and getting it running in use. The photo shows the assembled machine, with the ASTM F1387 A6 flexure-fatigue label on its controller.</p>
-    <p>I also developed other internal stress and verification apparatus: thermal, flow, tensile, and pressure testing. For data acquisition I researched, acquired, and integrated a Dewesoft system, and developed programs in DewesoftX and C++ for technical analysis.</p>
+    <p>The machine is for internal testing, built in accordance with ASTM standards to handle a variety of parts and sizes. I owned it end to end: the design, the machining and assembly, and the verification. The photo shows the assembled machine, with the ASTM F1387 A6 flexure-fatigue label on its controller.</p>
+    <p>I also developed other internal stress and verification apparatus: thermal, flow, tensile, and pressure testing.</p>
+  </div>
+
+  <h3 class="subhead">Method</h3>
+  <div class="method-copy">
+    <p><strong>Stress analysis first.</strong> I used fundamental principles of stress analysis to decide how to design the system and what its size constraints were, before any CAD.</p>
+    <p><strong>CAD.</strong> With the approach and the size limits set, I moved into CAD.</p>
+    <p><strong>Machining and assembly.</strong> I machined the parts and assembled the machine.</p>
+    <p><strong>Verification.</strong> I verified the machine and confirmed the results.</p>
+    <p><strong>Data collection and control.</strong> I researched, acquired, and integrated a Dewesoft system for data acquisition. I wrote Dewesoft programs (DewesoftX and C++) to collect and analyse the data and to run the machine's control system.</p>
   </div>
 
   <h3 class="subhead">Outcome</h3>
   <div class="figure-card">
     <div class="figure-title">Flexural fatigue machine</div>
     <div data-fig="tylokFigure"></div>
-    <div class="figure-caption">The machine as built: two opposed air cylinders load the test fixture, and a controller with a display and mode switch runs it.</div>
+    <div class="figure-caption">The machine as built: two opposed air cylinders on either side of the test fixture, and a controller box with a display and mode switch.</div>
   </div>
 </section>
 
