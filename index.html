@@ -244,29 +244,20 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   </div>
 
   <div class="strip">
-    <h3 class="strip-title">Simulation and software</h3>
+    <h3 class="strip-title">Featured projects</h3>
     <div class="sprocket" aria-hidden="true"></div>
-    <div class="sheet sheet-4">
-      <a href="#mission-model" class="frame">
-        <div class="frame-top"><span class="tag tag-mono-outline">Coding</span><span class="frame-num">01</span></div>
-        <div class="frame-fig" data-fig="missionProfileFigure"></div>
-        <h4>Mission Model</h4>
-        <p>Flies a mock DARPA Heavy Lift 2028 course with every motor, propeller, and battery combination it has data for, and reports which ones finish it.</p>
-        <p class="frame-fact"><strong>2,793</strong> combinations swept across <strong>12</strong> vehicle configs.</p>
-        <div class="tag-row"><span class="tag tag-neutral">Python</span><span class="tag tag-neutral">Quaternion 6DOF</span></div>
-        <span class="view-link">View project <span aria-hidden="true">→</span></span>
-      </a>
-      <a href="#wing-optimizer" class="frame">
-        <div class="frame-top"><span class="tag tag-mono-outline">Coding</span><span class="frame-num">02</span></div>
-        <div class="frame-fig" data-fig="wingPlanformFigure"></div>
-        <h4>Wing Optimizer</h4>
-        <p>Sizes a wing from a lift requirement and a cruise speed, then writes the geometry out as SolidWorks equations. Built to support Mission Model.</p>
-        <p class="frame-fact">Balanced tailsitter: AR <strong>8.64</strong>, taper <strong>0.30</strong>, span <strong>6.463 m</strong>.</p>
-        <div class="tag-row"><span class="tag tag-neutral">Python</span><span class="tag tag-neutral">NACA airfoils</span></div>
+    <div class="sheet sheet-3">
+      <a href="#hexacopter-drone" class="frame">
+        <div class="frame-top"><span class="tag tag-mono-outline">CAD</span><span class="frame-num">01</span></div>
+        <div class="frame-fig" data-fig="cadPhotoFigure"></div>
+        <h4>Hexacopter Drone</h4>
+        <p>The competition hexacopter for VFS DBVF. I worked on the frame, motor mounts, sensor mounts, and payload mounts.</p>
+        <p class="frame-fact"><strong>7</strong> subassemblies mated into one SolidWorks assembly.</p>
+        <div class="tag-row"><span class="tag tag-neutral">SolidWorks</span><span class="tag tag-neutral">DBVF</span></div>
         <span class="view-link">View project <span aria-hidden="true">→</span></span>
       </a>
       <a href="demos/log-dashboard.html" class="frame">
-        <div class="frame-top"><span class="tag tag-mono-outline">Coding</span><span class="frame-num">03</span></div>
+        <div class="frame-top"><span class="tag tag-mono-outline">Coding</span><span class="frame-num">02</span></div>
         <div class="frame-fig" data-fig="droneScopeFigure"></div>
         <h4>Log Dashboard</h4>
         <p>Decodes a Pixhawk flight log into a score, an issues list, and every chart, so you can tell whether a flight was healthy before flying again.</p>
@@ -274,17 +265,8 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
         <div class="tag-row"><span class="tag tag-neutral">Flask</span><span class="tag tag-neutral">Plotly</span></div>
         <span class="view-link">Open the live demo <span aria-hidden="true">→</span></span>
       </a>
-      <a href="#liquid-rocket" class="frame">
-        <div class="frame-top"><span class="tag tag-mono-outline">Coding</span><span class="frame-num">04</span></div>
-        <div class="frame-fig" data-fig="rocketFigure"></div>
-        <h4>Liquid Rocket</h4>
-        <p>Ground-station software for a liquid rocket test stand: valve control, live gauges, and CSV logging in one PyQt6 app.</p>
-        <p class="frame-fact"><strong>9</strong> sensor channels: P0–P6, T0, L0.</p>
-        <div class="tag-row"><span class="tag tag-neutral">PyQt6</span><span class="tag tag-neutral">Real wire protocol</span></div>
-        <span class="view-link">View project <span aria-hidden="true">→</span></span>
-      </a>
       <a href="#naca-solidworks" class="frame">
-        <div class="frame-top"><span class="tag tag-mono-outline">Coding</span><span class="frame-num">05</span></div>
+        <div class="frame-top"><span class="tag tag-mono-outline">Coding</span><span class="frame-num">03</span></div>
         <div class="frame-fig" data-fig="nacaAirfoilFigure"></div>
         <h4>NACA to SolidWorks</h4>
         <p>Turns a NACA airfoil number and a chord length into the XYZ point files SolidWorks reads as curves. Runs in the browser, nothing uploaded.</p>
@@ -297,16 +279,34 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   </div>
 
   <div class="strip">
-    <h3 class="strip-title">Airframes and CAD</h3>
+    <h3 class="strip-title">All projects</h3>
     <div class="sprocket" aria-hidden="true"></div>
-    <div class="sheet sheet-3">
-      <a href="#hexacopter-drone" class="frame">
-        <div class="frame-top"><span class="tag tag-mono-outline">CAD</span><span class="frame-num">06</span></div>
-        <div class="frame-fig" data-fig="cadPhotoFigure"></div>
-        <h4>Hexacopter Drone</h4>
-        <p>The competition hexacopter for VFS DBVF. I worked on the frame, motor mounts, sensor mounts, and payload mounts.</p>
-        <p class="frame-fact"><strong>7</strong> subassemblies mated into one SolidWorks assembly.</p>
-        <div class="tag-row"><span class="tag tag-neutral">SolidWorks</span><span class="tag tag-neutral">DBVF</span></div>
+    <div class="sheet sheet-4">
+      <a href="#mission-model" class="frame">
+        <div class="frame-top"><span class="tag tag-mono-outline">Coding</span><span class="frame-num">04</span></div>
+        <div class="frame-fig" data-fig="missionProfileFigure"></div>
+        <h4>Mission Model</h4>
+        <p>Flies a mock DARPA Heavy Lift 2028 course with every motor, propeller, and battery combination it has data for, and reports which ones finish it.</p>
+        <p class="frame-fact"><strong>2,793</strong> combinations swept across <strong>12</strong> vehicle configs.</p>
+        <div class="tag-row"><span class="tag tag-neutral">Python</span><span class="tag tag-neutral">Quaternion 6DOF</span></div>
+        <span class="view-link">View project <span aria-hidden="true">→</span></span>
+      </a>
+      <a href="#wing-optimizer" class="frame">
+        <div class="frame-top"><span class="tag tag-mono-outline">Coding</span><span class="frame-num">05</span></div>
+        <div class="frame-fig" data-fig="wingPlanformFigure"></div>
+        <h4>Wing Optimizer</h4>
+        <p>Sizes a wing from a lift requirement and a cruise speed, then writes the geometry out as SolidWorks equations. Built to support Mission Model.</p>
+        <p class="frame-fact">Balanced tailsitter: AR <strong>8.64</strong>, taper <strong>0.30</strong>, span <strong>6.463 m</strong>.</p>
+        <div class="tag-row"><span class="tag tag-neutral">Python</span><span class="tag tag-neutral">NACA airfoils</span></div>
+        <span class="view-link">View project <span aria-hidden="true">→</span></span>
+      </a>
+      <a href="#liquid-rocket" class="frame">
+        <div class="frame-top"><span class="tag tag-mono-outline">Coding</span><span class="frame-num">06</span></div>
+        <div class="frame-fig" data-fig="rocketFigure"></div>
+        <h4>Liquid Rocket</h4>
+        <p>Ground-station software for a liquid rocket test stand: valve control, live gauges, and CSV logging in one PyQt6 app.</p>
+        <p class="frame-fact"><strong>9</strong> sensor channels: P0–P6, T0, L0.</p>
+        <div class="tag-row"><span class="tag tag-neutral">PyQt6</span><span class="tag tag-neutral">Real wire protocol</span></div>
         <span class="view-link">View project <span aria-hidden="true">→</span></span>
       </a>
       <a href="#x8-tailsitter" class="frame">
