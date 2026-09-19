@@ -684,7 +684,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   <div class="figure-card">
     <div class="figure-title">CompDrone2025 — interactive model</div>
     <div data-fig="modelFigureCad"></div>
-    <div class="figure-caption">Click the image to load the interactive 3D model (2.2 MB), then drag to rotate.</div>
+    <div class="figure-caption">Interactive 3D model (2.2 MB). Drag to rotate, scroll or pinch to zoom.</div>
   </div>
 
 
@@ -712,7 +712,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   <div class="figure-card">
     <div class="figure-title">X-8 Tailsitter</div>
     <div data-fig="x8TiltMotorFigure"></div>
-    <div class="figure-caption">Click the image to load the interactive 3D model (1.4 MB), then drag to rotate.</div>
+    <div class="figure-caption">Interactive 3D model (1.4 MB). Drag to rotate, scroll or pinch to zoom.</div>
   </div>
 </section>
 
@@ -738,7 +738,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   <div class="figure-card">
     <div class="figure-title">5-inch drone frame</div>
     <div data-fig="quadcopterFigure"></div>
-    <div class="figure-caption">Click the image to load the interactive 3D model (0.7 MB), then drag to rotate.</div>
+    <div class="figure-caption">Interactive 3D model (0.7 MB). Drag to rotate, scroll or pinch to zoom.</div>
   </div>
 </section>
 
@@ -1399,8 +1399,8 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     const mv = document.createElement("model-viewer");
     mv.setAttribute("src", src); mv.setAttribute("alt", alt);
     if (poster) mv.setAttribute("poster", poster);
-    // The model only downloads once the visitor clicks the poster image.
-    mv.setAttribute("loading", "lazy"); mv.setAttribute("reveal", "interaction");
+    // Lazy: the model downloads once its (initially hidden) section scrolls into view; the poster shows until it is ready.
+    mv.setAttribute("loading", "lazy"); mv.setAttribute("reveal", "auto");
     mv.setAttribute("camera-controls", "");
     if (!matchMedia("(prefers-reduced-motion: reduce)").matches) mv.setAttribute("auto-rotate", "");
     mv.setAttribute("shadow-intensity", "1"); mv.setAttribute("exposure", "1");
