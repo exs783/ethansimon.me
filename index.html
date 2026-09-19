@@ -326,20 +326,19 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
       <h2 style="margin-top:var(--space-2)">Mission Model</h2>
     </div>
   </div>
-  <p class="project-tagline">A mission-performance simulator that sweeps every motor, propeller, and battery combination it has data for against a fixed cargo mission and reports which ones actually complete it — including, for winged tailsitter airframes, a real quaternion 6DOF rigid-body simulation of the hover-to-cruise transition instead of a simplified angle approximation.</p>
+  <p class="project-tagline">A mission-performance simulator that sweeps every motor, propeller, and battery combination it is given. The model runs a theoretical mission, the DARPA 2028 heavy lift, and returns the feasibility of each combination. It's state based, with the states of landed, take-off, transition, cruise, and land. The model runs a system of dynamics equations to model the motion of flight in every state except transition. In the transition state the drone uses a quaternion model to better represent its motion through the transition from vertical to horizontal flight.</p>
 
   <h6 class="subhead">Overview</h6>
   <div class="method-copy">
-    <p>Mission Model simulates a specific cargo run for a family of VTOL (vertical takeoff/landing) airframes: takeoff to 100 ft, cruise 1 nautical mile, land, pick up cargo, takeoff, cruise 8 nm, land, drop cargo, takeoff, cruise 1 nm back, land. For every candidate airframe, it sweeps every motor × propeller × battery combination it has spec data for (thousands of combinations) and reports which one actually completes the mission, how much battery it has left over, and how long it can hover — so "which motor should this drone use" becomes a search over real thrust-curve data instead of a guess.</p>
-    <p>Wing sizing for the winged tailsitter variants comes from a separate standalone tool, <code>wing_optimizer.py</code> — its own project below — which sizes every TailSitter config against the fleet's real governed cruise speeds.</p>
+    <p>Mission Model simulates the running of a course for a variety of airframes. The current iteration runs the following mission: takeoff to 100 ft, cruise 1 nautical mile, land, pick up cargo, takeoff, cruise 8 nm, land, drop cargo, takeoff, cruise 1 nm back, land. For every candidate airframe, it sweeps every motor × propeller × battery combination it has spec data for and reports which one actually completes the mission. It also reports back how much battery it has left over, and how long it can hover.</p>
     <p>The airframe list (Hexacopter, Quadcopter, x8, Tail Sitter) matches the real vehicle classes I work on as VTOL Mechanical Team Lead — this is the same kind of simulation-to-inform-design work as the MATLAB/Python scripts I write for the team, built out as a standalone public tool.</p>
   </div>
 
   <h6 class="subhead">Method</h6>
   <div class="method-copy">
-    <p>Every TailSitter vehicle config is sized using Wing Optimizer's energy-based (hover + cruise) objective, evaluated at each tier's real governed cruise speed (18.0/18.8/19.6 m/s). Required wing area scales as 1/v², so getting the real cruise speed right — not a flat placeholder — is the single biggest lever on the sizing result.</p>
-    <p>The mission simulation uses closed-form kinematics for wingless multirotors — thrust against quadratic drag, <code>v̇ = a₀ − k·v²</code>, has an exact tanh solution, so every accel/decel leg is solved in one evaluation instead of stepped through a simulation loop.</p>
-    <p>A winged tailsitter's hover-to-cruise transition can't take that shortcut. The rotor thrust has to physically rotate from vertical to horizontal as the wing builds lift with airspeed, so the required thrust angle and the drag area both keep changing through the maneuver. I integrate that leg as a full quaternion 6DOF rigid body — position, velocity, attitude, and angular rate together. Attitude kinematics: <code>q̇ = ½ q ⊗ [0, ω]</code> (Hamilton, scalar-first), alongside the rotational dynamics <code>I ω̇ = τ − ω × (Iω)</code>. I use quaternions specifically because Euler angles hit a gimbal-lock singularity right at the 90° pitch-over a tailsitter transition goes through — the one attitude this model actually has to fly through on every single leg.</p>
+    <p>Every TailSitter vehicle config is sized using Wing Optimizer's energy-based (hover + cruise) objective, evaluated at each tier's real governed cruise speed. The required wing area scales as 1/v², so getting the real cruise speed right has a large impact on the sizing result.</p>
+    <p>The mission simulation uses closed-form kinematics for wingless multirotors, <code>v̇ = a₀ − k·v²</code>, which has an exact tanh solution, so every accel/decel leg is solved in one evaluation instead of stepped through a simulation loop.</p>
+    <p>A winged tailsitter's hover-to-cruise transition can't take that shortcut. The rotor thrust has to physically rotate from vertical to horizontal as the wing builds lift with airspeed, so the required thrust angle and the drag area both keep changing through the maneuver. I integrate that leg as a full quaternion 6DOF rigid body, position, velocity, attitude, and angular rate together. Attitude kinematics: <code>q̇ = ½ q ⊗ [0, ω]</code> (Hamilton, scalar-first), alongside the rotational dynamics <code>I ω̇ = τ − ω × (Iω)</code>. I use quaternions specifically because Euler angles hit a gimbal-lock singularity right at the 90° pitch-over a tailsitter transition goes through.</p>
     <p>Lift points along the wing's own body-fixed axis and scales with the velocity component perpendicular to it, rather than pointing straight up and scaling with raw airspeed the way a simpler model would. That distinction matters most mid-transition, when the vehicle is neither purely hovering nor purely cruising and a fixed lift direction isn't a safe approximation.</p>
   </div>
 
@@ -382,19 +381,19 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
       <h2 style="margin-top:var(--space-2)">Wing Optimizer</h2>
     </div>
   </div>
-  <p class="project-tagline">A wing-sizing tool that searches lift coefficient, aspect ratio, and taper ratio for whichever combination minimizes structural mass, cruise drag, or total mission energy. Three of its search objectives are grounded in real aerostructural optimization papers — not a claim to replicate methods (RANS CFD, nonlinear FE, flight test) a standalone script can't actually run.</p>
+  <p class="project-tagline">A wing-sizing tool that searches lift coefficient, aspect ratio, and taper ratio for whichever combination minimizes structural mass, cruise drag, or total mission energy. Three of its search objectives are grounded in real aerostructural optimization papers. It doesn't claim to replicate methods like RANS CFD, nonlinear FE, or flight test — a standalone script can't actually run those.</p>
 
   <h6 class="subhead">Overview</h6>
   <div class="method-copy">
-    <p><code>wing_optimizer.py</code> sizes a wing from mission requirements alone. Given how much weight it has to lift and how fast the aircraft cruises, it searches lift coefficient, aspect ratio, and (for the energy objective) taper ratio for whichever combination minimizes structural mass, cruise drag, or total mission energy, then emits the winning geometry as SolidWorks-ready NACA equations or point-cloud curves, plus a <code>vehicle_configs</code>-style JSON entry Mission Model can load directly.</p>
-    <p>Three of its objectives are each grounded in one real aerostructural optimization paper. Method below covers exactly what carried over from each one, and what I deliberately left out of scope.</p>
+    <p><code>wing_optimizer.py</code> sizes a wing from mission requirements alone. It takes how much weight the wing has to lift and how fast the aircraft cruises, then searches lift coefficient, aspect ratio, and (for the energy objective) taper ratio for whichever combination minimizes structural mass, cruise drag, or total mission energy. It emits the winning geometry as SolidWorks-ready NACA equations or point-cloud curves, plus a <code>vehicle_configs</code>-style JSON entry Mission Model can load directly.</p>
+    <p>Three of its objectives are each grounded in one real aerostructural optimization paper. The method below covers what carried over from each paper, and what I deliberately left out of scope.</p>
   </div>
 
   <h6 class="subhead">Method</h6>
   <div class="method-copy">
-    <p><strong>Aerodynamic-center reporting</strong>, inspired by Grimm, Price &amp; Ahmad's flight-tested flying-wing optimization (<em>Aerospace Systems</em>, 2026), which treats longitudinal stability as the primary design objective. <code>wing_mac_and_ac()</code> reports the wing's own mean aerodynamic chord and where its aerodynamic center sits relative to the root leading edge, derived directly from closed-form wing-theory integrals for both the linear-taper and elliptical planform rather than quoted from a table: <code>c̄ = (2/3)c_root(1+λ+λ²)/(1+λ)</code>, <code>x_AC = ȳ·tan(Λ) + 0.25c̄</code>. This only covers the wing's own half of a stability check — a real static margin also needs the aircraft's CG and any tail, which is out of scope for a wing-only script.</p>
-    <p><strong>Two wing-mass models.</strong> <code>--mass-model empirical</code> is a single fitted AR^0.5 exponent. <code>--mass-model beam</code>, inspired by Zhao et al.'s finite-element model updating for a composite flying-wing (AIAA SciTech 2019, 2019-1814) which calibrates mass and stiffness against real vibration-test data, makes two real structural drivers explicit instead: ultimate load factor and airfoil thickness ratio, through a first-order beam-bending scaling, <code>m ∝ (AR/AR_ref)^1.5 · (n/n_ref) · (t/c_ref ÷ t/c)^0.5</code>. The AR penalty is steeper, load factor enters linearly, and thinner airfoils cost more mass — a physically-derived scaling rather than a named curve fit, so it isn't borrowing anyone else's exact coefficients.</p>
-    <p><strong>Joint taper search.</strong> <code>--objective combined</code> searches taper jointly with cl and aspect ratio, inspired by Bombardieri et al.'s coupled aerostructural wing optimization (<em>Structural and Multidisciplinary Optimization</em>, 2021) — their central finding is that optimizing aerodynamics and structure separately misses real gains a coupled search finds. Taper's only channel into this model is bending relief → wing mass → hover energy, <code>η_bend = 2(1+2λ)/(3(1+λ))</code>, weighed against induced drag from the Oswald-efficiency estimate, <code>e₀ = 4.61(1−0.045·AR^0.68)cos(Λ)^0.15 − 3.1</code>, <code>C_Di = C_L²/(π·AR·e₀)</code>. That's a narrower coupling than the paper's full aero-structural one, but it's real: a taper that trades structural weight for nothing in cruise drag gets evaluated by the same objective as cl and AR, not decided in a separate step.</p>
+    <p><strong>Aerodynamic-center reporting</strong> is inspired by Grimm, Price &amp; Ahmad's flight-tested flying-wing optimization (<em>Aerospace Systems</em>, 2026), which treats longitudinal stability as the primary design objective. <code>wing_mac_and_ac()</code> reports the wing's own mean aerodynamic chord and where its aerodynamic center sits relative to the root leading edge. Both come straight from closed-form wing-theory integrals for the linear-taper and elliptical planform, not from a table: <code>c̄ = (2/3)c_root(1+λ+λ²)/(1+λ)</code>, <code>x_AC = ȳ·tan(Λ) + 0.25c̄</code>. This only covers the wing's own half of a stability check. A real static margin also needs the aircraft's CG and any tail, which is out of scope for a wing-only script.</p>
+    <p><strong>Two wing-mass models.</strong> <code>--mass-model empirical</code> is a single fitted AR^0.5 exponent. <code>--mass-model beam</code> is inspired by Zhao et al.'s finite-element model updating for a composite flying-wing (AIAA SciTech 2019, 2019-1814), which calibrates mass and stiffness against real vibration-test data. It makes two real structural drivers explicit instead: ultimate load factor and airfoil thickness ratio, through a first-order beam-bending scaling, <code>m ∝ (AR/AR_ref)^1.5 · (n/n_ref) · (t/c_ref ÷ t/c)^0.5</code>. The AR penalty is steeper, load factor enters linearly, and thinner airfoils cost more mass. It's a physically-derived scaling, not a named curve fit, so it isn't borrowing anyone else's exact coefficients.</p>
+    <p><strong>Joint taper search.</strong> <code>--objective combined</code> searches taper jointly with cl and aspect ratio, inspired by Bombardieri et al.'s coupled aerostructural wing optimization (<em>Structural and Multidisciplinary Optimization</em>, 2021). Their central finding is that optimizing aerodynamics and structure separately misses real gains a coupled search finds. Taper's only channel into this model is bending relief to wing mass to hover energy, <code>η_bend = 2(1+2λ)/(3(1+λ))</code>, weighed against induced drag from the Oswald-efficiency estimate, <code>e₀ = 4.61(1−0.045·AR^0.68)cos(Λ)^0.15 − 3.1</code>, <code>C_Di = C_L²/(π·AR·e₀)</code>. That's a narrower coupling than the paper's full aero-structural one, but it's real: a taper that trades structural weight for nothing in cruise drag gets evaluated by the same objective as cl and AR, not decided in a separate step.</p>
   </div>
 
   <h6 class="subhead">Outcome</h6>
@@ -432,19 +431,19 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     </div>
     <a class="btn btn-primary" href="demos/log-dashboard.html">Live demo ↗</a>
   </div>
-  <p class="project-tagline">A Flask + Plotly dashboard that decodes ArduCopter/PX4 flight logs into a full diagnostic report — upload your own flight log below and get back the score, the issues list, and every chart, real.</p>
+  <p class="project-tagline">A Flask + Plotly dashboard that decodes ArduCopter/PX4 flight logs into a full diagnostic report. Upload your own flight log below and get back the score, the issues list, and every chart, real.</p>
 
   <h6 class="subhead">Overview</h6>
   <div class="method-copy">
-    <p>Every ArduPilot-based flight controller (Pixhawk and compatibles) writes a binary <code>.BIN</code> log of everything it measured mid-flight — hundreds of message types at up to a few hundred Hz. Reading that raw log to answer "was this flight okay, and if not, why" normally means a separate desktop tool (MAVExplorer) and manual digging. This dashboard does that automatically: upload a log, get back attitude tracking, vibration spectra, motor balance, PID tracking, GPS track, battery health, and barometer/magnetometer data across dedicated tabs, plus one overall flight-quality verdict.</p>
-    <p>It's built for the same audience Mission Model is: someone who just flew a real airframe and needs to know whether the motors, frame, or tuning are actually behaving before flying again — not a generic telemetry viewer.</p>
+    <p>Every ArduPilot-based flight controller (Pixhawk and compatibles) writes a binary <code>.BIN</code> log of everything it measured mid-flight, hundreds of message types at up to a few hundred Hz. Reading that raw log to answer "was this flight okay, and if not, why" normally means a separate desktop tool (MAVExplorer) and manual digging. This dashboard does that automatically. Upload a log and get back attitude tracking, vibration spectra, motor balance, PID tracking, GPS track, battery health, and barometer/magnetometer data across dedicated tabs, plus one overall flight-quality verdict.</p>
+    <p>It's built for the same audience Mission Model is: someone who just flew a real airframe and needs to know whether the motors, frame, or tuning are actually behaving before flying again, not a generic telemetry viewer.</p>
   </div>
 
   <h6 class="subhead">Method</h6>
   <div class="method-copy">
-    <p>The backend (<code>python_backend.py</code>) reads a raw <code>.BIN</code> log with <code>pymavlink</code>, walks its message stream, and classifies the airframe from its frame-type parameter (quad/hex/octo/X8/tri/Y3/Y6). Vibration channels get an FFT pass — <code>X(f) = ℱ{a(t)} = ∫ a(t)·e^(−i2πft) dt</code> — mirroring the analysis MAVExplorer does for ArduPilot logs.</p>
-    <p>Ten analysis passes run per log — IMU, vibration, attitude, battery, motors, PID/rate controller, GPS, barometer, magnetometer, and discrete flight events (mode changes, arming, errors) — each producing its own stats block. A summary pass then scores the flight 0–100 and lists specific issues (e.g. "poor roll stability," "motor sync issues") instead of just dumping charts and leaving the reader to spot problems.</p>
-    <p>The dashboard (<code>log_dashboard.html</code>) renders the decoded series with Plotly, plus a Custom Plot tab that lets you overlay any two decoded variables against time regardless of category — useful for correlating, say, vibration against throttle.</p>
+    <p>The backend (<code>python_backend.py</code>) reads a raw <code>.BIN</code> log with <code>pymavlink</code>, walks its message stream, and classifies the airframe from its frame-type parameter (quad/hex/octo/X8/tri/Y3/Y6). Vibration channels get an FFT pass, <code>X(f) = ℱ{a(t)} = ∫ a(t)·e^(−i2πft) dt</code>, mirroring the analysis MAVExplorer does for ArduPilot logs.</p>
+    <p>Ten analysis passes run per log: IMU, vibration, attitude, battery, motors, PID/rate controller, GPS, barometer, magnetometer, and discrete flight events (mode changes, arming, errors), each producing its own stats block. A summary pass then scores the flight 0–100 and lists specific issues (e.g. "poor roll stability," "motor sync issues") instead of just dumping charts and leaving the reader to spot problems.</p>
+    <p>The dashboard (<code>log_dashboard.html</code>) renders the decoded series with Plotly, plus a Custom Plot tab that lets you overlay any two decoded variables against time regardless of category. That's useful for correlating, say, vibration against throttle.</p>
   </div>
 
   <h6 class="subhead">Outcome</h6>
@@ -474,21 +473,21 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
       <h2 style="margin-top:var(--space-2)">Liquid Rocket</h2>
     </div>
   </div>
-  <p class="project-tagline">Ground-station software for CWRU's Liquid Propulsion Team — rebuilt from two prototypes that were never actually integrated into one working app, one of them my own original hot-fire GUI.</p>
+  <p class="project-tagline">Ground-station software for CWRU's Liquid Propulsion Team, rebuilt from two prototypes that were never actually integrated into one working app, one of them my own original hot-fire GUI.</p>
 
   <h6 class="subhead">Overview</h6>
   <div class="method-copy">
-    <p>On CWRU's Liquid Propulsion Team (Aug 2025 – Jan 2026) I designed the mechanical thrust-control hardware for hot-fire tests — solenoids and servos regulating propellant flow — and built the PyQt5 control GUI that ran the hot-fire sequences against it.</p>
-    <p>A liquid rocket static test (or hot-fire test) needs a ground station: software running on a laptop near the test stand that shows the person running the test what's happening in real time — tank and chamber pressures, temperatures, thrust (via a load cell) — and lets them open or close valves and fire the igniter without touching the hardware directly. Every reading also needs to be logged, since post-test analysis (did the chamber pressure spike, did a valve stick) depends on having the full data, not just what was visible live.</p>
+    <p>On CWRU's Liquid Propulsion Team (Aug 2025 – Jan 2026) I designed the mechanical thrust-control hardware for hot-fire tests, solenoids and servos regulating propellant flow, and built the PyQt5 control GUI that ran the hot-fire sequences against it.</p>
+    <p>A liquid rocket static test (or hot-fire test) needs a ground station: software running on a laptop near the test stand that shows the person running the test what's happening in real time, tank and chamber pressures, temperatures, thrust (via a load cell), and lets them open or close valves and fire the igniter without touching the hardware directly. Every reading also needs to be logged, since post-test analysis (did the chamber pressure spike, did a valve stick) depends on having the full data, not just what was visible live.</p>
     <p>This app is that ground station, rebuilt: a P&amp;ID (piping-and-instrumentation diagram) view for valve control, a live-gauge view for the 9 real sensor channels, and a logging view that records a full test session to CSV.</p>
   </div>
 
   <h6 class="subhead">Method</h6>
   <div class="method-copy">
     <p>The repo held two separate PyQt prototypes on incompatible Qt bindings: my own original PyQt5 data-logging page (<code>main_v2.py</code>) from the actual hot-fire tests, and a separate PyQt6 P&amp;ID valve-control page. Its own readme said as much: "still needs to be integrated with the other page."</p>
-    <p>Rebuilt as one PyQt6 app (<code>ground_station/</code>) sharing a single sensor/valve state across three tabs — Controls (the real P&amp;ID diagram plus working valve toggles), Live Data (one gauge per real sensor channel), Logging (start/stop → the documented raw + interpolated CSV pair).</p>
-    <p>The wire protocol (<code>P0–P6, T0, L0</code>, one <code>name,value,timestamp</code> line per reading) matches the real Teensy firmware exactly, so a fake data source stands in for hardware without changing anything else — verified with a headless smoke test that boots the real window, ticks it, toggles a valve, and checks a logging session actually writes CSVs.</p>
-    <p>The live demo linked below is a from-scratch JavaScript port of that same protocol and gauge math (not a screen recording) — it runs the identical random-walk sensor simulation and the identical SVG gauge/valve drawing code the Python app uses, so what you click there is what the desktop app actually does with no hardware attached.</p>
+    <p>I rebuilt it as one PyQt6 app (<code>ground_station/</code>) sharing a single sensor/valve state across three tabs: Controls (the real P&amp;ID diagram plus working valve toggles), Live Data (one gauge per real sensor channel), and Logging (start/stop to the documented raw + interpolated CSV pair).</p>
+    <p>The wire protocol (<code>P0–P6, T0, L0</code>, one <code>name,value,timestamp</code> line per reading) matches the real Teensy firmware exactly, so a fake data source stands in for hardware without changing anything else. That's verified with a headless smoke test that boots the real window, ticks it, toggles a valve, and checks a logging session actually writes CSVs.</p>
+    <p>The live demo linked below is a from-scratch JavaScript port of that same protocol and gauge math, not a screen recording. It runs the identical random-walk sensor simulation and the identical SVG gauge/valve drawing code the Python app uses, so what you click there is what the desktop app actually does with no hardware attached.</p>
   </div>
 
   <h6 class="subhead">Outcome</h6>
@@ -520,11 +519,11 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
       <h2 style="margin-top:var(--space-2)">Hexacopter Drone</h2>
     </div>
   </div>
-  <p class="project-tagline">Design, manufacturing, and testing of a hexacopter drone for the VFS DBVF competition — I contributed to the frame, motor mounts, sensor mounts, and payload mounts.</p>
+  <p class="project-tagline">Design, manufacturing, and testing of a hexacopter drone for the VFS DBVF competition. I contributed to the frame, motor mounts, sensor mounts, and payload mounts.</p>
 
   <h6 class="subhead">Overview</h6>
   <div class="method-copy">
-    <p>CompDrone2025 is the full hexacopter assembly built for the VFS Design-Build-Vertical-Flight competition — carbon-fiber tube arms, a machined frame, RTK GPS and Pixhawk avionics mounts, a servo-actuated payload-drop mechanism, and folding landing gear, all as real mated SolidWorks assemblies. The model below is the actual assembly, exported to glTF so it's something you can rotate rather than a fixed render. It also doubles as the shared platform CWRU VTOL's Payload, Carbon Fiber, and Flight Testing teams integrate against.</p>
+    <p>CompDrone2025 is the full hexacopter assembly built for the VFS Design-Build-Vertical-Flight competition: carbon-fiber tube arms, a machined frame, RTK GPS and Pixhawk avionics mounts, a servo-actuated payload-drop mechanism, and folding landing gear, all as real mated SolidWorks assemblies. The model below is the actual assembly, exported to glTF so it's something you can rotate rather than a fixed render. It also doubles as the shared platform CWRU VTOL's Payload, Carbon Fiber, and Flight Testing teams integrate against.</p>
   </div>
 
   <h6 class="subhead">Method</h6>
@@ -554,7 +553,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 
   <h6 class="subhead">Overview</h6>
   <div class="method-copy">
-    <p>Designed as a derivative of the hexacopter platform: rather than six rotors on a flat frame, the X-8 layout pairs eight motors (coaxial or square-8 arrangement) beneath a wing so the airframe can pitch over into wing-borne cruise. The design goal is a high thrust-to-weight ratio so the vehicle can still transition and recover reliably even before the wing is generating full lift.</p>
+    <p>Designed as a derivative of the hexacopter platform. Rather than six rotors on a flat frame, the X-8 layout pairs eight motors (coaxial or square-8 arrangement) beneath a wing so the airframe can pitch over into wing-borne cruise. The design goal is a high thrust-to-weight ratio so the vehicle can still transition and recover reliably even before the wing is generating full lift.</p>
   </div>
 
   <h6 class="subhead">Outcome</h6>
@@ -600,7 +599,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 
   <h6 class="subhead">Overview</h6>
   <div class="method-copy">
-    <p>Tail-sitters are the simplest wing-based VTOL transition mechanism — the whole airframe pitches over rather than tilting individual motors or wing sections — which makes them the right starting point for members who haven't designed a transitioning aircraft before. The current design under review is a biplane tail-sitter: a small quadcopter core with foils that double as landing gear, weighing an S1223 airfoil against NACA 4412/6412 candidates.</p>
+    <p>Tail-sitters are the simplest wing-based VTOL transition mechanism. The whole airframe pitches over rather than tilting individual motors or wing sections, which makes them the right starting point for members who haven't designed a transitioning aircraft before. The current design under review is a biplane tail-sitter: a small quadcopter core with foils that double as landing gear, weighing an S1223 airfoil against NACA 4412/6412 candidates.</p>
     <p>Design decisions worked through with the team include 2 vs. 4 rotors, one wing vs. two, and how the wings attach to the frame (a matching profile clamp, bolted to the frame). Transition logic gets validated in PX4 + Gazebo SITL simulation before any hardware flies.</p>
   </div>
 
@@ -621,11 +620,11 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
       <h2 style="margin-top:var(--space-2)">Tilt Rotor Designs</h2>
     </div>
   </div>
-  <p class="project-tagline">Similar to Tail Sitter Designs — teaching new VTOL members how to design tilt rotors and build their own within a semester.</p>
+  <p class="project-tagline">Similar to Tail Sitter Designs. Teaching new VTOL members how to design tilt rotors and build their own within a semester.</p>
 
   <h6 class="subhead">Overview</h6>
   <div class="method-copy">
-    <p>Where a tail-sitter pitches the whole airframe, a tilt-rotor only rotates the motors from vertical to near-horizontal, letting the fuselage stay level through the transition. That's more mechanically complex than a tail-sitter, but easier on payloads and sensors that need to stay upright — the natural next step once members have a tail-sitter under their belt.</p>
+    <p>Where a tail-sitter pitches the whole airframe, a tilt-rotor only rotates the motors from vertical to near-horizontal, letting the fuselage stay level through the transition. That's more mechanically complex than a tail-sitter, but easier on payloads and sensors that need to stay upright. It's the natural next step once members have a tail-sitter under their belt.</p>
   </div>
 
   <h6 class="subhead">Outcome</h6>
@@ -649,7 +648,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 
   <h6 class="subhead">Overview</h6>
   <div class="method-copy">
-    <p>The CAD counterpart to <a href="#mission-model">Mission Model</a>, which sweeps motor/prop/battery combinations against a mock DARPA Heavy Lift 2028 mission — this is the physical airframe that mission analysis is meant to inform. Current direction is a low-rotor-count tail sitter, prioritizing hover efficiency and cruise range for the heavy-lift mission profile over the redundancy a higher rotor count would buy.</p>
+    <p>The CAD counterpart to <a href="#mission-model">Mission Model</a>, which sweeps motor/prop/battery combinations against a mock DARPA Heavy Lift 2028 mission. This is the physical airframe that mission analysis is meant to inform. Current direction is a low-rotor-count tail sitter, prioritizing hover efficiency and cruise range for the heavy-lift mission profile over the redundancy a higher rotor count would buy.</p>
   </div>
 
   <h6 class="subhead">Outcome</h6>
