@@ -24,7 +24,7 @@ Cross-disciplinary systems work on real hardware: simulation/optimization toolin
 
 ## Operating Context
 
-Mechanical engineering student, Case Western Reserve University (Michelson-Morley Scholar, B.S. Aug 2024 – May 2028). Confirmed from his resume (`~/Downloads/Ethan_Simon_Resume.docx`):
+Mechanical engineering student, Case Western Reserve University (3.8 GPA; Michelson-Morley Scholar and Case Alumni Association Scholarship; B.S. Aug 2024 – May 2028). Confirmed from his resume (`~/Downloads/Ethan_Simon_Resume.docx`):
 
 - **Mechanical and Aerospace Team Lead, CWRU VTOL Team** (Aug 2024 – Present, current/active role) — frame and payload-mechanism design across Tail Sitter (heavy-lift), Hexacopter, Quadcopter, and Tiltrotor airframes; SolidWorks CAD/simulation; MATLAB/Python scripts to inform design decisions; project planning, safety documents, work instructions.
 - **Mechanical Engineering Co-Op, Tylok International** (Jan – Aug 2026) — designed/built a flexural fatigue test machine to ASTM standards, plus thermal/flow/tensile/pressure test apparatus; Dewesoft data-acquisition integration (DewesoftX + C++).
