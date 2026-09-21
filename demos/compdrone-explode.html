@@ -143,7 +143,7 @@ function panelHTML(s, i) {
   return `<section class="panel" id="${esc(s.id)}" data-step="${i + 1}" aria-labelledby="${esc(s.id)}-h">
     <div class="kicker">${pad(i + 1)} / ${pad(content.length)}</div>
     <h2 id="${esc(s.id)}-h">${esc(s.title)}</h2>
-    ${s.blurb ? `<p class="lede">${esc(s.blurb)}</p>` : ''}
+    ${[].concat(s.blurb || []).map(t => `<p class="lede">${esc(t)}</p>`).join('')}
     ${(s.equations || []).map(m => `<div class="eqn-block">${m}</div>`).join('')}
     ${(s.figures || []).map(f => `<figure><img loading="lazy" src="${esc(f.src)}" alt="${esc(f.caption)}"><figcaption>${esc(f.caption)}</figcaption></figure>`).join('')}
     ${partsTable(s)}
@@ -356,7 +356,8 @@ function apply() {
     });
   });
   state.step = tl ? nearestStep() : 0;
-  document.querySelectorAll('.panel').forEach(el => el.classList.toggle('on', +el.dataset.step === state.step));
+  const mid = mobile() ? innerHeight * .72 : innerHeight / 2;                     // a panel is lit while it crosses the reading line, so tall panels stay readable
+  document.querySelectorAll('.panel').forEach(el => { const r = el.getBoundingClientRect(); el.classList.toggle('on', r.top <= mid && r.bottom >= mid); });
   dirty = true;
 }
 function nearestStep() {
