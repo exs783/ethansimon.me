@@ -264,7 +264,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 <section id="reel" aria-labelledby="projects-title">
   <div class="sheet-head">
     <h2 id="projects-title">Projects</h2>
-    <p>Twelve projects. Open one for the write-up, the math, and the figures.</p>
+    <p>Thirteen projects. Open one for the write-up, the math, and the figures.</p>
   </div>
 
   <div class="sheetset">
@@ -401,6 +401,18 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
         <h4 id="t-darpa-lift-2028">DARPA Lift 2028</h4>
         <p>The airframe Mission Model is meant to inform: a low-rotor-count tail sitter for the DARPA LIFT '28 challenge, still being adapted.</p>
         <span class="row-meta">Concept · In progress <span aria-hidden="true">→</span></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="sheetset">
+    <div class="sheetset-head"><h3>Research in progress</h3><span>Sheet 13</span></div>
+    <div class="sheet-rows">
+      <a href="#fly-brain-drone" class="row" aria-labelledby="t-fly-brain-drone">
+        <span class="frame-num">Sheet 13</span>
+        <h4 id="t-fly-brain-drone">Fly-Brain Drone</h4>
+        <p>A drone whose vision runs through a connectome-constrained model of the fly's optic lobe, decoded into steer and speed and tested in a PX4 + Gazebo sim. The camera-only decoder reaches the food in 4 of 10 episodes where a PID teacher reaches it in 10 of 10.</p>
+        <span class="row-meta">Simulation · Neural decoding · In progress <span aria-hidden="true">→</span></span>
       </a>
     </div>
   </div>
@@ -688,6 +700,132 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     <a class="btn btn-primary" href="demos/liquid-rocket.html">Live demo</a>
     <a class="btn btn-secondary" href="https://github.com/exs783/Liquid-Rocket" target="_blank" rel="noopener">View repo <span aria-hidden="true">↗</span><span class="sr-only">(opens in new tab)</span></a>
   </div>
+</section>
+
+<!-- ============================= FLY-BRAIN DRONE ============================= -->
+<section class="project-section" id="fly-brain-drone">
+  <a class="back-to-reel" href="#reel">← All projects</a>
+  <div class="project-head">
+    <h2>Fly-Brain Drone</h2>
+  </div>
+  <p class="project-tagline">A drone whose vision runs through a connectome-constrained model of the fruit fly's optic lobe, with a trained readout that turns the network's activity into steer and speed. Built and tested in a PX4 + Gazebo simulator. Work in progress, and the closed-loop results so far are honest ones: it works, partly.</p>
+
+  <h3 class="subhead">Overview</h3>
+  <div class="method-copy">
+    <p>The idea is a drone whose reflexes come from a model of a fly's visual system instead of a hand-written vision pipeline. A camera frame goes into <code>flyvis</code>, a published connectome-constrained network of the fruit fly's optic lobe, and what comes out is a stream of neuron activity. A small trained readout turns that activity into a steer and a speed, and a PX4 flight controller does the actual flying. A slower vision-language layer is meant to decide what the mission is right now, while the fly-brain reflexes lead the motion.</p>
+    <p>The test task is deliberately small. A yellow ball, the "food," sits 5–10 m from the drone in a Gazebo Harmonic world with PX4 running as software-in-the-loop. The drone starts at home facing a random heading and succeeds by getting within 1.5 m of the food inside 60 simulated seconds. That is small enough to measure, and it needs both halves of the stack: seeing the food, and searching when it is out of view.</p>
+    <p>Right now the camera-only fly-brain decoder finds the food in 4 of 10 matched episodes, where a PID teacher that is handed the food's true bearing finds it in 10 of 10. That gap is the interesting part, so most of this page is about where it comes from.</p>
+  </div>
+
+  <h3 class="subhead">Method</h3>
+  <div class="method-copy">
+    <p>The stack runs from camera to PX4 setpoint through the chain below. Everything up to the arbiter runs on the host, and only the PX4 bridge and the Gazebo camera live in the Docker container.</p>
+  </div>
+  <div class="figure-card">
+    <div class="figure-title">Pipeline</div>
+    <div data-fig="flyPipelineFigure"></div>
+    <div class="figure-caption">Camera to PX4. The fly-brain reflex leads; the slower goal from the semantic layer only gates the mode and caps the speed.</div>
+  </div>
+
+  <div class="method-copy">
+
+    <h4>The eye</h4>
+    <p>The flyvis network takes one luminance channel, so colour is invisible to it and the food has to contrast in brightness. I convert each camera frame to luminance, then place it inside the fly's eye at its true angular size. One ommatidium sees 5.8°, drawn 2 px wide on the canvas, so a 99.7° camera image is about 34 px wide, centred on a grey canvas, and the hexals outside the camera's field of view see grey. flyvis samples 721 hexals from that canvas. A quick check in the encoder asserts that the connectome's hexal order matches the sampler's, because a mismatch would silently put the image on the wrong cells.</p>
+    <p>The network is stateful: one step per camera frame with the state carried between frames, starting from a one-second grey steady state. flyvis was trained at 50 Hz, so each 20 Hz camera frame is split into sub-steps no longer than that.</p>
+    <div class="eqn-block" tabindex="0" role="group" aria-label="Eye equations">
+      <div class="eqn-label">Luminance, angular size, and sub-stepping</div>
+      <math display="block"><mi>Y</mi><mo>=</mo><mn>0.299</mn><mi>R</mi><mo>+</mo><mn>0.587</mn><mi>G</mi><mo>+</mo><mn>0.114</mn><mi>B</mi></math>
+      <math display="block"><mi>w</mi><mo>=</mo><mfrac><mtext>FOV</mtext><mrow><mi>Δφ</mi><mo>/</mo><mn>2</mn></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>99.7</mn><mo>°</mo></mrow><mrow><mn>5.8</mn><mo>°</mo><mo>/</mo><mn>2</mn></mrow></mfrac><mo>≈</mo><mn>34</mn><mtext> px</mtext></math>
+      <math display="block"><mi>n</mi><mo>=</mo><mrow><mo>⌈</mo><mfrac><mrow><mn>50</mn><mtext> Hz</mtext></mrow><msub><mi>f</mi><mtext>cam</mtext></msub></mfrac><mo>⌉</mo></mrow><mo>=</mo><mrow><mo>⌈</mo><mfrac><mn>50</mn><mn>20</mn></mfrac><mo>⌉</mo></mrow><mo>=</mo><mn>3</mn></math>
+      <math display="block"><mi>dt</mi><mo>=</mo><mfrac><mn>1</mn><mrow><msub><mi>f</mi><mtext>cam</mtext></msub><mi>n</mi></mrow></mfrac><mo>=</mo><mfrac><mn>1</mn><mn>60</mn></mfrac><mtext> s</mtext></math>
+      <p class="eqn-note">Δφ is the interommatidial angle of the fly, w the image width in canvas pixels (two per ommatidium), and n the number of network sub-steps per camera frame. The image height follows from the aspect ratio.</p>
+    </div>
+
+    <h4>The readout</h4>
+    <p>flyvis models only the optic lobe. It has no descending neurons, the cells that carry commands from the fly's brain down to its motor system, so a true descending-neuron readout is not available from it. What I read out instead is the network's own 34 output cell types (the T4/T5 motion cells, Tm, TmY, and so on), the cells that project out of the optic lobe toward the central brain. It is a proxy, and I call it descending-neuron-inspired, not descending-neuron activity.</p>
+    <p>Each type is mean-pooled over a 3×3 grid of the hex field so left and right, up and down, survive. Averaging a whole type into one number would throw away exactly the geometry a steering signal needs.</p>
+
+    <h4>Reservoir and ridge readout</h4>
+    <p>Between the network and the decoder sits a fixed random echo-state reservoir. Reservoir computing means the recurrent part is never trained: its random dynamics give the readout a short memory of recent activity, and only a linear layer on top is fit. That memory matters here because the drone's yaw lags its command by about half a second.</p>
+    <div class="eqn-block" tabindex="0" role="group" aria-label="Readout and reservoir equations">
+      <div class="eqn-label">Pooled features, reservoir, and ridge readout</div>
+      <math display="block"><msub><mi>u</mi><mrow><mi>c</mi><mo>,</mo><mi>r</mi><mo>,</mo><mi>k</mi></mrow></msub><mo>=</mo><mfrac><mn>1</mn><mrow><mo stretchy="false">|</mo><msub><mi>S</mi><mrow><mi>c</mi><mi>r</mi><mi>k</mi></mrow></msub><mo stretchy="false">|</mo></mrow></mfrac><munder><mo>∑</mo><mrow><mi>i</mi><mo>∈</mo><msub><mi>S</mi><mrow><mi>c</mi><mi>r</mi><mi>k</mi></mrow></msub></mrow></munder><msub><mi>a</mi><mi>i</mi></msub></math>
+      <math display="block"><msub><mover><mi>u</mi><mo>~</mo></mover><mi>t</mi></msub><mo>=</mo><mfrac><mrow><msub><mi>u</mi><mi>t</mi></msub><mo>−</mo><mi>μ</mi></mrow><mi>s</mi></mfrac></math>
+      <math display="block"><msub><mi>x</mi><mi>t</mi></msub><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo stretchy="false">)</mo><msub><mi>x</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><mi>α</mi><mo>⁢</mo><mi>tanh</mi><mo stretchy="false">(</mo><msub><mi>W</mi><mtext>in</mtext></msub><msub><mover><mi>u</mi><mo>~</mo></mover><mi>t</mi></msub><mo>+</mo><mi>W</mi><msub><mi>x</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></math>
+      <math display="block"><mi>W</mi><mo>=</mo><mi>ρ</mi><mfrac><msub><mi>W</mi><mn>0</mn></msub><mrow><mo stretchy="false">|</mo><msub><mi>λ</mi><mtext>max</mtext></msub><mo stretchy="false">(</mo><msub><mi>W</mi><mn>0</mn></msub><mo stretchy="false">)</mo><mo stretchy="false">|</mo></mrow></mfrac></math>
+      <math display="block"><msub><mi>φ</mi><mi>t</mi></msub><mo>=</mo><mo stretchy="false">[</mo><msub><mover><mi>u</mi><mo>~</mo></mover><mi>t</mi></msub><mo>;</mo><msub><mi>x</mi><mi>t</mi></msub><mo stretchy="false">]</mo></math>
+      <math display="block"><msub><mover><mi>y</mi><mo>^</mo></mover><mi>t</mi></msub><mo>=</mo><mi>Θ</mi><msub><mi>φ</mi><mi>t</mi></msub><mo>+</mo><mi>b</mi></math>
+      <math display="block"><mi>Θ</mi><mo>=</mo><mi>argmin</mi><munder><mo>∑</mo><mi>t</mi></munder><msup><mrow><mo stretchy="false">‖</mo><msub><mi>y</mi><mi>t</mi></msub><mo>−</mo><mi>Θ</mi><msub><mi>φ</mi><mi>t</mi></msub><mo stretchy="false">‖</mo></mrow><mn>2</mn></msup><mo>+</mo><mi>λ</mi><msubsup><mrow><mo stretchy="false">‖</mo><mi>Θ</mi><mo stretchy="false">‖</mo></mrow><mi>F</mi><mn>2</mn></msubsup></math>
+      <p class="eqn-note">c is one of 34 output cell types and (r, k) a cell of the 3×3 grid, so u has 34 × 9 = 306 entries and φ has 306 + 500 = 806. The reservoir has 500 units, leak α = 0.3, spectral radius ρ = 0.9, 10% connection density, and input weights uniform in ±0.1, all fixed. A single global scale s is used instead of per-feature standardisation, which amplified the near-silent cells: held-out z-scores reached 70. y is (steer, speed, confidence), and λ is picked per target from {1, 10, 10², 10³, 10⁴} by 5-fold cross-validation.</p>
+    </div>
+
+    <h4>The teacher, and what the decoder can learn</h4>
+    <p>A decoder needs something to imitate, so a PID teacher with ground-truth food bearing and range produces the reflex the decoder is trained toward. The teacher flies randomized episodes with Ornstein–Uhlenbeck noise added to the steer that is sent to the drone (σ = 0.5, τ = 1 s), so the camera sees off-centre views, while the training labels stay the clean teacher output.</p>
+    <div class="eqn-block" tabindex="0" role="group" aria-label="PID teacher equations">
+      <div class="eqn-label">Teacher reflex from ground-truth bearing error</div>
+      <math display="block"><mi>e</mi><mo>=</mo><msub><mi>θ</mi><mtext>food</mtext></msub><mo>−</mo><msub><mi>ψ</mi><mtext>heading</mtext></msub></math>
+      <math display="block"><mtext>steer</mtext><mo>=</mo><mi>clip</mi><mo stretchy="false">(</mo><msub><mi>k</mi><mi>p</mi></msub><mi>e</mi><mo>+</mo><msub><mi>k</mi><mi>d</mi></msub><mover><mi>e</mi><mo>˙</mo></mover><mo>,</mo><mo>−</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="false">)</mo></math>
+      <math display="block"><mtext>speed</mtext><mo>=</mo><mi>max</mi><mo stretchy="false">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>−</mo><mfrac><mrow><mo stretchy="false">|</mo><mi>e</mi><mo stretchy="false">|</mo></mrow><mrow><mn>45</mn><mo>°</mo></mrow></mfrac><mo stretchy="false">)</mo><mo>⋅</mo><mi>clip</mi><mo stretchy="false">(</mo><mfrac><mrow><mi>r</mi><mo>−</mo><mn>1</mn></mrow><mn>3</mn></mfrac><mo>,</mo><mn>0.15</mn><mo>,</mo><mn>1</mn><mo stretchy="false">)</mo></math>
+      <p class="eqn-note">e is positive when the food is to the right, r is the range to the food in metres, k<sub>p</sub> = 0.0333 (full steer at a 30° error) and k<sub>d</sub> = 0.005 (the integral gain is zero). Speed goes to zero at a 45° error, so the drone turns in place before it drives, and falls toward a floor of 0.15 as it closes on the food. The teacher's confidence is simply whether the food is visible in the image.</p>
+    </div>
+    <p>Here is what the decoder can and cannot learn. Steer and speed are trained only on frames where the food is actually in the image, because elsewhere the teacher's "turn toward the food" comes from ground truth the eye can't see. Confidence is trained on all frames, class-balanced, since about 80% of the first frames had the food visible and a plain fit just predicts "visible." Every fit is scored on held-out episodes, never held-out frames of episodes it trained on.</p>
+
+    <h4>DAgger</h4>
+    <p>A decoder trained only on teacher-driven flights has never seen the search phase or its own mistakes. DAgger fixes that: the decoder drives a fraction of the episodes, the teacher labels every frame anyway, and the fit runs over the aggregate. Round 1 used 36 episodes, with the decoder driving 70% of them, for 25,300 frames including the original teacher data.</p>
+
+    <h4>Arbiter and the semantic layer</h4>
+    <p>The arbiter fuses the fast reflex with a cached slow goal into a PX4 velocity setpoint. I made the fly-brain lead: its reflex drives the motion, and the goal is advisory, gating the mode (HOLD and ABORT stop, SEARCH and INSPECT slow the drone) and capping speed. An active obstacle veto in the reflex beats any goal, a stale goal falls back to SEARCH after 3 s, and an invalid reflex produces a zero setpoint so the 20 Hz OFFBOARD stream never stalls, which PX4 would answer by disarming.</p>
+    <div class="eqn-block" tabindex="0" role="group" aria-label="Arbiter equations">
+      <div class="eqn-label">Reflex to velocity setpoint</div>
+      <math display="block"><mover><mi>ψ</mi><mo>˙</mo></mover><mo>=</mo><mn>60</mn><mtext> °/s</mtext><mo>⋅</mo><mtext>steer</mtext></math>
+      <math display="block"><msub><mi>v</mi><mi>x</mi></msub><mo>=</mo><mn>2</mn><mtext> m/s</mtext><mo>⋅</mo><mtext>speed</mtext><mo>⋅</mo><mtext>cap</mtext></math>
+      <math display="block"><mtext>cap</mtext><mo>=</mo><mi>min</mi><mo stretchy="false">(</mo><msub><mtext>cap</mtext><mtext>goal</mtext></msub><mo>,</mo><msub><mtext>cap</mtext><mtext>mode</mtext></msub><mo stretchy="false">)</mo></math>
+      <p class="eqn-note">The mode caps are 0.3 in SEARCH, 0.15 in INSPECT, and 0 in HOLD and ABORT. In SEARCH, if the reflex confidence is below 0.2 or the goal says the target is unseen, the drone yaws at a fixed 20°/s to scan.</p>
+    </div>
+    <p>The semantic layer has two forms so far. <code>CvVLM</code> is a model-free stand-in that finds the food's yellow blob in the image and reports its bearing and range from pixels alone with a pinhole model and the food's known size. That same detector drives the camera-only baseline, the fair comparison for the fly-brain decoder: same camera, same PID, no brain. <code>HostedVLM</code> calls a hosted vision-language model with the image, the mission and the decoded reflex, and repairs malformed output once before falling back to HOLD. It has been tested against fake transports only, never the live API.</p>
+    <div class="eqn-block" tabindex="0" role="group" aria-label="Pinhole blob detector equations">
+      <div class="eqn-label">Bearing and range from a yellow blob</div>
+      <math display="block"><mi>f</mi><mo>=</mo><mfrac><mrow><mi>W</mi><mo>/</mo><mn>2</mn></mrow><mrow><mi>tan</mi><mo stretchy="false">(</mo><mtext>FOV</mtext><mo>/</mo><mn>2</mn><mo stretchy="false">)</mo></mrow></mfrac></math>
+      <math display="block"><mi>θ</mi><mo>=</mo><mi>arctan</mi><mfrac><mrow><msub><mi>c</mi><mi>x</mi></msub><mo>−</mo><mo stretchy="false">(</mo><mi>W</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>/</mo><mn>2</mn></mrow><mi>f</mi></mfrac></math>
+      <math display="block"><mi>r</mi><mo>=</mo><mfrac><mrow><mi>f</mi><mo>⋅</mo><mi>R</mi></mrow><msub><mi>ρ</mi><mtext>px</mtext></msub></mfrac><mo>,</mo><mspace width="1em"/><msub><mi>ρ</mi><mtext>px</mtext></msub><mo>=</mo><msqrt><mfrac><mi>A</mi><mi>π</mi></mfrac></msqrt></math>
+      <p class="eqn-note">W is the image width in pixels, c<sub>x</sub> the centre of the blob's bounding box (robust to an occluded edge), A its pixel area, and R = 0.4 m the food's real radius. This uses no ground truth.</p>
+    </div>
+
+    <h4>The simulator</h4>
+    <p>PX4 SITL and Gazebo Harmonic run headless in Docker with software rendering, which is slow: about 0.6× real time, so every timestamp in the stack is sim time taken from the camera frame stamps. Worse, the real-time factor halves after about six minutes of container uptime, even with no client attached. The fix was to run short chunks on freshly started sims, up to three in parallel with isolated Gazebo partitions, which gives about 3× the throughput. Caching the JSON-schema validators cut the policy step from 20 ms to about 8 ms.</p>
+  </div>
+
+  <h3 class="subhead">Outcome</h3>
+  <div class="method-copy">
+    <p>The offline readout experiments come first, on 26 teacher episodes with held-out-episode cross-validation. The reservoir helps: steer R² goes from 0.23 to 0.31. Reservoir size, input scale and leak barely matter. Widening the readout from the 34 output types to all 65 flyvis cell types does not help (0.30). Pooling to 1×5 instead of 3×3 does about the same. And raw retina luminance is much worse than the fly-network features, at 0.16–0.18 against 0.31–0.33 with the same reservoir, so the connectome-constrained front end really is adding information. A nonlinear model (ExtraTrees) on the same features only reaches about 0.49, so the features, not the linear readout, are the limit. In that first fit the sign of the steer agreed with the teacher 77% of the time, speed R² was 0.58, and food-visible accuracy was 0.88 against a majority baseline of 0.83.</p>
+  </div>
+  <div class="figure-card">
+    <div class="figure-title">What limits the readout</div>
+    <div data-fig="flyReadoutFigure"></div>
+    <div class="figure-caption">Held-out-episode steer R² from the offline sweep on 26 teacher episodes. The red bar is the configuration I kept. The nonlinear model uses the same features as the linear one, which is why I read the ceiling as being in the features.</div>
+  </div>
+
+  <div class="method-copy">
+    <p>Closed loop is where it falls apart. On the same 10 randomized scenarios, the PID teacher succeeded 10 of 10 with a mean of 9.6 s to the food, and the camera-only decoder succeeded 4 of 10, with a mean of 17.1 s on the four that made it. Neither collided with anything. The decoder succeeded in 3 of the 5 scenarios where the food started in view and 1 of the 5 where it did not.</p>
+    <p>Two things explain it. First, the decoder's confidence does not tell "food visible" from "not visible" in the loop: it averages 0.68 when the food is visible and 0.62 when it is not, an accuracy of 0.43, against 0.88 in cross-validation. So it stays in APPROACH and never scans. Second, its steer is only weakly right when it does see the food, with sign agreement of 62% and a steer R² of −0.22 against the teacher's reflex. The flyvis output cells are motion-driven, so a food that sits near the image centre during a pursuit is a weak cue, and the yaw lag means the optic flow reflects commands that are already half a second old.</p>
+  </div>
+  <div class="figure-card">
+    <div class="figure-title">One scenario, two flights</div>
+    <div data-fig="flyTrajectoryFigure"></div>
+    <div class="figure-caption">Top-down ground-truth track of scenario 2 from the closed-loop runs: the PID teacher reaches the food in 8.5 s, while the decoder wanders for the full 60 s and gets no closer than 4.5 m. The dashed circle is the 1.5 m success radius.</div>
+  </div>
+
+  <div class="method-copy">
+    <p>DAgger round 1 was the first response. On-policy, the decoder succeeded in 9 of the 26 episodes it drove to completion, and the held-out fit of the refit decoder has steer R² 0.31 (sign agreement 76%), speed R² 0.48, and food-visible accuracy 0.82 against a 0.62 majority baseline. Food was visible in 38% of the frames, against about 80% before, so the data now includes the search phase the first version never saw.</p>
+    <p>Not done yet: DAgger round 2 and the final closed-loop comparison of the teacher, the pixel-only baseline, the decoders, and the stack with and without the semantic layer. An overnight run for those was cut short when the laptop slept for about nine and a half hours, so I don't have that table, and I won't put one here until I do.</p>
+  </div>
+
+  <h3 class="subhead">Next</h3>
+  <div class="method-copy">
+    <p>If the decoder is still far from the teacher after round 2, I'll keep it as the fast reflex and let the semantic layer carry the search. An obstacle-avoidance reflex is also a better fit for a motion-driven network than target bearing, since looming is what those cells respond to. Before any hardware, the stack needs a horizontal geofence, a hover position hold, and a timing test on a Jetson.</p>
+  </div>
+
+  <div class="caution">⚠ Simulation only. The semantic layer has run only as a pixel-based stand-in and against fake transports, not against a live vision-language model, and the readout is a descending-neuron-inspired proxy, not real descending neurons.</div>
 </section>
 
 <!-- ============================= NACA TO SOLIDWORKS ============================= -->
@@ -1543,6 +1681,88 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 
 
   /* ============ wire real figures into their slots ============ */
+  /* ============ Fly-Brain Drone: real data from the closed-loop runs and the offline readout sweep ============ */
+const FLY_TRAJ = {"teacher":[[0.1,-0.1],[0.11,-0.1],[0.11,-0.1],[0.12,-0.09],[0.13,-0.09],[0.13,-0.08],[0.14,-0.07],[0.14,-0.07],[0.14,-0.05],[0.14,-0.04],[0.14,-0.02],[0.13,0.0],[0.12,0.03],[0.11,0.07],[0.09,0.12],[0.08,0.17],[0.06,0.22],[0.04,0.29],[0.02,0.36],[0.0,0.44],[-0.02,0.52],[-0.04,0.6],[-0.06,0.69],[-0.08,0.77],[-0.1,0.86],[-0.12,0.96],[-0.14,1.05],[-0.16,1.14],[-0.18,1.26],[-0.21,1.36],[-0.23,1.45],[-0.25,1.55],[-0.27,1.64],[-0.3,1.73],[-0.32,1.82],[-0.35,1.92],[-0.37,2.01],[-0.4,2.1],[-0.43,2.19],[-0.46,2.29],[-0.48,2.38],[-0.51,2.47],[-0.54,2.56],[-0.57,2.65],[-0.6,2.74],[-0.63,2.83],[-0.66,2.92],[-0.69,3.01],[-0.71,3.09],[-0.74,3.17],[-0.77,3.25],[-0.79,3.32],[-0.82,3.39],[-0.84,3.47],[-0.86,3.54],[-0.89,3.6],[-0.91,3.66],[-0.93,3.72],[-0.94,3.78],[-0.96,3.84],[-0.98,3.89],[-1.0,3.94],[-1.01,3.99],[-1.03,4.06],[-1.05,4.1],[-1.06,4.14],[-1.07,4.18],[-1.08,4.22],[-1.09,4.26],[-1.1,4.29],[-1.11,4.33],[-1.12,4.36],[-1.13,4.39],[-1.14,4.42],[-1.15,4.45],[-1.16,4.48],[-1.17,4.5],[-1.17,4.53],[-1.18,4.55],[-1.19,4.57],[-1.19,4.6],[-1.2,4.62],[-1.2,4.64],[-1.21,4.65],[-1.21,4.67]],"decoder":[[0.25,-0.07],[0.25,-0.05],[0.24,-0.04],[0.24,-0.02],[0.23,0.01],[0.21,0.04],[0.19,0.06],[0.13,0.11],[0.07,0.16],[-0.01,0.22],[-0.1,0.29],[-0.2,0.37],[-0.3,0.45],[-0.4,0.53],[-0.5,0.62],[-0.59,0.7],[-0.68,0.78],[-0.77,0.85],[-0.84,0.91],[-0.91,0.97],[-0.98,1.03],[-1.06,1.09],[-1.14,1.15],[-1.21,1.2],[-1.27,1.24],[-1.34,1.28],[-1.4,1.32],[-1.46,1.35],[-1.53,1.38],[-1.59,1.41],[-1.66,1.43],[-1.73,1.45],[-1.8,1.46],[-1.87,1.47],[-1.95,1.48],[-2.04,1.48],[-2.15,1.48],[-2.3,1.48],[-2.44,1.47],[-2.59,1.46],[-2.74,1.44],[-2.88,1.43],[-3.03,1.41],[-3.17,1.39],[-3.31,1.37],[-3.44,1.36],[-3.57,1.34],[-3.69,1.33],[-3.81,1.31],[-3.93,1.3],[-4.04,1.29],[-4.14,1.27],[-4.22,1.26],[-4.3,1.25],[-4.38,1.24],[-4.46,1.23],[-4.54,1.2],[-4.64,1.17],[-4.75,1.14],[-4.87,1.1],[-4.98,1.05],[-5.1,1.0],[-5.22,0.95],[-5.33,0.9],[-5.44,0.85],[-5.53,0.8],[-5.62,0.76],[-5.69,0.72],[-5.75,0.68],[-5.82,0.65],[-5.88,0.61],[-5.93,0.57],[-6.0,0.53],[-6.05,0.49],[-6.11,0.44],[-6.16,0.4],[-6.21,0.35],[-6.26,0.31],[-6.32,0.25],[-6.38,0.19],[-6.45,0.11],[-6.53,0.01],[-6.62,-0.09],[-6.71,-0.19],[-6.81,-0.3],[-6.9,-0.4],[-6.98,-0.5],[-7.08,-0.61],[-7.15,-0.71],[-7.23,-0.79],[-7.29,-0.88],[-7.35,-0.96],[-7.4,-1.03],[-7.44,-1.1],[-7.47,-1.16],[-7.5,-1.22],[-7.53,-1.28],[-7.56,-1.34],[-7.59,-1.4],[-7.62,-1.46],[-7.64,-1.53],[-7.67,-1.6],[-7.69,-1.66],[-7.72,-1.74],[-7.75,-1.81],[-7.77,-1.89],[-7.8,-1.98],[-7.83,-2.09],[-7.85,-2.2],[-7.88,-2.33],[-7.91,-2.45],[-7.93,-2.58],[-7.95,-2.71],[-7.97,-2.83],[-7.99,-2.95],[-8.01,-3.07],[-8.03,-3.19],[-8.05,-3.31],[-8.07,-3.44],[-8.08,-3.54],[-8.09,-3.67],[-8.1,-3.77],[-8.11,-3.86],[-8.12,-3.95],[-8.12,-4.04],[-8.12,-4.13],[-8.12,-4.21],[-8.12,-4.28],[-8.11,-4.36],[-8.11,-4.43],[-8.1,-4.5],[-8.09,-4.57],[-8.08,-4.65],[-8.06,-4.72],[-8.05,-4.8],[-8.03,-4.88],[-8.02,-4.97],[-8.0,-5.1],[-7.98,-5.24],[-7.96,-5.37],[-7.94,-5.52],[-7.92,-5.67],[-7.9,-5.83],[-7.89,-5.97],[-7.87,-6.12],[-7.86,-6.26],[-7.85,-6.4],[-7.84,-6.53],[-7.83,-6.65],[-7.82,-6.75],[-7.8,-6.84],[-7.79,-6.93],[-7.78,-7.0],[-7.76,-7.09],[-7.75,-7.16],[-7.73,-7.23],[-7.71,-7.3],[-7.7,-7.38],[-7.68,-7.45],[-7.67,-7.53],[-7.66,-7.61],[-7.65,-7.68],[-7.64,-7.76],[-7.63,-7.83],[-7.62,-7.9],[-7.61,-7.96],[-7.61,-8.02],[-7.6,-8.09],[-7.59,-8.16],[-7.58,-8.22],[-7.56,-8.3],[-7.54,-8.36],[-7.52,-8.42],[-7.51,-8.48],[-7.49,-8.53],[-7.47,-8.59],[-7.46,-8.64],[-7.44,-8.69],[-7.43,-8.75],[-7.41,-8.8],[-7.4,-8.85],[-7.39,-8.91],[-7.37,-8.96],[-7.36,-9.02],[-7.34,-9.08],[-7.31,-9.16],[-7.29,-9.24],[-7.26,-9.32],[-7.21,-9.45],[-7.17,-9.56],[-7.13,-9.68],[-7.09,-9.8],[-7.05,-9.91],[-7.02,-10.03],[-6.98,-10.13],[-6.94,-10.23],[-6.91,-10.33],[-6.88,-10.42],[-6.85,-10.49],[-6.83,-10.56],[-6.8,-10.62],[-6.78,-10.69],[-6.75,-10.75],[-6.72,-10.82],[-6.69,-10.88],[-6.66,-10.94],[-6.62,-11.01],[-6.59,-11.07],[-6.55,-11.13],[-6.52,-11.2],[-6.48,-11.26],[-6.44,-11.33],[-6.4,-11.39],[-6.36,-11.46],[-6.31,-11.52],[-6.27,-11.58],[-6.23,-11.64],[-6.18,-11.7],[-6.13,-11.77],[-6.07,-11.85],[-6.0,-11.93],[-5.92,-12.02],[-5.83,-12.12],[-5.74,-12.22],[-5.65,-12.33],[-5.57,-12.42],[-5.48,-12.52],[-5.41,-12.61],[-5.34,-12.7],[-5.27,-12.78],[-5.21,-12.85],[-5.16,-12.92],[-5.11,-12.97],[-5.06,-13.03],[-5.02,-13.08],[-4.98,-13.13],[-4.92,-13.18],[-4.88,-13.23],[-4.83,-13.28],[-4.79,-13.33],[-4.74,-13.39],[-4.69,-13.44],[-4.64,-13.48],[-4.59,-13.53],[-4.54,-13.58],[-4.5,-13.62],[-4.45,-13.66],[-4.4,-13.71],[-4.35,-13.75],[-4.3,-13.79],[-4.26,-13.83],[-4.21,-13.87],[-4.15,-13.92],[-4.1,-13.96],[-4.05,-14.0],[-3.99,-14.04],[-3.93,-14.07],[-3.85,-14.12],[-3.77,-14.17],[-3.66,-14.22],[-3.55,-14.28],[-3.44,-14.33],[-3.32,-14.39],[-3.2,-14.44],[-3.08,-14.5],[-2.96,-14.55],[-2.85,-14.6],[-2.74,-14.64],[-2.65,-14.68],[-2.56,-14.72],[-2.49,-14.75],[-2.42,-14.77],[-2.36,-14.8],[-2.29,-14.82],[-2.22,-14.84],[-2.16,-14.86],[-2.09,-14.88],[-2.02,-14.89],[-1.95,-14.91],[-1.88,-14.92],[-1.8,-14.92],[-1.7,-14.93],[-1.59,-14.93],[-1.46,-14.92],[-1.32,-14.91],[-1.17,-14.9],[-1.03,-14.89],[-0.89,-14.87],[-0.76,-14.85],[-0.63,-14.83],[-0.49,-14.8],[-0.36,-14.78],[-0.23,-14.75],[-0.1,-14.72],[0.03,-14.69],[0.15,-14.66],[0.28,-14.63],[0.41,-14.6],[0.54,-14.56],[0.68,-14.52],[0.81,-14.47]],"food":[-1.89,6.02]};
+  const FLY_READOUT = [
+    {label:"No reservoir", r2:0.23},
+    {label:"Reservoir (kept)", r2:0.31, kept:true},
+    {label:"All 65 cell types", r2:0.30},
+    {label:"Nonlinear (ExtraTrees)", r2:0.49},
+  ];
+  function flyReadoutFigure(){
+    return hbarFigure(FLY_READOUT, "r2", v => v.toFixed(2), r => r.kept ? ACCENT : INK);
+  }
+
+  function flyTrajectoryFigure(){
+    const T = FLY_TRAJ, W = 300, H = 330, pad = 14;
+    const all = T.teacher.concat(T.decoder, [T.food, [0, 0]]);
+    const xs = all.map(p => p[0]), ys = all.map(p => p[1]);
+    const x0 = Math.min(...xs) - 1.6, x1 = Math.max(...xs) + 1.6, y0 = Math.min(...ys) - 1.6, y1 = Math.max(...ys) + 1.6;
+    const s = Math.min((W*0.55 - 2*pad) / (x1 - x0), (H - 2*pad) / (y1 - y0));
+    const X = x => pad + (x - x0) * s, Y = y => H - pad - (y - y0) * s;
+    const root = svgRoot(`0 0 ${W} ${H}`);
+    root.appendChild(svg("rect", {x:X(x0), y:Y(y1), width:(x1-x0)*s, height:(y1-y0)*s, fill:"none", stroke:LINE, "stroke-width":1}));
+    const line = pts => pts.map((p, i) => (i ? "L" : "M") + X(p[0]).toFixed(1) + " " + Y(p[1]).toFixed(1)).join(" ");
+    root.appendChild(svg("circle", {cx:X(T.food[0]), cy:Y(T.food[1]), r:1.5*s, fill:"none", stroke:INK2, "stroke-width":1, "stroke-dasharray":"3,3"}));
+    root.appendChild(svg("path", {d:line(T.decoder), fill:"none", stroke:ACCENT, "stroke-width":1.4, "stroke-linejoin":"round"}));
+    root.appendChild(svg("path", {d:line(T.teacher), fill:"none", stroke:INK, "stroke-width":2, "stroke-linejoin":"round"}));
+    root.appendChild(svg("circle", {cx:X(T.food[0]), cy:Y(T.food[1]), r:Math.max(0.4*s, 3), fill:INK2}));
+    root.appendChild(svg("circle", {cx:X(0), cy:Y(0), r:3.2, fill:PAPER, stroke:INK, "stroke-width":1.5}));
+    const text = (x, y, str, fill, size, anchor) => {
+      const t = svg("text", {x, y, "font-size":size || "9.5", "font-family":"Archivo", fill:fill || INK, "text-anchor":anchor || "start"});
+      t.textContent = str; root.appendChild(t);
+    };
+    text(X(0) - 11, Y(0) + 16, "home", INK2);
+    text(X(T.food[0]) + 1.5*s + 5, Y(T.food[1]) + 3, "food", INK2);
+    const lx = W * 0.6;
+    root.appendChild(svg("line", {x1:lx, x2:lx+18, y1:40, y2:40, stroke:INK, "stroke-width":2}));
+    text(lx + 24, 43, "PID teacher");
+    text(lx + 24, 56, "reached food, 8.5 s", INK2, "9");
+    root.appendChild(svg("line", {x1:lx, x2:lx+18, y1:82, y2:82, stroke:ACCENT, "stroke-width":1.4}));
+    text(lx + 24, 85, "Fly-brain decoder");
+    text(lx + 24, 98, "60 s, no success,", INK2, "9");
+    text(lx + 24, 110, "closest 4.5 m", INK2, "9");
+    root.appendChild(svg("line", {x1:lx, x2:lx + 5*s, y1:H-26, y2:H-26, stroke:INK, "stroke-width":1.5}));
+    text(lx, H-12, "5 m", INK2, "9");
+    return root;
+  }
+
+  function flyPipelineFigure(){
+    const W = 300, H = 352, bh = 30, gap = 14, lx = 12, lw = 150, rx = 190, rw = 100;
+    const root = svgRoot(`0 0 ${W} ${H}`);
+    const defs = svg("defs", {});
+    const mk = svg("marker", {id:"flyArrow", markerWidth:8, markerHeight:8, refX:6, refY:3, orient:"auto"});
+    mk.appendChild(svg("path", {d:"M0,0 L6,3 L0,6 Z", fill:INK2}));
+    defs.appendChild(mk); root.appendChild(defs);
+    const stages = [
+      ["Camera", "160×120 · 20 Hz"],
+      ["Retina", "721 hexals · luminance"],
+      ["flyvis network", "connectome-constrained"],
+      ["Pooled readout", "34 types × 3×3 = 306"],
+      ["Reservoir", "500 units, fixed"],
+      ["Ridge decoder", "steer · speed · confidence"],
+      ["Arbiter", "brain leads"],
+      ["PX4 setpoint", "20 Hz velocity"],
+    ];
+    const box = (x, y, w, label, sub, dashed) => {
+      root.appendChild(svg("rect", {x, y, width:w, height:bh, fill:PAPER, stroke:INK, "stroke-width":1.5, "stroke-dasharray":dashed ? "4,3" : "none"}));
+      const t = svg("text", {x:x + w/2, y:y + 13, "text-anchor":"middle", "font-size":"10.5", "font-family":"Archivo", fill:INK}); t.textContent = label; root.appendChild(t);
+      const u = svg("text", {x:x + w/2, y:y + 24, "text-anchor":"middle", "font-size":"8.5", "font-family":"Archivo", fill:INK2}); u.textContent = sub; root.appendChild(u);
+    };
+    const arrow = (x1, y1, x2, y2) => root.appendChild(svg("line", {x1, y1, x2, y2, stroke:INK2, "stroke-width":1.5, "marker-end":"url(#flyArrow)"}));
+    stages.forEach((st, i) => {
+      const y = i * (bh + gap);
+      box(lx, y, lw, st[0], st[1]);
+      if (i < stages.length - 1) arrow(lx + lw/2, y + bh, lx + lw/2, y + bh + gap - 1);
+    });
+    const yDec = 5 * (bh + gap), yArb = 6 * (bh + gap);
+    box(rx, yDec, rw, "PID teacher", "training labels only", true);
+    arrow(rx, yDec + bh/2, lx + lw + 1, yDec + bh/2);
+    box(rx, yArb, rw, "Semantic layer", "goal · ~1 Hz");
+    arrow(rx, yArb + bh/2, lx + lw + 1, yArb + bh/2);
+    return root;
+  }
+
   const FIGURE_MAP = {
     missionProfileFigure: () => missionProfileFigure(),
     wingPlanformFigure: () => wingCoverFigure(),
@@ -1562,6 +1782,9 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     attitudeTrackFigure: () => attitudeTrackFigure(ATTITUDE_TRACK),
     scopeFigureTall: () => scopeFigure(11, true),
     flowFigure: () => flowFigure(),
+    flyReadoutFigure: () => flyReadoutFigure(),
+    flyTrajectoryFigure: () => flyTrajectoryFigure(),
+    flyPipelineFigure: () => flyPipelineFigure(),
     sensorPanelFigure: () => sensorPanelFigure(),
     modelFigureCad: () => modelFigure("assets/compdrone2025.glb", "CompDrone2025 hexacopter SolidWorks assembly", "assets/compdrone2025-render.webp"),
     quadcopterFigure: () => modelFigure("assets/quadcopter-5in-drone.glb", "Quadcopter 5-inch drone frame", "assets/quadcopter-orthographic.png"),
