@@ -307,7 +307,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
       </a>
       <a href="#fly-brain-drone" class="frame" aria-labelledby="t-fly-brain-drone">
         <span class="frame-num">Sheet 03</span>
-        <div class="frame-fig" data-fig="flyThumbFigure"></div>
+        <div class="frame-fig" data-fig="flyBrainPhotoFigure"></div>
         <h4 id="t-fly-brain-drone">Fly-Brain Drone</h4>
         <p>A drone whose vision runs through a connectome-constrained model of the fly's optic lobe, decoded into steer and speed in a PX4 + Gazebo sim. In progress.</p>
         <div class="frame-tb">
@@ -1700,7 +1700,7 @@ const FLY_TRAJ = {"teacher":[[0.1,-0.1],[0.11,-0.1],[0.11,-0.1],[0.12,-0.09],[0.
     return hbarFigure(FLY_READOUT, "r2", v => v.toFixed(2), r => r.kept ? ACCENT : INK);
   }
 
-  function flyTrajectoryFigure(compact){
+  function flyTrajectoryFigure(){
     const T = FLY_TRAJ, W = 300, H = 330, pad = 14;
     const all = T.teacher.concat(T.decoder, [T.food, [0, 0]]);
     const xs = all.map(p => p[0]), ys = all.map(p => p[1]);
@@ -1715,10 +1715,6 @@ const FLY_TRAJ = {"teacher":[[0.1,-0.1],[0.11,-0.1],[0.11,-0.1],[0.12,-0.09],[0.
     root.appendChild(svg("path", {d:line(T.teacher), fill:"none", stroke:INK, "stroke-width":2, "stroke-linejoin":"round"}));
     root.appendChild(svg("circle", {cx:X(T.food[0]), cy:Y(T.food[1]), r:Math.max(0.4*s, 3), fill:INK2}));
     root.appendChild(svg("circle", {cx:X(0), cy:Y(0), r:3.2, fill:PAPER, stroke:INK, "stroke-width":1.5}));
-    if (compact){ // card thumbnail: the plot alone, tight viewBox, no legend
-      root.setAttribute("viewBox", `${X(x0) - 4} ${Y(y1) - 4} ${(x1 - x0) * s + 8} ${(y1 - y0) * s + 8}`);
-      return root;
-    }
     const text = (x, y, str, fill, size, anchor) => {
       const t = svg("text", {x, y, "font-size":size || "9.5", "font-family":"Archivo", fill:fill || INK, "text-anchor":anchor || "start"});
       t.textContent = str; root.appendChild(t);
@@ -1795,7 +1791,7 @@ const FLY_TRAJ = {"teacher":[[0.1,-0.1],[0.11,-0.1],[0.11,-0.1],[0.12,-0.09],[0.
     flowFigure: () => flowFigure(),
     flyReadoutFigure: () => flyReadoutFigure(),
     flyTrajectoryFigure: () => flyTrajectoryFigure(),
-    flyThumbFigure: () => flyTrajectoryFigure(true),
+    flyBrainPhotoFigure: () => imgFigure("assets/fly-brain-scan.webp", "Rendering of a fruit fly brain connectome: neurons in many colours over a black background", "grayscale", [1072, 720]),
     flyPipelineFigure: () => flyPipelineFigure(),
     sensorPanelFigure: () => sensorPanelFigure(),
     modelFigureCad: () => modelFigure("assets/compdrone2025.glb", "CompDrone2025 hexacopter SolidWorks assembly", "assets/compdrone2025-render.webp"),
