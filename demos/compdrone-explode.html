@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CompDrone2025, taken apart</title>
+<meta name="description" content="The real CompDrone2025 hexacopter SolidWorks assembly, pulled apart one subsystem at a time as you scroll.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap" rel="stylesheet">
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.186.0/examples/jsm/",
+  "animejs":"https://cdn.jsdelivr.net/npm/animejs@4.5.0/dist/bundles/anime.esm.min.js"
+}}
+</script>
+<style>
+:root{
+  --color-bg:#f3f2f2; --color-surface:#eae9e9; --color-text:#201e1d;
+  --color-accent:#ec3013; --color-accent-700:#ae1800;
+  --color-divider:color-mix(in srgb, #201e1d 40%, transparent);
+  --color-neutral-700:#605d5d; --color-neutral-900:#2d2b2b;
+  --color-text-muted:var(--color-neutral-700);
+  --font-heading:"Archivo", system-ui, sans-serif;
+  --font-math:"STIX Two Math","Latin Modern Math","Cambria Math",math,serif;
+  --space-2:8px; --space-3:12px; --space-4:16px; --space-6:24px; --space-8:32px;
+  --nav-h:66px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scrollbar-color:#7d7979 var(--color-bg)}
+body{margin:0;background:var(--color-bg);color:var(--color-text);font-family:var(--font-heading);font-size:16px;line-height:1.55}
+h1,h2,h3{font-weight:800;line-height:1.12;letter-spacing:-.015em;margin:0 0 var(--space-3);text-wrap:balance}
+h1{font-size:clamp(34px,4.6vw,56px)} h2{font-size:clamp(28px,3vw,38px)} h3{font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-text-muted);margin-top:var(--space-6)}
+p{margin:0 0 var(--space-3);text-wrap:pretty}
+a{color:var(--color-neutral-900);text-underline-offset:3px}
+a:hover{color:var(--color-accent-700)}
+img{display:block;max-width:100%}
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
+::selection{background:color-mix(in srgb, var(--color-accent) 25%, transparent)}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+header{position:sticky;top:0;z-index:40;background:var(--color-bg);border-bottom:2px solid var(--color-divider)}
+.nav{height:var(--nav-h);display:flex;align-items:center;gap:var(--space-4);padding-inline:clamp(20px,5vw,64px)}
+.nav-brand{font-weight:800;font-size:17px;letter-spacing:-.01em;margin-right:auto;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-weight:800;font-size:14px;padding:10px 16px;border:2px solid var(--color-divider);color:var(--color-text);background:transparent}
+.btn:hover{background:color-mix(in srgb, var(--color-text) 7%, transparent);color:var(--color-text)}
+
+/* story: panels scroll on the left, the 3D stage stays pinned on the right */
+.story{display:grid;grid-template-columns:minmax(320px,5fr) 7fr;grid-template-areas:"p s"}
+.panels{grid-area:p}
+.stage{grid-area:s;position:sticky;top:var(--nav-h);height:calc(100svh - var(--nav-h));border-left:2px solid var(--color-divider);overflow:hidden;
+  background-color:var(--color-surface);
+  background-image:linear-gradient(color-mix(in srgb,#201e1d 7%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,#201e1d 7%,transparent) 1px,transparent 1px);
+  background-size:48px 48px}
+.stage canvas,.stage .poster,.stage svg{position:absolute;inset:0;width:100%;height:100%}
+.stage .poster{object-fit:contain;filter:grayscale(1) contrast(1.08);transition:opacity .5s}
+.stage.ready .poster{opacity:0;pointer-events:none}
+.stage svg{pointer-events:none}
+#leader{stroke:var(--color-accent);stroke-width:2;fill:none}
+#leader-dot{fill:var(--color-accent)}
+.tag{position:absolute;left:16px;top:16px;font-weight:800;font-size:14px;letter-spacing:.04em;text-transform:uppercase;background:var(--color-bg);border:2px solid var(--color-divider);padding:6px 10px;opacity:0;pointer-events:none}
+.tag b{color:var(--color-accent-700);margin-right:8px}
+
+.panel{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:calc(var(--nav-h) + 6svh) clamp(20px,4vw,56px) 6svh;border-bottom:2px solid var(--color-divider);opacity:.3;transition:opacity .45s}
+.panel.on{opacity:1}
+.kicker{font-size:14px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:var(--space-3)}
+.lede{font-size:18px;color:var(--color-text-muted);max-width:46ch}
+.hint{margin-top:var(--space-8);font-weight:800;font-size:14px;letter-spacing:.1em;text-transform:uppercase}
+.parts{width:100%;border-collapse:collapse;font-size:15px;margin-top:var(--space-3)}
+.parts th{font-size:12px;letter-spacing:.1em;text-transform:uppercase;text-align:left;color:var(--color-text-muted);font-weight:800;padding:0 0 var(--space-2)}
+.parts td{padding:9px 0;border-top:1px solid var(--color-divider);vertical-align:baseline}
+.parts .num{display:block;font-size:12px;color:var(--color-text-muted);letter-spacing:.04em}
+.parts .qty{text-align:right;font-variant-numeric:tabular-nums;font-weight:800}
+.parts .kind{text-align:right;color:var(--color-text-muted);font-size:13px;padding-left:12px}
+.stat{font-weight:800;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-muted)}
+.stat b{color:var(--color-accent-700)}
+.eqn-block{border:1px solid var(--color-divider);background:var(--color-surface);padding:var(--space-3) var(--space-4);margin:var(--space-3) 0;overflow-x:auto}
+.eqn-block math{font-family:var(--font-math);font-size:1.2em;margin:.35em 0}
+figure{margin:var(--space-4) 0;border:1px solid var(--color-divider);background:var(--color-surface)}
+figcaption{padding:var(--space-2) var(--space-3);font-size:14px;color:var(--color-text-muted);border-top:1px solid var(--color-divider)}
+.links{display:flex;flex-wrap:wrap;gap:var(--space-2);margin-top:var(--space-4)}
+
+@media (max-width:820px){
+  .story{grid-template-columns:1fr;grid-template-areas:"p"}
+  .stage{grid-area:p;align-self:start;z-index:2;height:46svh;margin-bottom:-46svh;border-left:0;border-bottom:2px solid var(--color-divider)}
+  .panels{grid-area:p}
+  .panel{justify-content:flex-start;padding-top:calc(var(--nav-h) + 46svh + 20px)}
+}
+@media (prefers-reduced-motion:reduce){.panel,.stage .poster{transition:none}}
+</style>
+</head>
+<body>
+<header>
+  <nav class="nav" aria-label="Primary">
+    <span class="nav-brand">ETHAN SIMON</span>
+    <a class="btn" href="../index.html#hexacopter-drone">← Hexacopter Drone</a>
+  </nav>
+</header>
+
+<main>
+<section class="story" id="story" aria-label="CompDrone2025 exploded view">
+  <div class="stage" id="stage">
+    <img class="poster" src="../assets/compdrone2025-render.webp" alt="Render of the CompDrone2025 hexacopter" width="1200" height="800">
+    <canvas id="gl" role="img" aria-label="Interactive 3D view of the CompDrone2025 hexacopter assembly, pulled apart by scrolling. The same parts are listed in the text panels beside it."></canvas>
+    <svg aria-hidden="true"><line id="leader" x1="0" y1="0" x2="0" y2="0"/><circle id="leader-dot" r="5" cx="0" cy="0" opacity="0"/></svg>
+    <div class="tag" id="tag" aria-hidden="true"></div>
+  </div>
+  <div class="panels" id="panels"></div>
+</section>
+</main>
+
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { createTimeline, onScroll } from 'animejs';
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches || location.search.includes('reduce');   // ?reduce previews the static path
+const mobile = () => matchMedia('(max-width:820px)').matches;
+const PART_RE = /(ARM|BATT|ELEC|ELM|FRM|LGR|PAYLOAD)-\d{3}-[MP]-/;
+const partId = n => n.split('/').pop().split('^')[0].replace(/-\d+$/, '');
+const pad = n => String(n).padStart(2, '0');
+
+const content = await (await fetch('compdrone-explode.content.json')).json();
+const uniqueParts = content.reduce((n, s) => n + s.parts.length, 0);
+let qty = {};   // partId -> instance count, filled once the model loads
+
+/* ---------- panels: rendered from the content file, only fields that exist ---------- */
+function partsTable(s) {
+  const rows = s.parts.map(p => {
+    const [, kind] = /^[A-Z]+-\d{3}-([MP])-/.exec(p) || [];
+    return `<tr><td>${esc(p.replace(/^[A-Z]+-\d{3}-[MP]-/, ''))}<span class="num">${esc(p.match(/^[A-Z]+-\d{3}/)[0])}</span></td>` +
+           `<td class="qty">${qty[p] ? '×' + qty[p] : ''}</td><td class="kind">${kind === 'P' ? 'Purchased' : 'Made'}</td></tr>`;
+  }).join('');
+  return `<table class="parts"><caption class="sr-only">${esc(s.title)} parts in the CAD assembly</caption>` +
+         `<thead><tr><th scope="col">Part</th><th scope="col" class="qty">In CAD</th><th scope="col" class="kind">Source</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+function panelHTML(s, i) {
+  return `<section class="panel" id="${esc(s.id)}" data-step="${i + 1}" aria-labelledby="${esc(s.id)}-h">
+    <div class="kicker">${pad(i + 1)} / ${pad(content.length)}</div>
+    <h2 id="${esc(s.id)}-h">${esc(s.title)}</h2>
+    ${s.blurb ? `<p class="lede">${esc(s.blurb)}</p>` : ''}
+    ${(s.equations || []).map(m => `<div class="eqn-block">${m}</div>`).join('')}
+    ${(s.figures || []).map(f => `<figure><img loading="lazy" src="${esc(f.src)}" alt="${esc(f.caption)}"><figcaption>${esc(f.caption)}</figcaption></figure>`).join('')}
+    ${partsTable(s)}
+    ${(s.links || []).length ? `<div class="links">${s.links.map(l => `<a class="btn" href="${esc(l.href)}">${esc(l.label)} <span aria-hidden="true">↗</span></a>`).join('')}</div>` : ''}
+  </section>`;
+}
+function renderPanels() {
+  $('#panels').innerHTML =
+    `<section class="panel on" id="intro" data-step="0" aria-labelledby="intro-h">
+       <div class="kicker">CWRU VTOL team · SolidWorks assembly</div>
+       <h1 id="intro-h">CompDrone2025, taken apart</h1>
+       <p class="lede">The real hexacopter CAD: ${uniqueParts} unique parts in ${content.length} subsystems. Scroll and each one pulls out of the airframe.</p>
+       <div class="hint" aria-hidden="true">Scroll ↓</div>
+     </section>` +
+    content.map(panelHTML).join('') +
+    `<section class="panel" id="outro" data-step="${content.length + 1}" aria-labelledby="outro-h">
+       <div class="kicker">All apart</div>
+       <h2 id="outro-h">Every part is a real node in the assembly</h2>
+       <p class="lede" id="outro-stat">${uniqueParts} unique parts, named by the team's part numbers.</p>
+       <div class="links"><a class="btn" href="../index.html#hexacopter-drone">← Back to the project</a></div>
+     </section>`;
+}
+renderPanels();
+
+/* ---------- 3D: scene, explode geometry, timeline ---------- */
+const stage = $('#stage'), canvas = $('#gl');
+const N = content.length, LAST = N + 1;               // steps: 0 assembled, 1..N subsystems, N+1 all apart
+const cam = {x: 0, y: 0, z: 0, r: 1, az: .6, f: .85};
+let renderer, scene, camera, groups = [], tl, obs, dirty = true, ready = false;
+const state = {step: 0};
+
+try {
+  renderer = new THREE.WebGLRenderer({canvas, antialias: true, alpha: true});
+} catch (e) { console.warn('WebGL unavailable, showing the render instead', e); }
+
+if (renderer) init().catch(e => { console.warn('model failed, showing the render instead', e); renderer.dispose(); });
+
+async function init() {
+  renderer.setPixelRatio(Math.min(devicePixelRatio, mobile() ? 1.5 : 2));
+  renderer.setClearColor(0x000000, 0);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  scene = new THREE.Scene();
+  scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.environmentIntensity = .6;
+  const sun = new THREE.DirectionalLight(0xffffff, 2.4); sun.position.set(3, 6, 2); scene.add(sun);
+  camera = new THREE.PerspectiveCamera(30, 1, .01, 100);
+
+  const draco = new DRACOLoader().setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.186.0/examples/jsm/libs/draco/gltf/');
+  const gltf = await new GLTFLoader().setDRACOLoader(draco).loadAsync('../assets/compdrone2025-parts.glb');
+
+  const pivot = new THREE.Group(); pivot.add(gltf.scene); scene.add(pivot);
+  orient(pivot, gltf.scene);
+  buildGroups(pivot);
+  rerenderWithCounts();
+  resize();
+  new ResizeObserver(resize).observe(stage);
+  addEventListener('load', build);
+  build();
+  ready = true; stage.classList.add('ready');
+  requestAnimationFrame(loop);
+}
+
+/* Put the smallest bbox axis on +Y, landing gear below, model centred at the origin. */
+function orient(pivot, root) {
+  const size = new THREE.Box3().setFromObject(root).getSize(new THREE.Vector3());
+  if (size.z < size.y && size.z < size.x) pivot.rotation.x = -Math.PI / 2;
+  else if (size.x < size.y && size.x < size.z) pivot.rotation.z = Math.PI / 2;
+  pivot.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(pivot);
+  pivot.position.sub(box.getCenter(new THREE.Vector3()));
+  pivot.updateMatrixWorld(true);
+}
+
+const ACCENT = new THREE.Color(0xec3013);
+function buildGroups(pivot) {
+  const sub = {}; content.forEach(s => s.prefixes.forEach(p => sub[p] = s.id));
+  const units = [];
+  const nameOf = o => o.userData.name || o.name || '';
+  (function walk(o) {
+    const m = PART_RE.exec(nameOf(o));
+    if (m) { units.push({o, sub: sub[m[1]], id: partId(nameOf(o))}); return; }   // a part: its whole subtree moves as one
+    o.children.forEach(walk);
+  })(pivot);
+
+  groups = content.map((s, i) => ({id: s.id, title: s.title, i, units: [], s: {lift: 0, dim: 0}}));
+  const byId = Object.fromEntries(groups.map(g => [g.id, g]));
+  units.forEach(u => {
+    u.o.updateMatrixWorld(true);
+    u.box = new THREE.Box3().setFromObject(u.o);
+    if (u.box.isEmpty() || !byId[u.sub]) return;
+    u.c = u.box.getCenter(new THREE.Vector3());
+    u.rest = u.o.position.clone();
+    u.m3 = new THREE.Matrix3().setFromMatrix4(new THREE.Matrix4().copy(u.o.parent.matrixWorld).invert());
+    u.mats = [];
+    u.o.traverse(c => { if (c.isMesh) {
+      c.material = Array.isArray(c.material) ? c.material.map(m => m.clone()) : c.material.clone();
+      [].concat(c.material).forEach(m => {
+        const h = {}; m.color.getHSL(h); m.color.setHSL(h.h, h.s * .12, h.l);        // site rule: grayscale CAD, accent only for highlights
+        u.mats.push(m);
+      });
+    }});
+    byId[u.sub].units.push(u); qty[u.id] = (qty[u.id] || 0) + 1;
+  });
+  groups = groups.filter(g => g.units.length);
+
+  const all = groups.flatMap(g => g.units);
+  const vc = all.reduce((v, u) => v.add(u.c), new THREE.Vector3()).divideScalar(all.length);
+  const veh = new THREE.Box3(); all.forEach(u => veh.union(u.box));
+  const vs = veh.getSize(new THREE.Vector3()), span = Math.max(vs.x, vs.z);
+
+  // landing gear must end up below the centroid; flip 180° about X if the export had it upside down
+  const lgr = groups.find(g => g.id === 'lgr');
+  if (lgr && lgr.units.reduce((s, u) => s + u.c.y, 0) / lgr.units.length > vc.y) {
+    console.warn('flipping model: landing gear was above the centroid'); flip(pivot); return buildGroups(pivot);
+  }
+
+  const CFG = {frm: {SH: .3, SV: 3.2}, arm: {SH: .5, SV: 1}, batt: {SH: .5, SV: 2}, elec: {SH: .7, SV: 2}, lgr: {SH: .8, SV: 1.5}, payload: {SH: .6, SV: 2}};
+  groups.forEach(g => {
+    g.c = g.units.reduce((v, u) => v.add(u.c), new THREE.Vector3()).divideScalar(g.units.length);
+    g.dy = g.c.y - vc.y;
+  });
+  [1, -1].forEach(side => groups.filter(g => Math.abs(g.dy) > .08 * vs.y && Math.sign(g.dy) === side)
+    .sort((a, b) => Math.abs(a.dy) - Math.abs(b.dy)).forEach((g, r) => g.D = side * (.3 * vs.y + span * (.05 + .1 * r))));
+  groups.forEach(g => {
+    const {SH, SV} = {SH: .6, SV: 2, ...CFG[g.id]}, D = g.D || 0;
+    g.exp = new THREE.Box3();
+    g.units.forEach(u => {
+      const d = u.c.clone().sub(g.c);
+      u.off = new THREE.Vector3(d.x * SH, d.y * SV + D, d.z * SH);
+      g.exp.union(u.box.clone().translate(u.off));
+    });
+    const vol = u => { const z = u.box.getSize(v3); return z.x * z.y * z.z; };
+    g.anchor = g.units.reduce((a, u) => vol(u) > vol(a) ? u : a);                    // leader line points at the group's biggest part
+  });
+  state.veh = veh;
+  state.wide = new THREE.Box3(); groups.forEach(g => state.wide.union(g.exp));
+}
+function flip(pivot) {
+  pivot.quaternion.premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI));
+  pivot.position.set(0, 0, 0); pivot.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(pivot); pivot.position.sub(box.getCenter(new THREE.Vector3())); pivot.updateMatrixWorld(true);
+}
+function rerenderWithCounts() {
+  const inst = Object.values(qty).reduce((a, b) => a + b, 0);
+  $('#panels').innerHTML = ''; renderPanels();
+  $('#outro-stat').textContent = `${inst} part instances, ${uniqueParts} unique, each one named by the team's part number.`;
+  $('#panels').firstElementChild.classList.add('on');
+}
+
+/* camera targets */
+const camOf = (box, step) => { const s = box.getBoundingSphere(new THREE.Sphere()); return {x: s.center.x, y: s.center.y, z: s.center.z, r: s.radius, az: .6 + .14 * step, f: step === 0 ? .85 : step === LAST ? .72 : 1.05}; };
+const camFor = k => k === 0 ? camOf(state.veh, 0) : k === LAST ? camOf(state.wide, LAST) : camOf(groups[k - 1].exp, k);
+const liftAt = (g, k) => k === LAST ? 1 : (k === g.i + 1 ? 1 : 0);
+const dimAt = (g, k) => (k === 0 || k === LAST) ? 0 : (k === g.i + 1 ? 0 : 1);
+
+/* time (0..TOTAL) at which each step's panel is in place, from real panel positions */
+const TOTAL = 7000;
+function stepTimes() {
+  const sy = scrollY, st = $('#story').getBoundingClientRect().top + sy, vh = innerHeight;
+  const dist = $('#story').offsetHeight - vh;
+  return [...document.querySelectorAll('.panel')].map(p => {
+    const r = p.getBoundingClientRect(), top = r.top + sy;
+    const at = mobile() ? top : top + r.height / 2 - vh / 2;                       // scroll position where the panel is "in place"
+    return Math.round(Math.min(1, Math.max(0, (at - st) / dist)) * TOTAL);
+  });
+}
+
+function build() {
+  if (tl) { tl.revert(); obs && obs.revert(); }
+  groups.forEach(g => { g.s.lift = 0; g.s.dim = 0; });
+  const T = stepTimes(), ease = 'inOutCubic';
+  obs = reduce ? null : onScroll({target: '#story', enter: 'top top', leave: 'bottom bottom', sync: true});
+  tl = createTimeline({autoplay: obs || false, onUpdate: () => apply()});
+  Object.assign(cam, camFor(0));
+  for (let k = 1; k <= LAST; k++) {
+    const t0 = T[k - 1], t1 = T[k], d = Math.max(1, t1 - t0);
+    tl.add(cam, {...Object.fromEntries(['x', 'y', 'z', 'r', 'az', 'f'].map(p => [p, [camFor(k - 1)[p], camFor(k)[p]]])), duration: d, ease}, t0);
+    groups.forEach(g => {
+      const a = liftAt(g, k - 1), b = liftAt(g, k), da = dimAt(g, k - 1), db = dimAt(g, k);
+      const lo = b > a ? [.4, 1] : [0, .5];
+      if (a !== b) tl.add(g.s, {lift: [a, b], duration: d * (lo[1] - lo[0]), ease}, t0 + d * lo[0]);
+      if (da !== db) tl.add(g.s, {dim: [da, db], duration: d, ease}, t0);
+    });
+  }
+  state.T = T;
+  reduce ? observePanels() : apply();
+  apply();
+}
+
+/* reduced motion: no scrubbing, each panel snaps the model to its step */
+let panelIO;
+function observePanels() {
+  panelIO && panelIO.disconnect();
+  panelIO = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { tl.seek(state.T[+e.target.dataset.step]); apply(); } }), {rootMargin: '-45% 0px -45% 0px'});
+  document.querySelectorAll('.panel').forEach(p => panelIO.observe(p));
+}
+
+/* apply timeline state to the scene */
+const tmp = new THREE.Vector3(), v3 = new THREE.Vector3();
+function apply() {
+  if (!groups.length) return;
+  groups.forEach(g => {
+    const {lift, dim} = g.s;
+    g.units.forEach(u => {
+      u.o.position.copy(u.rest).add(tmp.copy(u.off).multiplyScalar(lift).applyMatrix3(u.m3));
+      u.mats.forEach(m => {
+        m.transparent = dim > .001; m.opacity = 1 - .82 * dim; m.depthWrite = dim < .02;
+        if (m.emissive) m.emissive.copy(ACCENT).multiplyScalar(.12 * lift * (1 - dim));
+      });
+    });
+  });
+  state.step = tl ? nearestStep() : 0;
+  document.querySelectorAll('.panel').forEach(el => el.classList.toggle('on', +el.dataset.step === state.step));
+  dirty = true;
+}
+function nearestStep() {
+  const t = tl.currentTime, T = state.T; let best = 0;
+  T.forEach((x, i) => { if (Math.abs(x - t) < Math.abs(T[best] - t)) best = i; });
+  return best;
+}
+
+/* render on demand */
+function resize() {
+  const w = stage.clientWidth, h = stage.clientHeight;
+  renderer.setPixelRatio(Math.min(devicePixelRatio, mobile() ? 1.5 : 2));
+  renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); dirty = true;
+  const sp = state.veh ? Math.max(state.veh.getSize(v3).x, v3.z) : 1; camera.near = sp * .05; camera.far = sp * 40; camera.updateProjectionMatrix();
+}
+function leader() {
+  const line = $('#leader'), dot = $('#leader-dot'), tag = $('#tag');
+  const act = groups.reduce((a, g) => g.s.lift > (a ? a.s.lift : 0) ? g : a, null);
+  const many = groups.filter(g => g.s.lift > .5).length > 1;
+  if (!act || act.s.lift < .02 || many) { tag.style.opacity = 0; line.setAttribute('x2', line.getAttribute('x1')); line.setAttribute('y2', line.getAttribute('y1')); dot.setAttribute('opacity', 0); return; }
+  const c = act.anchor.c.clone().addScaledVector(act.anchor.off, act.s.lift).project(camera);
+  const w = stage.clientWidth, h = stage.clientHeight, x = (c.x * .5 + .5) * w, y = (-c.y * .5 + .5) * h;
+  const x0 = 28, y0 = 62, L = act.s.lift;
+  tag.innerHTML = `<b>${pad(act.i + 1)}</b>${esc(act.title)}`; tag.style.opacity = L;
+  line.setAttribute('x1', x0); line.setAttribute('y1', y0);
+  line.setAttribute('x2', x0 + (x - x0) * L); line.setAttribute('y2', y0 + (y - y0) * L);
+  dot.setAttribute('cx', x); dot.setAttribute('cy', y); dot.setAttribute('opacity', L > .95 ? 1 : 0);
+}
+function loop() {
+  if (dirty) {
+    const vf = THREE.MathUtils.degToRad(camera.fov), hf = 2 * Math.atan(Math.tan(vf / 2) * camera.aspect);
+    const dist = cam.r / Math.sin(Math.min(vf, hf) / 2) * cam.f, el = .5;
+    camera.position.set(cam.x + dist * Math.cos(el) * Math.sin(cam.az), cam.y + dist * Math.sin(el), cam.z + dist * Math.cos(el) * Math.cos(cam.az));
+    camera.lookAt(cam.x, cam.y, cam.z);
+    renderer.render(scene, camera); leader(); dirty = false;
+  }
+  requestAnimationFrame(loop);
+}
+
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => ready && build(), 200); });
+
+window.__explode = {
+  active: () => state.step === 0 ? 'intro' : state.step === LAST ? 'all' : groups[state.step - 1]?.id,
+  step: () => state.step, ready: () => ready, groups: () => groups.map(g => ({id: g.id, units: g.units.length, lift: g.s.lift, dim: g.s.dim})),
+  seek: t => { tl.seek(t); apply(); }, times: () => state.T, qty: () => qty,
+};
+</script>
+</body>
+</html>

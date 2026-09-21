@@ -1,0 +1,89 @@
+[
+ {
+  "id": "frm",
+  "title": "Frame",
+  "prefixes": [
+   "FRM"
+  ],
+  "parts": [
+   "FRM-001-M-Bottom Plate",
+   "FRM-002-M-Top Plate",
+   "FRM-003-M-Payload Mount",
+   "FRM-005-M-Protective Arch"
+  ]
+ },
+ {
+  "id": "arm",
+  "title": "Arms and propulsion",
+  "prefixes": [
+   "ARM"
+  ],
+  "parts": [
+   "ARM-001-M-CF Tube",
+   "ARM-002-P-Propeller 22x6.6",
+   "ARM-003-P-MN6007II",
+   "ARM-004-M-Motor Mount Plate",
+   "ARM-005-M-Motor Mount Ring",
+   "ARM-006-M-Frame Mount Block",
+   "ARM-007-M-LGR Mount"
+  ]
+ },
+ {
+  "id": "batt",
+  "title": "Battery",
+  "prefixes": [
+   "BATT"
+  ],
+  "parts": [
+   "BATT-001-P-TATTU 22 Ah TAA22K6S30ASX",
+   "BATT-002-P-25mm Velcro Strap",
+   "BATT-003-M-TPU Mount Print"
+  ]
+ },
+ {
+  "id": "elec",
+  "title": "Electronics",
+  "prefixes": [
+   "ELEC",
+   "ELM"
+  ],
+  "parts": [
+   "ELEC-001-P-TMOTOR CINE55A",
+   "ELEC-002-P-H-RTK ZED F9P Rover",
+   "ELEC-003-P-Pixhawk 6X",
+   "ELEC-004-P-Pixhawk Baseboard V2B",
+   "ELEC-007-P-XT90E-M Amass",
+   "ELM-005-M-Pixhawk Mount Plate",
+   "ELM-006-M-NEW RTK Mount",
+   "ELM-007-M-Shunt Plug Mount"
+  ]
+ },
+ {
+  "id": "lgr",
+  "title": "Landing gear",
+  "prefixes": [
+   "LGR"
+  ],
+  "parts": [
+   "LGR-001-M-CF-Kevlar Tube",
+   "LGR-002-M-Top Plate",
+   "LGR-003-M-Support Strut",
+   "LGR-004-M-Support Ring",
+   "LGR-005-M-TPU Foot"
+  ]
+ },
+ {
+  "id": "payload",
+  "title": "Payload",
+  "prefixes": [
+   "PAYLOAD"
+  ],
+  "parts": [
+   "PAYLOAD-001-P-MG90S Servo",
+   "PAYLOAD-003-P-Medium Servo Horn",
+   "PAYLOAD-004-M-Indented Servo Attachment",
+   "PAYLOAD-005-M-Top Fixed Plate",
+   "PAYLOAD-006-M-TPU Slotted Housing"
+  ]
+ }
+]
