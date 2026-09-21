@@ -156,17 +156,15 @@ header{position:sticky;top:0;z-index:40}
 .sheetset{margin:0 clamp(20px,5vw,64px) var(--space-8);border:2px solid var(--color-divider)}
 .sheetset-head{display:flex;justify-content:space-between;align-items:baseline;gap:var(--space-4);flex-wrap:wrap;padding:var(--space-3) var(--space-4);border-bottom:2px solid var(--color-divider)}
 .sheetset-head h3{margin:0;font-size:18px}
-.sheetset-head span{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-muted);font-variant-numeric:tabular-nums}
 .sheet{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px;background:var(--color-divider)}
 @media (max-width:1100px){.sheet{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:600px){.sheet{grid-template-columns:1fr}}
 .frame{background:var(--color-bg);padding:clamp(14px,1.8vw,22px);display:flex;flex-direction:column;gap:10px;text-decoration:none;color:inherit;box-shadow:inset 0 3px 0 transparent}
 @supports (grid-template-rows:subgrid){ /* cards in a row share one track per part, so titles, text and title blocks line up */
-  .frame{display:grid;grid-row:span 6;grid-template-rows:subgrid;row-gap:10px;align-content:start}
+  .frame{display:grid;grid-row:span 5;grid-template-rows:subgrid;row-gap:10px;align-content:start}
 }
 .frame:hover{color:inherit;background:var(--color-surface);box-shadow:inset 0 3px 0 var(--color-accent)}
 .frame:focus-visible{outline:2px solid var(--color-accent);outline-offset:-5px}
-.frame-num{font:600 13px var(--font-heading);color:var(--color-text-muted);font-variant-numeric:tabular-nums;letter-spacing:.04em}
 .frame-fig{width:100%;height:clamp(120px,13vw,160px);display:flex;align-items:center;justify-content:center;background:var(--color-neutral-100)}
 .frame-fig svg{width:100%;height:100%}
 .frame-fig img{width:100%;height:100%;object-fit:cover}
@@ -181,13 +179,13 @@ header{position:sticky;top:0;z-index:40}
 .frame-tb .tb-result{display:block;font-size:14px;line-height:1.4;color:var(--color-text-muted);font-variant-numeric:tabular-nums}
 .frame-tb .tb-result strong{color:var(--color-accent-700);font-weight:800}
 .sheet-rows{display:grid;gap:2px;background:var(--color-divider)}
-.row{display:grid;grid-template-columns:72px 230px minmax(0,1fr) 190px;gap:var(--space-4);align-items:baseline;background:var(--color-bg);padding:var(--space-4) clamp(14px,1.8vw,22px);text-decoration:none;color:inherit;box-shadow:inset 0 3px 0 transparent}
+.row{display:grid;grid-template-columns:230px minmax(0,1fr) 190px;gap:var(--space-4);align-items:baseline;background:var(--color-bg);padding:var(--space-4) clamp(14px,1.8vw,22px);text-decoration:none;color:inherit;box-shadow:inset 0 3px 0 transparent}
 .row:hover{color:inherit;background:var(--color-surface);box-shadow:inset 0 3px 0 var(--color-accent)}
 .row:focus-visible{outline:2px solid var(--color-accent);outline-offset:-5px}
 .row h4{margin:0;font-size:clamp(17px,1.8vw,20px)}
 .row p{margin:0;font-size:14px;color:var(--color-neutral-800);max-width:72ch}
 .row-meta{font-size:13px;color:var(--color-text-muted);text-align:right;text-wrap:balance}
-@media (max-width:900px){.row{grid-template-columns:72px minmax(0,1fr) auto}.row p{grid-column:2/-1;grid-row:2}}
+@media (max-width:900px){.row{grid-template-columns:minmax(0,1fr) auto}.row p{grid-column:1/-1;grid-row:2}}
 @media (max-width:600px){.row{grid-template-columns:1fr;gap:4px}.row p{grid-column:auto;grid-row:auto}.row-meta{white-space:normal;text-align:left}}
 
 /* — detail sections — */
@@ -279,10 +277,9 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   </div>
 
   <div class="sheetset">
-    <div class="sheetset-head"><h3>Featured projects</h3><span>Sheets 01–04</span></div>
+    <div class="sheetset-head"><h3>Featured projects</h3></div>
     <div class="sheet">
       <a href="#tylok-fatigue-machine" class="frame" aria-labelledby="t-tylok-fatigue-machine">
-        <span class="frame-num">Sheet 01</span>
         <div class="frame-fig" data-fig="tylokPhotoFigure"></div>
         <h4 id="t-tylok-fatigue-machine">Flexural Fatigue Test Machine</h4>
         <p>The fatigue test machine I designed, manufactured, and put into service as a co-op at Tylok International. Built to ASTM F1387 A6 to test a variety of parts and sizes.</p>
@@ -294,7 +291,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
         <span class="view-link">View project <span aria-hidden="true">→</span></span>
       </a>
       <a href="#mission-model" class="frame" aria-labelledby="t-mission-model">
-        <span class="frame-num">Sheet 02</span>
         <div class="frame-fig" data-fig="missionProfileFigure"></div>
         <h4 id="t-mission-model">Mission Model</h4>
         <p>Flies a mock DARPA Heavy Lift 2028 course with every motor, propeller, and battery combination it has data for, and reports which ones finish it.</p>
@@ -306,7 +302,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
         <span class="view-link">View project <span aria-hidden="true">→</span></span>
       </a>
       <a href="#fly-brain-drone" class="frame" aria-labelledby="t-fly-brain-drone">
-        <span class="frame-num">Sheet 03</span>
         <div class="frame-fig" data-fig="flyBrainPhotoFigure"></div>
         <h4 id="t-fly-brain-drone">Fly-Brain Drone</h4>
         <p>A drone whose vision runs through a connectome-constrained model of the fly's optic lobe, decoded into steer and speed in a PX4 + Gazebo sim. In progress.</p>
@@ -318,7 +313,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
         <span class="view-link">View project <span aria-hidden="true">→</span></span>
       </a>
       <a href="#log-dashboard" class="frame" aria-labelledby="t-log-dashboard">
-        <span class="frame-num">Sheet 04</span>
         <div class="frame-fig" data-fig="droneScopeFigure"></div>
         <h4 id="t-log-dashboard">Log Dashboard</h4>
         <p>Decodes a Pixhawk flight log into a score, an issues list, and every chart, so you can tell whether a flight was healthy before flying again.</p>
@@ -333,10 +327,9 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   </div>
 
   <div class="sheetset">
-    <div class="sheetset-head"><h3>More projects</h3><span>Sheets 05–08</span></div>
+    <div class="sheetset-head"><h3>More projects</h3></div>
     <div class="sheet">
       <a href="#wing-optimizer" class="frame" aria-labelledby="t-wing-optimizer">
-        <span class="frame-num">Sheet 05</span>
         <div class="frame-fig" data-fig="wingPlanformFigure"></div>
         <h4 id="t-wing-optimizer">Wing Optimizer</h4>
         <p>Sizes a wing from a lift requirement and a cruise speed, then writes the geometry out as SolidWorks equations. Built to support Mission Model.</p>
@@ -348,7 +341,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
         <span class="view-link">View project <span aria-hidden="true">→</span></span>
       </a>
       <a href="#liquid-rocket" class="frame" aria-labelledby="t-liquid-rocket">
-        <span class="frame-num">Sheet 06</span>
         <div class="frame-fig" data-fig="rocketFigure"></div>
         <h4 id="t-liquid-rocket">Liquid Rocket</h4>
         <p>Ground-station software for a liquid rocket test stand: valve control, live gauges, and CSV logging in one PyQt6 app.</p>
@@ -360,7 +352,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
         <span class="view-link">View project <span aria-hidden="true">→</span></span>
       </a>
       <a href="#naca-solidworks" class="frame" aria-labelledby="t-naca-solidworks">
-        <span class="frame-num">Sheet 07</span>
         <div class="frame-fig" data-fig="nacaAirfoilFigure"></div>
         <h4 id="t-naca-solidworks">NACA to SolidWorks</h4>
         <p>Turns a NACA airfoil number and a chord length into the XYZ point files SolidWorks reads as curves. Runs in the browser, nothing uploaded.</p>
@@ -372,7 +363,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
         <span class="view-link">View project <span aria-hidden="true">→</span></span>
       </a>
       <a href="#x8-tailsitter" class="frame" aria-labelledby="t-x8-tailsitter">
-        <span class="frame-num">Sheet 08</span>
         <div class="frame-fig" data-fig="x8TailsitterOrthoFigure"></div>
         <h4 id="t-x8-tailsitter">X-8 Tailsitter</h4>
         <p>The hexacopter reworked into an X-8 tailsitter: lift from a wing, and a high thrust-to-weight ratio.</p>
@@ -387,34 +377,29 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   </div>
 
   <div class="sheetset">
-    <div class="sheetset-head"><h3>Airframes, team teaching and concept work</h3><span>Sheets 09–13</span></div>
+    <div class="sheetset-head"><h3>Airframes, team teaching and concept work</h3></div>
     <div class="sheet-rows">
       <a href="#hexacopter-drone" class="row" aria-labelledby="t-hexacopter-drone">
-        <span class="frame-num">Sheet 09</span>
         <h4 id="t-hexacopter-drone">Hexacopter Drone</h4>
         <p>The competition hexacopter for VFS DBVF. I worked on the frame, motor mounts, sensor mounts, and payload mounts.</p>
         <span class="row-meta">CAD · Competition <span aria-hidden="true">→</span></span>
       </a>
       <a href="#quadcopter" class="row" aria-labelledby="t-quadcopter">
-        <span class="frame-num">Sheet 10</span>
         <h4 id="t-quadcopter">Quadcopter</h4>
         <p>I use a basic 5-inch quadcopter build to teach newer VTOL members multirotor design before they move on to transitioning airframes.</p>
         <span class="row-meta">CAD · Teaching <span aria-hidden="true">→</span></span>
       </a>
       <a href="#tail-sitter-designs" class="row" aria-labelledby="t-tail-sitter-designs">
-        <span class="frame-num">Sheet 11</span>
         <h4 id="t-tail-sitter-designs">Tail Sitter Designs</h4>
         <p>I'm teaching newer VTOL members to design their own tail sitters, so the club can design successful transition drones.</p>
         <span class="row-meta">Concept · Teaching <span aria-hidden="true">→</span></span>
       </a>
       <a href="#tilt-rotor-designs" class="row" aria-labelledby="t-tilt-rotor-designs">
-        <span class="frame-num">Sheet 12</span>
         <h4 id="t-tilt-rotor-designs">Tilt Rotor Designs</h4>
         <p>I teach newer VTOL members to design tilt rotors and build their own within a semester.</p>
         <span class="row-meta">Concept · Teaching <span aria-hidden="true">→</span></span>
       </a>
       <a href="#darpa-lift-2028" class="row" aria-labelledby="t-darpa-lift-2028">
-        <span class="frame-num">Sheet 13</span>
         <h4 id="t-darpa-lift-2028">DARPA Lift 2028</h4>
         <p>The airframe Mission Model is meant to inform: a low-rotor-count tail sitter for the DARPA LIFT '28 challenge, still being adapted.</p>
         <span class="row-meta">Concept · In progress <span aria-hidden="true">→</span></span>
