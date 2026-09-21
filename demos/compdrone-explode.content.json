@@ -55,7 +55,8 @@
    "BATT-001-P-TATTU 22 Ah TAA22K6S30ASX",
    "BATT-002-P-25mm Velcro Strap",
    "BATT-003-M-TPU Mount Print"
-  ]
+  ],
+  "blurb": "The pack is a TATTU 22 Ah, held by two 25 mm velcro straps on a printed TPU mount."
  },
  {
   "id": "elec",
@@ -73,7 +74,8 @@
    "ELM-005-M-Pixhawk Mount Plate",
    "ELM-006-M-NEW RTK Mount",
    "ELM-007-M-Shunt Plug Mount"
-  ]
+  ],
+  "blurb": "The avionics are real vendor parts: a Pixhawk 6X with its baseboard, and an RTK GPS. I contributed to the mounts they sit on (the Pixhawk mount plate, the RTK mount and the shunt plug mount) and modeled or imported the vendor parts next to them."
  },
  {
   "id": "lgr",
@@ -87,7 +89,8 @@
    "LGR-003-M-Support Strut",
    "LGR-004-M-Support Ring",
    "LGR-005-M-TPU Foot"
-  ]
+  ],
+  "blurb": "Folding landing gear on three legs. Each leg is a CF-Kevlar tube with a top plate, four support struts, a support ring and a TPU foot."
  },
  {
   "id": "payload",
@@ -101,6 +104,7 @@
    "PAYLOAD-004-M-Indented Servo Attachment",
    "PAYLOAD-005-M-Top Fixed Plate",
    "PAYLOAD-006-M-TPU Slotted Housing"
-  ]
+  ],
+  "blurb": "A servo-actuated payload-drop mechanism: an MG90S servo and horn, an indented servo attachment, a top fixed plate and a TPU slotted housing. The drone is a platform, so a number of different payloads can be attached to it, which is why the payload mount is a subassembly of its own."
  }
 ]

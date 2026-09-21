@@ -90,7 +90,7 @@ changes to their drawing code.
   accent-700. The accent is used for those key numbers, focus rings, and the
   hover top rule. Featured order alternates hardware and software: Flexural
   Fatigue Test Machine (Tylok), Mission Model, Hexacopter Drone (CompDrone),
-  Log Dashboard. Every frame links to its in-page `:target` write-up; the Log
+  Log Dashboard. Every frame links to its in-page `:target` write-up, except Hexacopter Drone, whose project page is the standalone scroll-driven exploded view `demos/compdrone-explode.html` (its old in-page section was removed; `index.html` redirects the old `#hexacopter-drone` hash there); the Log
   Dashboard live demo is a button inside its section.
 - **Detail sections**: one per project, `scroll-margin-top: var(--nav-h)` so the
   sticky nav doesn't cover the anchor target. Each opens with a drawing-style

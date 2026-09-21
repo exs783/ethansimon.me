@@ -14,6 +14,7 @@
 <meta property="og:url" content="https://ethansimon.me/">
 <meta property="og:image" content="https://ethansimon.me/assets/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
+<script>if (location.hash === "#hexacopter-drone") location.replace("demos/compdrone-explode.html");</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap" rel="stylesheet">
@@ -261,7 +262,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
       <a href="assets/Ethan_Simon_Resume.pdf" target="_blank" rel="noopener" class="btn btn-secondary">Resume <span aria-hidden="true">↗</span><span class="sr-only">(PDF, opens in new tab)</span></a>
     </div>
   </div>
-  <a class="hero-figure" href="#hexacopter-drone">
+  <a class="hero-figure" href="demos/compdrone-explode.html">
     <img src="assets/compdrone2025-render.webp" alt="Render of the CompDrone2025 hexacopter" width="1350" height="1080" fetchpriority="high">
     <div class="frame-tb">
       <div><span class="tb-label">Assembly</span><span class="tb-value">CompDrone2025</span></div>
@@ -379,7 +380,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   <div class="sheetset">
     <div class="sheetset-head"><h3>Airframes, team teaching and concept work</h3></div>
     <div class="sheet-rows">
-      <a href="#hexacopter-drone" class="row" aria-labelledby="t-hexacopter-drone">
+      <a href="demos/compdrone-explode.html" class="row" aria-labelledby="t-hexacopter-drone">
         <h4 id="t-hexacopter-drone">Hexacopter Drone</h4>
         <p>The competition hexacopter for VFS DBVF. I worked on the frame, motor mounts, sensor mounts, and payload mounts.</p>
         <span class="row-meta">CAD · Competition <span aria-hidden="true">→</span></span>
@@ -868,35 +869,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   </div>
 
   <div style="margin-top:var(--space-4)"><a class="btn btn-primary" href="demos/naca-airfoil.html">Open the tool <span aria-hidden="true">→</span></a></div>
-</section>
-
-<!-- ============================= HEXACOPTER DRONE ============================= -->
-<section class="project-section" id="hexacopter-drone">
-  <a class="back-to-reel" href="#reel">← All projects</a>
-  <div class="project-head">
-    <h2>Hexacopter Drone</h2>
-    <a class="btn btn-primary" href="demos/compdrone-explode.html">Exploded view <span aria-hidden="true">→</span></a>
-  </div>
-  <p class="project-tagline">Design, manufacturing, and testing of a hexacopter drone for the VFS DBVF competition. I contributed to the frame, motor mounts, sensor mounts, and payload mounts.</p>
-
-  <h3 class="subhead">Overview</h3>
-  <div class="method-copy">
-    <p>CompDrone2025 is the full hexacopter assembly built for the VFS Design-Build-Vertical-Flight competition: carbon-fiber tube arms, a machined frame, RTK GPS and Pixhawk avionics mounts, a servo-actuated payload-drop mechanism, and folding landing gear, all as real mated SolidWorks assemblies. The model below is the actual assembly, exported to glTF so it's something you can rotate rather than a fixed render. It is also a platform: a number of different payloads can be attached to it, which is why the payload mount is a subassembly of its own.</p>
-  </div>
-
-  <h3 class="subhead">Method</h3>
-  <div class="method-copy">
-    <p>The assembly is organized the way a real drone build actually breaks down: <code>ARM</code> (carbon-fiber tube, motor mount plate/ring, prop), <code>FRM</code> (top/bottom plates, payload mount, protective dome), <code>LGR</code> (landing-gear struts, TPU feet), <code>BATT</code> (battery + velcro strap + printed mount), <code>CAM</code>, <code>PAYLOAD</code> (servo, horn, clamp body, water-bottle attachment), and <code>ELEC</code> (Pixhawk 6X, RTK GPS, baseboard) — seven subassemblies mated into one top-level <code>.SLDASM</code>, each with real vendor parts (T-Motor, Amass, Pixhawk) modeled or imported alongside the machined/printed parts.</p>
-  </div>
-
-  <h3 class="subhead">Outcome</h3>
-  <div class="figure-card">
-    <div class="figure-title">CompDrone2025 — interactive model</div>
-    <div data-fig="modelFigureCad"></div>
-    <div class="figure-caption">Interactive 3D model (2.2 MB). Drag to rotate, scroll or pinch to zoom.</div>
-  </div>
-
-
 </section>
 
 <!-- ============================= FLEXURAL FATIGUE TEST MACHINE ============================= -->
@@ -1780,7 +1752,6 @@ const FLY_TRAJ = {"teacher":[[0.1,-0.1],[0.11,-0.1],[0.11,-0.1],[0.12,-0.09],[0.
     flyBrainPhotoFigure: () => imgFigure("assets/fly-brain-scan.webp", "Rendering of a fruit fly brain connectome: neurons in many colours over a black background", "grayscale", [1072, 720]),
     flyPipelineFigure: () => flyPipelineFigure(),
     sensorPanelFigure: () => sensorPanelFigure(),
-    modelFigureCad: () => modelFigure("assets/compdrone2025.glb", "CompDrone2025 hexacopter SolidWorks assembly", "assets/compdrone2025-render.webp"),
     quadcopterFigure: () => modelFigure("assets/quadcopter-5in-drone.glb", "Quadcopter 5-inch drone frame", "assets/quadcopter-orthographic.png"),
     x8TiltMotorFigure: () => modelFigure("assets/x8-tailsitter-tilt-motor-assem.glb", "X-8 tailsitter tilt motor assembly", "assets/x8-tailsitter-orthographic.png"),
     quadcopterOrthoFigure: () => imgFigure("assets/quadcopter-orthographic.png", "Quadcopter top-down orthographic view"),

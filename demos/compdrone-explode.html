@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CompDrone2025, taken apart</title>
-<meta name="description" content="The real CompDrone2025 hexacopter SolidWorks assembly, pulled apart one subsystem at a time as you scroll.">
+<title>Hexacopter Drone, taken apart</title>
+<meta name="description" content="Hexacopter drone for the VFS DBVF competition: the real CompDrone2025 SolidWorks assembly, pulled apart one subsystem at a time as you scroll, with the calcs behind it.">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -95,7 +95,7 @@ figcaption{padding:var(--space-2) var(--space-3);font-size:14px;color:var(--colo
 <header>
   <nav class="nav" aria-label="Primary">
     <span class="nav-brand">ETHAN SIMON</span>
-    <a class="btn" href="../index.html#hexacopter-drone">← Hexacopter Drone</a>
+    <a class="btn" href="../index.html#reel">← All projects</a>
   </nav>
 </header>
 
@@ -155,9 +155,10 @@ function panelHTML(s, i) {
 function renderPanels() {
   $('#panels').innerHTML =
     `<section class="panel on" id="intro" data-step="0" aria-labelledby="intro-h">
-       <div class="kicker">CWRU VTOL team · SolidWorks assembly</div>
-       <h1 id="intro-h">CompDrone2025, taken apart</h1>
-       <p class="lede">The real hexacopter CAD: ${uniqueParts} unique parts in ${content.length} subsystems. Scroll and each one pulls out of the airframe.</p>
+       <div class="kicker">CWRU VTOL team · VFS DBVF competition</div>
+       <h1 id="intro-h">Hexacopter Drone</h1>
+       <p class="lede">Design, manufacturing, and testing of a hexacopter drone for the VFS DBVF competition. I contributed to the frame, motor mounts, sensor mounts, and payload mounts.</p>
+       <p class="lede">CompDrone2025 is the full hexacopter assembly built for the VFS Design-Build-Vertical-Flight competition: carbon-fiber tube arms, a machined frame, RTK GPS and Pixhawk avionics mounts, a servo-actuated payload-drop mechanism, and folding landing gear, all as real mated SolidWorks assemblies. Scroll and its ${uniqueParts} unique parts pull out subsystem by subsystem.</p>
        <div class="hint" aria-hidden="true">Scroll ↓</div>
      </section>` +
     content.map(panelHTML).join('') +
@@ -165,7 +166,7 @@ function renderPanels() {
        <div class="kicker">All apart</div>
        <h2 id="outro-h">Every part is a real node in the assembly</h2>
        <p class="lede" id="outro-stat">${uniqueParts} unique parts, named by the team's part numbers.</p>
-       <div class="links"><a class="btn" href="../index.html#hexacopter-drone">← Back to the project</a></div>
+       <div class="links"><a class="btn" href="../index.html#reel">← All projects</a></div>
      </section>`;
 }
 renderPanels();
