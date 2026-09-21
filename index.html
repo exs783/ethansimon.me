@@ -137,6 +137,7 @@ header{position:sticky;top:0;z-index:40}
 .hero{padding:clamp(48px,9vw,110px) clamp(20px,5vw,64px) clamp(40px,6vw,72px);
   display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(24px,4vw,56px);align-items:center;border-bottom:2px solid var(--color-divider)}
 .hero h1{font-size:clamp(28px,3.6vw,46px);max-width:26ch;margin-bottom:var(--space-6)}
+.hero-sub{display:block;font-size:.55em;line-height:1.3;margin-top:var(--space-2);color:var(--color-neutral-800)}
 .hero p{font-size:clamp(16px,1.6vw,18px);max-width:58ch;color:var(--color-neutral-800);margin-bottom:var(--space-6)}
 .hero-figure{display:block;width:100%;max-width:520px;margin-left:auto;border:1px solid var(--color-divider);background:var(--color-neutral-100);text-decoration:none;color:inherit}
 .hero-figure:hover{color:inherit}
@@ -195,12 +196,6 @@ header{position:sticky;top:0;z-index:40}
 .subhead{font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-text-muted);margin-top:var(--space-8)}
 .caution{font-size:14px;color:var(--color-accent-800);background:var(--color-accent-100);border:1px solid var(--color-accent);padding:9px 12px;max-width:64ch;margin:var(--space-3) 0}
 
-/* — title block (drawing-sheet convention) — */
-.titleblock{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--color-divider);
-  border:2px solid var(--color-divider);margin:var(--space-6) 0 var(--space-4);max-width:860px}
-.titleblock>div{background:var(--color-bg);padding:10px 14px}
-.titleblock-6{grid-template-columns:repeat(3,minmax(0,1fr))}
-@media (max-width:520px){.titleblock-6{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .tb-label{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-muted)}
 .tb-value{display:block;font-weight:800;font-size:15px}
 
@@ -251,7 +246,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 
 <section class="hero">
   <div>
-    <h1>Junior Mechanical Engineering Student interested in mechanical and software integration</h1>
+    <h1>Junior Mechanical Engineering Student <span class="hero-sub">interested in mechanical and software integration</span></h1>
     <div style="display:flex;gap:var(--space-3);flex-wrap:wrap">
       <a href="#reel" class="btn btn-primary">See the projects <span aria-hidden="true">→</span></a>
       <a href="assets/Ethan_Simon_Resume.pdf" target="_blank" rel="noopener" class="btn btn-secondary">Resume <span aria-hidden="true">↗</span><span class="sr-only">(PDF, opens in new tab)</span></a>
@@ -418,12 +413,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     <h2>Mission Model</h2>
   </div>
   <p class="project-tagline">A mission-performance simulator that sweeps every motor, propeller, and battery combination it is given. The model runs a theoretical mission, the DARPA 2028 heavy lift, and returns the feasibility of each combination. It's state based, with the states of landed, take-off, transition, cruise, and land. The model runs a system of dynamics equations to model the motion of flight in every state except transition. In the transition state the drone uses a quaternion model to better represent its motion through the transition from vertical to horizontal flight.</p>
-  <div class="titleblock">
-    <div><span class="tb-label">Discipline</span><span class="tb-value">Simulation</span></div>
-    <div><span class="tb-label">Year</span><span class="tb-value">2026</span></div>
-    <div><span class="tb-label">Built with</span><span class="tb-value">Python, NumPy, SciPy</span></div>
-    <div><span class="tb-label">Repository</span><span class="tb-value">exs783/Log_Reader</span></div>
-  </div>
 
   <h3 class="subhead">Overview</h3>
   <div class="method-copy">
@@ -543,12 +532,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     <h2>Wing Optimizer</h2>
   </div>
   <p class="project-tagline">A wing-sizing tool that searches lift coefficient, aspect ratio, and taper ratio for whichever combination minimizes structural mass, cruise drag, or total mission energy. Three of its search objectives are grounded in real aerostructural optimization papers. It doesn't claim to replicate methods like RANS CFD, nonlinear FE, or flight test — a standalone script can't actually run those.</p>
-  <div class="titleblock">
-    <div><span class="tb-label">Discipline</span><span class="tb-value">Optimization tool</span></div>
-    <div><span class="tb-label">Year</span><span class="tb-value">2026</span></div>
-    <div><span class="tb-label">Built with</span><span class="tb-value">Python</span></div>
-    <div><span class="tb-label">Repository</span><span class="tb-value">exs783/Log_Reader</span></div>
-  </div>
 
   <h3 class="subhead">Overview</h3>
   <div class="method-copy">
@@ -615,12 +598,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     <a class="btn btn-primary" href="demos/log-dashboard.html">Live demo <span aria-hidden="true">→</span></a>
   </div>
   <p class="project-tagline">A Flask + Plotly dashboard that decodes ArduCopter/PX4 flight logs into a full diagnostic report. Upload your own flight log in the live demo and get back the score, the issues list, and every chart. The numbers on this page come from a real sample log.</p>
-  <div class="titleblock">
-    <div><span class="tb-label">Discipline</span><span class="tb-value">Flight-data tooling</span></div>
-    <div><span class="tb-label">Year</span><span class="tb-value">2026</span></div>
-    <div><span class="tb-label">Built with</span><span class="tb-value">Python, Flask, Plotly, pymavlink</span></div>
-    <div><span class="tb-label">Repository</span><span class="tb-value">exs783/Log_Reader</span></div>
-  </div>
 
   <h3 class="subhead">Overview</h3>
   <div class="method-copy">
@@ -677,12 +654,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     <h2>Liquid Rocket</h2>
   </div>
   <p class="project-tagline">Ground-station software for CWRU's Liquid Propulsion Team, rebuilt from two prototypes that were never actually integrated into one working app, one of them my own original hot-fire GUI.</p>
-  <div class="titleblock">
-    <div><span class="tb-label">Team</span><span class="tb-value">CWRU Liquid Propulsion</span></div>
-    <div><span class="tb-label">Year</span><span class="tb-value">2026</span></div>
-    <div><span class="tb-label">Built with</span><span class="tb-value">PyQt6</span></div>
-    <div><span class="tb-label">Repository</span><span class="tb-value">exs783/Liquid-Rocket</span></div>
-  </div>
 
   <h3 class="subhead">Overview</h3>
   <div class="method-copy">
@@ -727,12 +698,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     <a class="btn btn-primary" href="demos/naca-airfoil.html">Open the tool <span aria-hidden="true">→</span></a>
   </div>
   <p class="project-tagline">Type a NACA 4- or 5-digit airfoil and a chord length, and it downloads XYZ point files for SolidWorks' Curve Through XYZ Points. It does the whole calculation in your browser, so there's nothing to install and nothing uploaded.</p>
-  <div class="titleblock">
-    <div><span class="tb-label">Discipline</span><span class="tb-value">CAD tooling</span></div>
-    <div><span class="tb-label">Year</span><span class="tb-value">2026</span></div>
-    <div><span class="tb-label">Built with</span><span class="tb-value">JavaScript, SVG</span></div>
-    <div><span class="tb-label">Repository</span><span class="tb-value">exs783/ethansimon.me</span></div>
-  </div>
 
   <h3 class="subhead">Overview</h3>
   <div class="method-copy">
@@ -783,12 +748,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     <h2>Hexacopter Drone</h2>
   </div>
   <p class="project-tagline">Design, manufacturing, and testing of a hexacopter drone for the VFS DBVF competition. I contributed to the frame, motor mounts, sensor mounts, and payload mounts.</p>
-  <div class="titleblock">
-    <div><span class="tb-label">Discipline</span><span class="tb-value">CAD</span></div>
-    <div><span class="tb-label">Built with</span><span class="tb-value">SolidWorks</span></div>
-    <div><span class="tb-label">Competition</span><span class="tb-value">VFS DBVF</span></div>
-    <div><span class="tb-label">Assembly</span><span class="tb-value">CompDrone2025</span></div>
-  </div>
 
   <h3 class="subhead">Overview</h3>
   <div class="method-copy">
@@ -817,14 +776,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     <h2>Flexural Fatigue Test Machine</h2>
   </div>
   <p class="project-tagline">A flexural fatigue test machine for internal testing, built to ASTM F1387 A6. I designed, manufactured, and implemented it as a Mechanical Engineering Co-Op at Tylok International.</p>
-  <div class="titleblock titleblock-6">
-    <div><span class="tb-label">Discipline</span><span class="tb-value">Mechanical testing</span></div>
-    <div><span class="tb-label">Employer</span><span class="tb-value">Tylok International</span></div>
-    <div><span class="tb-label">Dates</span><span class="tb-value">Jan – Aug 2026</span></div>
-    <div><span class="tb-label">Standard</span><span class="tb-value">ASTM F1387 A6</span></div>
-    <div><span class="tb-label">Test load</span><span class="tb-value">Over 2,000 lb</span></div>
-    <div><span class="tb-label">Cycle range</span><span class="tb-value">Over 80,000</span></div>
-  </div>
 
   <h3 class="subhead">Overview</h3>
   <div class="method-copy">
@@ -856,11 +807,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     <h2>X-8 Tailsitter</h2>
   </div>
   <p class="project-tagline">An adaptation of the Hexacopter Drone into an X-8 tailsitter frame, focused on generating lift from a wing and a high thrust-to-weight ratio.</p>
-  <div class="titleblock">
-    <div><span class="tb-label">Discipline</span><span class="tb-value">CAD</span></div>
-    <div><span class="tb-label">Built with</span><span class="tb-value">SolidWorks</span></div>
-    <div><span class="tb-label">Derived from</span><span class="tb-value">Hexacopter Drone</span></div>
-  </div>
 
   <h3 class="subhead">Overview</h3>
   <div class="method-copy">
@@ -882,11 +828,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     <h2>Quadcopter</h2>
   </div>
   <p class="project-tagline">I use a basic quadcopter build to teach newer VTOL members multirotor design fundamentals before they move on to transitioning airframes.</p>
-  <div class="titleblock">
-    <div><span class="tb-label">Discipline</span><span class="tb-value">CAD, teaching</span></div>
-    <div><span class="tb-label">Built with</span><span class="tb-value">SolidWorks</span></div>
-    <div><span class="tb-label">Frame</span><span class="tb-value">5-inch, 4 motors</span></div>
-  </div>
 
   <h3 class="subhead">Overview</h3>
   <div class="method-copy">
@@ -908,11 +849,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     <h2>Tail Sitter Designs</h2>
   </div>
   <p class="project-tagline">An ongoing project: I'm teaching newer VTOL members how to design their own tail sitters, so the club can design successful transition drones.</p>
-  <div class="titleblock">
-    <div><span class="tb-label">Discipline</span><span class="tb-value">CAD, teaching</span></div>
-    <div><span class="tb-label">Built with</span><span class="tb-value">SolidWorks</span></div>
-    <div><span class="tb-label">Status</span><span class="tb-value">Ongoing</span></div>
-  </div>
 
   <h3 class="subhead">Overview</h3>
   <div class="method-copy">
@@ -935,11 +871,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     <h2>Tilt Rotor Designs</h2>
   </div>
   <p class="project-tagline">Similar to Tail Sitter Designs. I teach newer VTOL members how to design tilt rotors and build their own within a semester.</p>
-  <div class="titleblock">
-    <div><span class="tb-label">Discipline</span><span class="tb-value">CAD, teaching</span></div>
-    <div><span class="tb-label">Built with</span><span class="tb-value">SolidWorks</span></div>
-    <div><span class="tb-label">Status</span><span class="tb-value">CAD not yet finalized</span></div>
-  </div>
 
   <h3 class="subhead">Overview</h3>
   <div class="method-copy">
@@ -961,12 +892,6 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
     <h2>DARPA Lift 2028</h2>
   </div>
   <p class="project-tagline">A drone built to compete in the DARPA LIFT '28 challenge. The current design is a tail sitter with a low rotor count, being actively adapted.</p>
-  <div class="titleblock">
-    <div><span class="tb-label">Discipline</span><span class="tb-value">CAD</span></div>
-    <div><span class="tb-label">Built with</span><span class="tb-value">SolidWorks</span></div>
-    <div><span class="tb-label">Competition</span><span class="tb-value">DARPA LIFT '28</span></div>
-    <div><span class="tb-label">Status</span><span class="tb-value">In progress</span></div>
-  </div>
 
   <h3 class="subhead">Overview</h3>
   <div class="method-copy">
