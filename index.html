@@ -813,12 +813,12 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
   <div class="method-copy">
     <p>DAgger round 1 was the first response. On-policy, the decoder succeeded in 9 of the 26 episodes it drove to completion, and the held-out fit of the refit decoder has steer R² 0.31 (sign agreement 76%), speed R² 0.48, and food-visible accuracy 0.82 against a 0.62 majority baseline. Food was visible in 38% of the frames, against about 80% before, so the data now includes the search phase the first version never saw.</p>
     <p>DAgger round 2 repeated this with the round-1 decoder driving 80% of the episodes, on three parallel sims. The final fit uses 97 episodes and 46.5k frames, with food visible in 44% of them. The held-out fit did not improve: steer R² 0.27 (sign agreement 79%), speed R² 0.25 and food-visible accuracy 0.78 against a 0.56 majority baseline, where round 1 had 0.31, 0.48 and 0.82. The data now holds more of the decoder's own mistakes, so the folds are harder and the numbers are not directly comparable, but the readout metric did not get better.</p>
-    <p>The final closed-loop comparison ran every policy on the same 12 seeds, three fresh sims in parallel, with a 35 s timeout (the first test used 60 s). The round-2 decoder reached the food in 10 of 12 episodes, a mean of 23.1 s on the ones that succeeded, with no collisions. The first decoder got 4 of 10, but on different scenarios and a longer timeout, and I did not re-run it in this matrix, so I can't say how much of the gain is DAgger and how much is the draw of scenarios.</p>
+    <p>The final closed-loop comparison ran every policy on the same 12 seeds, three fresh sims in parallel, with a 35 s timeout (the first test used 60 s). The round-2 decoder reached the food in 10 of 12 episodes, a mean of 23.1 s on the ones that succeeded, with no collisions. The first, teacher-only decoder got 4 of 10 on its own scenarios, so I re-ran it, and the no-reservoir variant, on these same 12 seeds. The teacher-only decoder gets 4 of 12, so the DAgger rounds are what took it from 4 to 10 (Fisher exact p = 0.04). Removing the reservoir gives 9 of 12 against 10 of 12, which is no detectable difference at this sample size, in line with the offline sweep where the reservoir moved steer R² only from 0.23 to 0.31.</p>
   </div>
   <div class="figure-card figure-card--fit">
     <div class="figure-title">Success over 12 matched episodes</div>
     <div data-fig="flyMatrixFigure"></div>
-    <div class="figure-caption">Same 12 seeds for every policy, 35 s timeout. Mean time to food: PID teacher 9.9 s, pixel-only baseline 13.7 s, decoder alone 23.1 s, decoder plus goal 20.6 s, decoder without a goal 30.2 s. The goal here comes from the <code>CvVLM</code> stand-in, not a hosted model.</div>
+    <div class="figure-caption">Same 12 seeds for every policy, 35 s timeout. Mean time to food: PID teacher 9.9 s, pixel-only baseline 13.7 s, decoder alone 23.1 s, decoder plus goal 20.6 s, decoder without a goal 30.2 s, and 14.9 s and 22.3 s for the two ablations, the teacher-data-only decoder and the no-reservoir one. The goal here comes from the <code>CvVLM</code> stand-in, not a hosted model.</div>
   </div>
   <div class="method-copy">
     <p>The semantic layer is what carries the search. The same decoder plus the <code>CvVLM</code> goal got 12 of 12, and with the goal removed, so the arbiter falls back on a stale goal, it got 6 of 12. A goal that says the target is unseen is what makes the drone scan, which the decoder's own confidence never could.</p>
@@ -828,7 +828,7 @@ footer{padding:var(--space-6) clamp(20px,5vw,64px);border-top:2px solid var(--co
 
   <h3 class="subhead">Next</h3>
   <div class="method-copy">
-    <p>The next step is a task where the fly network has an advantage over pixel detection. An obstacle-avoidance reflex is a better fit for a motion-driven network than target bearing, since looming is what those cells respond to. Two loose ends: the ablations that switch the reservoir off and use the teacher-only weights are not run in closed loop, so I can't yet say what the reservoir and DAgger each buy, and <code>HostedVLM</code> still has not met the live API. Before any hardware, the stack needs a horizontal geofence, a hover position hold, and a timing test on a Jetson.</p>
+    <p>The next step is a task where the fly network has an advantage over pixel detection. An obstacle-avoidance reflex is a better fit for a motion-driven network than target bearing, since looming is what those cells respond to. One loose end: <code>HostedVLM</code> still has not met the live API. Before any hardware, the stack needs a horizontal geofence, a hover position hold, and a timing test on a Jetson.</p>
   </div>
 
   <div class="caution">⚠ Simulation only. The semantic layer has run only as a pixel-based stand-in and against fake transports, not against a live vision-language model, and the readout is a descending-neuron-inspired proxy, not real descending neurons.</div>
@@ -1665,6 +1665,8 @@ const FLY_TRAJ = {"teacher":[[0.1,-0.1],[0.11,-0.1],[0.11,-0.1],[0.12,-0.09],[0.
   const FLY_MATRIX = [
     {label:"PID teacher", ok:12},
     {label:"Pixel-only baseline", ok:12},
+    {label:"Decoder, teacher-only", ok:4},
+    {label:"Decoder, no reservoir", ok:9},
     {label:"Decoder alone", ok:10},
     {label:"Decoder + goal", ok:12, kept:true},
     {label:"Decoder, no goal", ok:6},
