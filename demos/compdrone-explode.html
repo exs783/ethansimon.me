@@ -302,14 +302,17 @@ const camFor = k => k === 0 ? camOf(state.veh, 0) : k === LAST ? camOf(state.wid
 const liftAt = (g, k) => k === LAST ? 1 : (k === g.i + 1 ? 1 : 0);
 const dimAt = (g, k) => (k === 0 || k === LAST) ? 0 : (k === g.i + 1 ? 0 : 1);
 
+/* a panel is "on" once its top crosses this line (see apply()); step times below must key off the same line */
+const midLine = () => mobile() ? innerHeight * .72 : innerHeight / 2;
+
 /* time (0..TOTAL) at which each step's panel is in place, from real panel positions */
 const TOTAL = 7000;
 function stepTimes() {
   const sy = scrollY, st = $('#story').getBoundingClientRect().top + sy, vh = innerHeight;
-  const dist = $('#story').offsetHeight - vh;
+  const dist = $('#story').offsetHeight - vh, mid = midLine();
   return [...document.querySelectorAll('.panel')].map(p => {
     const r = p.getBoundingClientRect(), top = r.top + sy;
-    const at = mobile() ? top : top + r.height / 2 - vh / 2;                       // scroll position where the panel is "in place"
+    const at = top - mid;                       // scroll position where the panel's top crosses the mid line, i.e. where it goes "on"
     return Math.round(Math.min(1, Math.max(0, (at - st) / dist)) * TOTAL);
   });
 }
@@ -359,7 +362,7 @@ function apply() {
     });
   });
   state.step = tl ? nearestStep() : 0;
-  const mid = mobile() ? innerHeight * .72 : innerHeight / 2;                     // a panel is lit while it crosses the reading line, so tall panels stay readable
+  const mid = midLine();                                                        // a panel is lit while it crosses the reading line, so tall panels stay readable
   document.querySelectorAll('.panel').forEach(el => { const r = el.getBoundingClientRect(); el.classList.toggle('on', r.top <= mid && r.bottom >= mid); });
   dirty = true;
 }
