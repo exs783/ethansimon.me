@@ -8,38 +8,55 @@
 <meta name="description" content="In-browser port of the real ground_station PyQt6 app: same sensor protocol, same gauge math, same valve logic.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+  /* Modernist tokens, matching the main site (../index.html) -- single light theme,
+     one red accent (decorative-only: needles, open/active state, focus rings), zero
+     radius. Instrument-panel character stays in the SVG dial drawing, not the chrome.
+     IBM Plex Mono stays for the sensor readouts themselves (real measurement data). */
   :root{
-    --panel:#0a0c0a; --panel-2:#0f1512; --bezel:#171f1a; --hairline:#2c3a30;
-    --ink:#d7d9d4; --ink-dim:#8a8f86; --ink-faint:#5c635d;
-    --phosphor:#8fffb0; --amber:#f5c518; --caution:#ff4d4d;
-    --font-body:'IBM Plex Sans', system-ui, sans-serif;
+    --bg:#f3f2f2; --surface:#eae9e9; --panel:#e2e0e0;
+    --hairline:color-mix(in srgb, #201e1d 40%, transparent);
+    --ink:#201e1d; --ink-dim:#605d5d; --ink-faint:#605d5d;
+    --accent:#ec3013; --accent-text:#ae1800;
+    --open:#1a7a3d; --caution:#ec3013;
+    --font-body:'Archivo', system-ui, sans-serif;
     --font-mono:'IBM Plex Mono', ui-monospace, monospace;
   }
   *{ box-sizing:border-box; }
-  html{ color-scheme:dark; }
+  html{ color-scheme:light; }
   body{
-    margin:0; background:var(--panel); color:var(--ink); font-family:var(--font-body);
-    padding-inline:20px;
+    margin:0; background:var(--bg); color:var(--ink); font-family:var(--font-body);
+    padding-inline:20px; caret-color:var(--accent); accent-color:var(--accent);
   }
+  :focus{ outline:none; }
+  :focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  ::selection{ background:color-mix(in srgb, var(--accent) 25%, transparent); }
   .wrap{ max-width:1100px; margin-inline:auto; padding-block:24px 60px; }
 
+  .header-brand{
+    font-family:var(--font-body); font-weight:800; font-size:16px; letter-spacing:-.01em;
+    color:var(--ink); text-decoration:none; display:inline-flex; align-items:center; min-height:32px;
+  }
+  .header-brand:hover{ color:var(--accent-text); }
+
   .notice{
-    font-family:var(--font-mono); font-size:12.5px; color:var(--ink-dim); background:var(--panel-2);
-    border:1px solid var(--hairline); border-radius:8px; padding:10px 14px; margin-bottom:18px;
+    font-family:var(--font-mono); font-size:13px; color:var(--ink-dim); background:var(--surface);
+    border:1px solid var(--hairline); padding:10px 14px; margin-bottom:18px;
   }
-  .notice a{ color:var(--phosphor); }
+  .notice a{ color:var(--accent-text); }
 
-  h1{ font-size:1.3rem; margin:0 0 4px; letter-spacing:-0.01em; }
-  .sub{ color:var(--ink-dim); font-size:.9rem; margin-bottom:20px; }
+  h1{ font-family:var(--font-body); font-weight:800; font-size:22px; margin:0 0 4px; letter-spacing:-0.01em; }
+  .sub{ color:var(--ink-dim); font-size:16px; margin-bottom:20px; }
 
-  .tabs{ display:flex; gap:6px; border-bottom:1px solid var(--hairline); margin-bottom:20px; }
+  .tabs{ display:flex; gap:6px; border-bottom:2px solid var(--hairline); margin-bottom:20px; }
   .tabs button{
-    font-family:var(--font-body); font-size:14px; background:none; border:none; color:var(--ink-dim);
-    padding:10px 16px; cursor:pointer; border-bottom:2px solid transparent;
+    font-family:var(--font-body); font-weight:600; font-size:16px; background:none; border:none; color:var(--ink-dim);
+    padding:10px 16px; min-height:44px; cursor:pointer; border-bottom:2px solid transparent;
   }
-  .tabs button.active{ color:var(--amber); border-bottom-color:var(--amber); }
+  .tabs button:hover{ color:var(--ink); }
+  .tabs button.active{ color:var(--accent-text); border-bottom-color:var(--accent); }
+  .tabs button:focus-visible{ outline-offset:-2px; }
 
   .page{ display:none; }
   .page.active{ display:block; }
@@ -47,10 +64,10 @@
   .cols{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
   @media (max-width:800px){ .cols{ grid-template-columns:1fr; } }
 
-  .card{ background:var(--bezel); border:1px solid var(--hairline); border-radius:8px; padding:16px 18px; }
-  .card h2{ margin:0 0 12px; font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--phosphor); font-family:var(--font-mono); }
+  .card{ background:var(--surface); border:1px solid var(--hairline); padding:16px 18px; }
+  .card h2{ margin:0 0 12px; font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-dim); font-family:var(--font-body); font-weight:700; }
 
-  .schematic{ width:100%; background:#000; border-radius:6px; overflow:hidden; }
+  .schematic{ width:100%; background:var(--panel); border:1px solid var(--hairline); overflow:hidden; }
   .schematic img{ width:100%; display:block; }
 
   .valve-row{ display:flex; align-items:center; gap:14px; padding-block:10px; border-bottom:1px solid var(--hairline); }
@@ -58,36 +75,37 @@
   .valve-row svg{ width:64px; height:64px; flex-shrink:0; cursor:pointer; }
   .valve-info{ display:flex; flex-direction:column; gap:4px; }
   .placard{
-    font-family:var(--font-mono); font-size:11.5px; letter-spacing:.04em; text-transform:uppercase;
-    background:var(--amber); color:var(--panel); padding:3px 9px; border-radius:2px; width:fit-content; font-weight:600;
+    font-family:var(--font-mono); font-size:11px; letter-spacing:.04em; text-transform:uppercase;
+    background:var(--ink); color:var(--bg); padding:3px 9px; width:fit-content; font-weight:600;
   }
-  .valve-status{ font-family:var(--font-mono); font-size:12.5px; }
-  .valve-status.open{ color:var(--phosphor); }
-  .valve-status.closed{ color:var(--caution); }
+  .valve-status{ font-family:var(--font-mono); font-size:13px; font-weight:600; }
+  .valve-status.open{ color:var(--open); }
+  .valve-status.closed{ color:var(--accent-text); }
 
   .grid9{ display:grid; grid-template-columns:repeat(3, 1fr); gap:14px; }
   @media (max-width:700px){ .grid9{ grid-template-columns:repeat(2, 1fr); } }
-  .gauge-tile{ background:var(--bezel); border:1px solid var(--hairline); border-radius:8px; padding:12px; text-align:center; }
+  .gauge-tile{ background:var(--surface); border:1px solid var(--hairline); padding:12px; text-align:center; }
   .gauge-tile svg{ width:88px; height:88px; }
-  .gauge-tile .label{ font-family:var(--font-mono); font-size:10px; color:var(--ink-dim); text-transform:uppercase; margin-top:4px; }
-  .gauge-tile .value{ font-family:var(--font-mono); font-size:13px; color:var(--ink); margin-top:2px; }
+  .gauge-tile .label{ font-family:var(--font-mono); font-size:11px; color:var(--ink-dim); text-transform:uppercase; margin-top:4px; }
+  .gauge-tile .value{ font-family:var(--font-mono); font-size:13px; font-weight:600; color:var(--ink); margin-top:2px; }
 
   .log-btn{
-    font-family:var(--font-mono); font-size:13px; font-weight:600; letter-spacing:.05em; background:var(--panel-2);
-    color:var(--amber); border:1px solid var(--amber); border-radius:4px; padding:9px 18px; cursor:pointer;
+    font-family:var(--font-body); font-size:13px; font-weight:800; letter-spacing:.02em; background:var(--ink);
+    color:var(--bg); border:1px solid var(--ink); padding:12px 18px; min-height:44px; cursor:pointer;
   }
-  .log-btn.active{ background:var(--amber); color:var(--panel); }
-  .log-status{ font-family:var(--font-mono); font-size:12.5px; color:var(--ink-dim); margin-top:12px; }
+  .log-btn:hover{ background:var(--ink-dim); border-color:var(--ink-dim); }
+  .log-btn.active{ background:var(--accent); border-color:var(--accent); color:var(--bg); }
+  .log-status{ font-family:var(--font-mono); font-size:13px; color:var(--ink-dim); margin-top:12px; }
   .log-download{ display:none; margin-top:12px; }
   .log-download a{
-    font-family:var(--font-mono); font-size:12.5px; color:var(--phosphor); text-decoration:none; border:1px solid var(--hairline);
-    padding:7px 12px; border-radius:4px; margin-right:8px;
+    font-family:var(--font-mono); font-size:13px; color:var(--accent-text); text-decoration:none; border:1px solid var(--hairline);
+    padding:7px 12px; margin-right:8px; min-height:44px; display:inline-flex; align-items:center;
   }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <p style="margin:0 0 12px;font-size:14px"><a href="../index.html#liquid-rocket">← Back to the write-up</a></p>
+  <p style="margin:0 0 16px"><a class="header-brand" href="../index.html#liquid-rocket">← Ethan Simon</a></p>
   <div class="notice">
     In-browser port of the real <code>ground_station/</code> PyQt6 app — same sensor protocol
     (<code>sensors.py</code>), same gauge math and valve SVGs (<code>svg_widgets.py</code>), reimplemented in
@@ -176,13 +194,13 @@
   function pressureSvg(value, maxValue){
     const angle = (value/maxValue)*180 - 90;
     const g = svg("g", {});
-    g.appendChild(svg("circle", {cx:50, cy:50, r:45, fill:"#111c17", stroke:"#3a4a3f", "stroke-width":4}));
+    g.appendChild(svg("circle", {cx:50, cy:50, r:45, fill:"#e2e0e0", stroke:"#bab6b6", "stroke-width":4}));
     [[50,20,(maxValue/2).toFixed(0)],[18,54,"0"],[82,54,maxValue.toFixed(0)]].forEach(([x,y,t])=>{
-      const txt = svg("text", {x,y,"text-anchor":"middle","font-size":9,fill:"#8fffb0","font-family":"IBM Plex Mono","font-weight":"bold"});
+      const txt = svg("text", {x,y,"text-anchor":"middle","font-size":9,fill:"#605d5d","font-family":"IBM Plex Mono","font-weight":"bold"});
       txt.textContent = t; g.appendChild(txt);
     });
-    g.appendChild(svg("line", {x1:50,y1:50,x2:50,y2:15, stroke:"#f5c518","stroke-width":3,"stroke-linecap":"round", transform:`rotate(${angle} 50 50)`}));
-    g.appendChild(svg("circle", {cx:50,cy:50,r:5, fill:"#f5c518"}));
+    g.appendChild(svg("line", {x1:50,y1:50,x2:50,y2:15, stroke:"#ec3013","stroke-width":3,"stroke-linecap":"round", transform:`rotate(${angle} 50 50)`}));
+    g.appendChild(svg("circle", {cx:50,cy:50,r:5, fill:"#ec3013"}));
     return g;
   }
   function thermoSvg(value, maxValue){
@@ -190,27 +208,27 @@
     const fillH = Math.max(0, Math.min(1, value/maxValue))*maxFill;
     const fillY = minY + (maxFill - fillH);
     const g = svg("g", {});
-    g.appendChild(svg("rect", {x:25,y:10,width:10,height:65,rx:5, fill:"#111c17", stroke:"#3a4a3f","stroke-width":1}));
-    g.appendChild(svg("rect", {x:25,y:fillY,width:10,height:fillH,rx:5, fill:"#8fffb0"}));
-    g.appendChild(svg("circle", {cx:30,cy:75,r:10, fill:"#8fffb0", stroke:"#3a4a3f","stroke-width":2}));
-    g.appendChild(svg("rect", {x:25,y:65,width:10,height:10, fill:"#8fffb0"}));
+    g.appendChild(svg("rect", {x:25,y:10,width:10,height:65, fill:"#e2e0e0", stroke:"#bab6b6","stroke-width":1}));
+    g.appendChild(svg("rect", {x:25,y:fillY,width:10,height:fillH, fill:"#ec3013"}));
+    g.appendChild(svg("circle", {cx:30,cy:75,r:10, fill:"#ec3013", stroke:"#bab6b6","stroke-width":2}));
+    g.appendChild(svg("rect", {x:25,y:65,width:10,height:10, fill:"#ec3013"}));
     return g;
   }
   function loadCellSvg(value, maxValue){
     const compression = Math.max(0, Math.min(1, value/maxValue))*10;
     const g = svg("g", {});
-    g.appendChild(svg("rect", {x:10,y:80,width:80,height:10, fill:"#3a4a3f", rx:3}));
-    g.appendChild(svg("rect", {x:40,y:30+compression,width:20,height:50-compression, fill:"#f5c518", rx:5}));
-    g.appendChild(svg("rect", {x:30,y:25,width:40,height:10, fill:"#8fffb0", rx:3}));
+    g.appendChild(svg("rect", {x:10,y:80,width:80,height:10, fill:"#bab6b6"}));
+    g.appendChild(svg("rect", {x:40,y:30+compression,width:20,height:50-compression, fill:"#ec3013"}));
+    g.appendChild(svg("rect", {x:30,y:25,width:40,height:10, fill:"#201e1d"}));
     return g;
   }
   function valveSvg(isOpen){
-    const bodyColor = isOpen ? "#8fffb0" : "#ff4d4d";
+    const bodyColor = isOpen ? "#1a7a3d" : "#ec3013";
     const rot = isOpen ? 0 : 90;
     const g = svg("g", {});
-    g.appendChild(svg("rect", {x:5,y:37,width:70,height:6, fill:"#3a4a3f"}));
+    g.appendChild(svg("rect", {x:5,y:37,width:70,height:6, fill:"#bab6b6"}));
     g.appendChild(svg("circle", {cx:40,cy:40,r:12, fill:bodyColor}));
-    g.appendChild(svg("rect", {x:5,y:28,width:50,height:4,rx:2, fill:"#f5c518", transform:`rotate(${rot} 10 30)`}));
+    g.appendChild(svg("rect", {x:5,y:28,width:50,height:4, fill:"#201e1d", transform:`rotate(${rot} 10 30)`}));
     return g;
   }
   function svgRoot(vb){ return svg("svg", {viewBox:vb}); }
