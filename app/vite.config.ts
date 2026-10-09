@@ -5,8 +5,8 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/preview-react/',
-  build: { outDir: '../preview-react', emptyOutDir: true },
+  base: '/',
+  build: { assetsDir: 'app-assets' },
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: { '@': path.resolve(__dirname, './src') },

@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 
 APP = Path(__file__).resolve().parent.parent
-src = (APP.parent / "index.html").read_text(encoding="utf-8").split("\n")
+src = (APP / "legacy-source.html").read_text(encoding="utf-8").split("\n")
 OUT = APP / "src" / "site"
 (OUT / "parts").mkdir(parents=True, exist_ok=True)
 
