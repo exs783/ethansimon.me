@@ -33,6 +33,10 @@
     });
     srcEl.querySelectorAll(".frame-fig").forEach(f => f.remove()); // drawn once, on the cards
 
+    const input = document.getElementById("fanSearch"), countEl = document.getElementById("fanCount");
+    P.forEach(p => p.hay = [p.title, p.disc, p.built || "", p.desc, (p.result || "").replace(/<[^>]+>/g, "")].join(" ").toLowerCase());
+    let query = "";
+    const matches = p => query.split(/\s+/).filter(Boolean).every(t => p.hay.includes(t));
     let W, H, cw, ch, tuck, hovered = null, played = null, phase = "pre", timers = [];
     const els = {}, pile = {}, away = {};
     P.forEach((p, i) => {
@@ -77,14 +81,16 @@
     }
     const tf = (x, y, r, s = 1) => `translate(${x}px,${y}px) rotate(${r}deg) scale(${s})`;
     function render(){
-      const hand = P.filter(p => p.id !== played);
+      const hand = P.filter(p => p.id !== played && matches(p));
       const hi = hovered ? hand.findIndex(p => p.id === hovered) : -1;
       P.forEach((p, i) => {
         const el = els[p.id]; let t, z;
         if (phase === "pre") { t = tf(away[p.id].x, -(H + ch + 160), away[p.id].r); z = i; el.style.opacity = 0; }
         else if (phase === "pile") { t = tf(pile[p.id].x, -(H / 2 - ch / 2 + tuck) + pile[p.id].y, pile[p.id].r); z = i; el.style.opacity = 1; }
         else if (p.id === played) { t = tf(0, -(H - 8 - ch + tuck), pile[p.id].r * .25); z = 100; el.style.opacity = 1; }
-        else {
+        else if (!matches(p)) { // filtered out: drop below the stage and out of the tab order
+          t = tf(0, tuck + ch, 0); z = 0; el.style.opacity = 0;
+        } else {
           const idx = hand.findIndex(h => h.id === p.id), f = pose(idx, hand.length), on = p.id === hovered;
           const nb = hi !== -1 && !on ? Math.sign(idx - hi) * 24 / Math.max(1, Math.abs(idx - hi)) : 0;
           t = tf(f.x + nb, on ? -(tuck + 8) : f.y, on ? f.r * .3 : f.r, on ? 1.08 : 1);
@@ -93,7 +99,8 @@
         el.style.bottom = -tuck + "px"; el.style.transform = t; el.style.zIndex = z;
         el.classList.toggle("up", phase === "dealt");
         el.classList.toggle("sel", p.id === played);
-        el.disabled = phase !== "dealt";
+        el.disabled = phase !== "dealt" || (!matches(p) && p.id !== played);
+        el.style.pointerEvents = el.disabled ? "none" : "";
         el.setAttribute("aria-label", (p.id === played ? "Return the " : "Play the ") + p.title + " card");
       });
     }
@@ -101,7 +108,10 @@
       const p = P.find(x => x.id === played);
       panel.classList.toggle("idle", !p);
       if (!p) {
-        panel.innerHTML = `<p class="hint">${phase === "dealt" ? "Pick a card." : "Dealing the hand…"}</p><p>Each card is one project. The corner number is its headline result.</p>`;
+        const n = P.filter(matches).length;
+        panel.innerHTML = n === 0
+          ? `<p class="hint">No project matches “${esc(query.trim())}”.</p><p>Try a tool, a topic, or a number.</p>`
+          : `<p class="hint">${phase !== "dealt" ? "Dealing the hand…" : n < P.length ? (n === 1 ? "One match." : n + " matches.") : "Pick a card."}</p><p>Each card is one project. The corner number is its headline result.</p>`;
         return;
       }
       const tb = p.built
@@ -143,7 +153,23 @@
         P.forEach(p => { els[p.id].style.transitionDelay = ""; els[p.id].querySelector(".fc-flip").style.transitionDelay = ""; });
       }, dealAt + P.length * 80 + 900));
     }
-    addEventListener("keydown", e => { if (e.key === "Escape" && played) back(); });
+    function applySearch(){
+      query = input.value;
+      const n = P.filter(matches).length;
+      countEl.textContent = query.trim() ? n + " of " + P.length : "";
+      if (played && !matches(P.find(x => x.id === played))) played = null;
+      if (hovered && !matches(P.find(x => x.id === hovered))) hovered = null;
+      render(); showPanel();
+    }
+    input.addEventListener("input", applySearch);
+    input.addEventListener("keydown", e => {
+      if (e.key === "Escape") { if (input.value) { input.value = ""; applySearch(); } else if (played) back(); }
+      if (e.key === "Enter" && phase === "dealt") { // one match: play it
+        const hit = P.filter(matches);
+        if (hit.length === 1 && played !== hit[0].id) { played = hit[0].id; hovered = null; render(); showPanel(); }
+      }
+    });
+    addEventListener("keydown", e => { if (e.key === "Escape" && played && e.target !== input) back(); });
     let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { metrics(); render(); }, 100); });
     metrics(); render(); showPanel();
     // Deal when the section scrolls into view, not on load, so the fall is seen.

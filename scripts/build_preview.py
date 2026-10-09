@@ -30,9 +30,16 @@ out = sub1('<section id="reel" aria-labelledby="projects-title">',
            '<section id="reel-src" hidden aria-hidden="true">', out)
 out = sub1('#reel a[href^=\'#\']', '#reel-src a[href^=\'#\']', out)
 out = sub1('<section id="reel-src" hidden', '''<section id="reel" class="fan-sec" aria-labelledby="projects-title">
-  <div class="sheet-head">
-    <h2 id="projects-title">Projects</h2>
-    <p>Thirteen projects, dealt as a hand. Hover a card to lift it, click to play it.</p>
+  <div class="sheet-head fan-head">
+    <div>
+      <h2 id="projects-title">Projects</h2>
+      <p>Thirteen projects, dealt as a hand. Hover a card to lift it, click to play it.</p>
+    </div>
+    <div class="fan-search">
+      <label for="fanSearch" class="sr-only">Search projects</label>
+      <input id="fanSearch" type="search" placeholder="Search projects" autocomplete="off" spellcheck="false">
+      <span class="fan-count" id="fanCount" aria-live="polite"></span>
+    </div>
   </div>
   <div class="stage" id="stage">
     <section class="fan-panel" id="fanPanel" aria-live="polite" aria-label="Selected project"></section>
