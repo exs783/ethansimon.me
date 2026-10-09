@@ -1,15 +1,8 @@
 import { ArrowRight } from 'lucide-react'
 import { motion } from 'motion/react'
 import { Badge } from '@/components/ui/badge'
-import { CountUp } from '@/components/CountUp'
 import { ShiftCard } from '@/components/ui/shift-card'
-import {
-  CutoutCard,
-  CutoutCardMedia,
-  CutoutCardPin,
-  CutoutCorner,
-  cutoutCardSurfaceClassName,
-} from '@/components/ui/cutout-card'
+import { CutoutCard, CutoutCardMedia, cutoutCardSurfaceClassName } from '@/components/ui/cutout-card'
 import reelHtml from '@/site/parts/reel.html?raw'
 
 type Item = {
@@ -24,18 +17,6 @@ type Item = {
   meta: string
 }
 type SheetSet = { title: string; rows: boolean; items: Item[] }
-
-// The headline number on each card, as stated in that project's own result line.
-const STAT: Record<string, { to: number; decimals?: number; prefix?: string; suffix?: string; unit: string }> = {
-  'tylok-fatigue-machine': { to: 2000, prefix: 'over ', unit: 'lb load' },
-  'mission-model': { to: 2793, unit: 'combinations' },
-  'fly-brain-drone': { to: 12, suffix: ' of 12', unit: 'episodes reached' },
-  'log-dashboard': { to: 65, suffix: '/100', unit: 'sample flight' },
-  'wing-optimizer': { to: 8.64, decimals: 2, prefix: 'AR ', unit: 'balanced tailsitter' },
-  'liquid-rocket': { to: 9, unit: 'sensor channels' },
-  'naca-solidworks': { to: 80, unit: 'points per surface' },
-  'x8-tailsitter': { to: 8, unit: 'motors, one wing' },
-}
 
 // The reel markup in index.html is the single source for titles, text and figure names.
 function parse(): SheetSet[] {
@@ -61,21 +42,6 @@ function parse(): SheetSet[] {
   })
 }
 const sets = parse()
-
-function Stat({ id }: { id: string }) {
-  const s = STAT[id]
-  if (!s) return null
-  return (
-    <div className="flex flex-col items-start leading-none">
-      <b className="text-[22px] font-extrabold tracking-[-0.02em] text-[var(--color-accent-700)] tabular-nums">
-        {s.prefix ? <span className="text-[13px] font-semibold">{s.prefix}</span> : null}
-        <CountUp to={s.to} decimals={s.decimals} />
-        {s.suffix ? <span className="text-[13px] font-semibold">{s.suffix}</span> : null}
-      </b>
-      <span className="mt-1 text-[11px] uppercase tracking-[0.08em] text-[var(--color-text-muted)]">{s.unit}</span>
-    </div>
-  )
-}
 
 function Card({ item }: { item: Item }) {
   const titleId = `rc-${item.id}`
@@ -106,11 +72,6 @@ function Card({ item }: { item: Item }) {
           <CutoutCardMedia className="h-[250px] w-full">
             <div className="rc-fig" data-fig={item.fig} />
           </CutoutCardMedia>
-          <CutoutCardPin className="right-0 top-0 bg-[var(--color-bg)] py-2 pl-3 pr-3">
-            <CutoutCorner size={12} className="absolute right-full top-0 -rotate-90 text-[var(--color-bg)]" />
-            <CutoutCorner size={12} className="absolute right-0 top-full -rotate-90 text-[var(--color-bg)]" />
-            <Stat id={item.id} />
-          </CutoutCardPin>
         </CutoutCard>
       }
       bottomContent={
