@@ -1,4 +1,6 @@
+import { ArrowRight } from 'lucide-react'
 import { motion } from 'motion/react'
+import { Badge } from '@/components/ui/badge'
 import { CountUp } from '@/components/CountUp'
 import { ShiftCard } from '@/components/ui/shift-card'
 import {
@@ -84,7 +86,7 @@ function Card({ item }: { item: Item }) {
           <h4 id={titleId} className="rc-title">
             <a className="rc-link" href={item.href} aria-describedby={`${titleId}-d`}>{item.title}</a>
           </h4>
-          <span className="tb-label" id={`${titleId}-d`}>{item.disc}</span>
+          <Badge id={`${titleId}-d`}>{item.disc}</Badge>
         </>
       }
       topAnimateContent={
@@ -96,7 +98,7 @@ function Card({ item }: { item: Item }) {
           exit={{ opacity: 0, x: -10 }}
           transition={{ duration: 0.25 }}
         >
-          →
+          <ArrowRight className="size-5" />
         </motion.span>
       }
       middleContent={
@@ -113,7 +115,7 @@ function Card({ item }: { item: Item }) {
       }
       bottomContent={
         <div className="pb-4">
-          <div className="rc-view" aria-hidden="true">View project <span>→</span></div>
+          <div className="rc-view" aria-hidden="true">View project <ArrowRight className="size-4" /></div>
           <p className="rc-desc">{item.desc}</p>
           <div className="frame-tb">
             <div><span className="tb-label">Discipline</span><span className="tb-value">{item.disc}</span></div>

@@ -1,4 +1,7 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
+import { ArrowRight, ArrowUpRight, Menu } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import {
   CutoutCard,
   CutoutCardAction,
@@ -8,32 +11,69 @@ import {
   CutoutCorner,
 } from '@/components/ui/cutout-card'
 
-const Ext = () => (
+const links = [
+  { href: '#reel', label: 'Projects' },
+  { href: '#about', label: 'About' },
+  { href: '#skills', label: 'Skills' },
+  { href: '#contact', label: 'Contact' },
+]
+
+const ext = (
   <>
-    {' '}
-    <span aria-hidden="true">↗</span>
+    <ArrowUpRight aria-hidden="true" />
     <span className="sr-only">(opens in new tab)</span>
   </>
 )
 
 export function Nav() {
+  const [open, setOpen] = useState(false)
   return (
     <header>
       <nav className="nav" aria-label="Primary">
         <span className="nav-brand">ETHAN SIMON</span>
-        <a href="#reel">Projects</a>
-        <a href="#about">About</a>
-        <a className="nav-skills" href="#skills">Skills</a>
-        <a href="#contact">Contact</a>
-        <a
-          className="btn btn-secondary nav-linkedin"
-          href="https://www.linkedin.com/in/ethansimon13"
-          target="_blank"
-          rel="noopener"
-          style={{ marginLeft: 8 }}
-        >
-          LinkedIn<Ext />
-        </a>
+        <div className="nav-links">
+          {links.map((l) => (
+            <a key={l.href} href={l.href}>{l.label}</a>
+          ))}
+          <Button
+            variant="subtle"
+            nativeButton={false}
+            render={<a href="https://www.linkedin.com/in/ethansimon13" target="_blank" rel="noopener" />}
+            className="ml-2"
+          >
+            LinkedIn{ext}
+          </Button>
+        </div>
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTrigger
+            render={<Button variant="subtle" size="icon" className="nav-menu" aria-label="Open menu" />}
+          >
+            <Menu aria-hidden="true" />
+          </SheetTrigger>
+          <SheetContent side="right" showCloseButton>
+            <SheetTitle className="sr-only">Menu</SheetTitle>
+            <div className="flex flex-col gap-1 px-6 pt-16">
+              {links.map((l) => (
+                <SheetClose
+                  key={l.href}
+                  nativeButton={false}
+                  render={<a href={l.href} className="sheet-link" />}
+                >
+                  {l.label}
+                </SheetClose>
+              ))}
+              <Button
+                variant="outline"
+                size="lg"
+                nativeButton={false}
+                render={<a href="https://www.linkedin.com/in/ethansimon13" target="_blank" rel="noopener" />}
+                className="mt-4"
+              >
+                LinkedIn{ext}
+              </Button>
+            </div>
+          </SheetContent>
+        </Sheet>
       </nav>
     </header>
   )
@@ -48,14 +88,19 @@ export function Hero() {
           <span className="hero-sub">interested in mechanical and software integration</span>
         </h1>
         <p>Looking for a summer 2027 internship in mechanical or aerospace engineering.</p>
-        <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
-          <a href="#reel" className="btn btn-primary">
-            See the projects <span aria-hidden="true">→</span>
-          </a>
-          <a href="/assets/Ethan_Simon_Resume.pdf" target="_blank" rel="noopener" className="btn btn-secondary">
-            Resume <span aria-hidden="true">↗</span>
+        <div className="flex flex-wrap gap-3">
+          <Button size="lg" nativeButton={false} render={<a href="#reel" />}>
+            See the projects <ArrowRight aria-hidden="true" />
+          </Button>
+          <Button
+            size="lg"
+            variant="subtle"
+            nativeButton={false}
+            render={<a href="/assets/Ethan_Simon_Resume.pdf" target="_blank" rel="noopener" />}
+          >
+            Resume <ArrowUpRight aria-hidden="true" />
             <span className="sr-only">(PDF, opens in new tab)</span>
-          </a>
+          </Button>
         </div>
       </div>
       <a className="hero-figure" href="/demos/compdrone-explode.html">
@@ -84,9 +129,9 @@ export function Hero() {
           </CutoutCardInsetLabel>
           <CutoutCardAction
             revealOnHover={false}
-            className="bottom-0 right-0 bg-[var(--color-neutral-900)] px-4 py-3 text-[14px] font-extrabold text-[var(--color-bg)]"
+            className="right-0 top-0 flex items-center gap-2 bg-[var(--color-neutral-900)] px-4 py-3 text-[14px] font-extrabold text-[var(--color-bg)]"
           >
-            Check out this project <span aria-hidden="true">→</span>
+            Check out this project <ArrowRight aria-hidden="true" className="size-4" />
           </CutoutCardAction>
         </CutoutCard>
       </a>
@@ -104,17 +149,32 @@ export function Contact() {
           request.
         </p>
       </div>
-      <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap', alignItems: 'center' }}>
-        <a href="mailto:exs783@case.edu" className="btn btn-lg btn-light">exs783@case.edu</a>
-        <a href="/assets/Ethan_Simon_Resume.pdf" target="_blank" rel="noopener" className="btn btn-lg btn-light">
-          Resume<Ext />
-        </a>
-        <a href="https://www.linkedin.com/in/ethansimon13" target="_blank" rel="noopener" className="btn">
-          LinkedIn<Ext />
-        </a>
-        <a href="https://github.com/exs783" target="_blank" rel="noopener" className="btn">
-          GitHub<Ext />
-        </a>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button size="lg" variant="light" nativeButton={false} render={<a href="mailto:exs783@case.edu" />}>
+          exs783@case.edu
+        </Button>
+        <Button
+          size="lg"
+          variant="light"
+          nativeButton={false}
+          render={<a href="/assets/Ethan_Simon_Resume.pdf" target="_blank" rel="noopener" />}
+        >
+          Resume{ext}
+        </Button>
+        <Button
+          variant="ghostLight"
+          nativeButton={false}
+          render={<a href="https://www.linkedin.com/in/ethansimon13" target="_blank" rel="noopener" />}
+        >
+          LinkedIn{ext}
+        </Button>
+        <Button
+          variant="ghostLight"
+          nativeButton={false}
+          render={<a href="https://github.com/exs783" target="_blank" rel="noopener" />}
+        >
+          GitHub{ext}
+        </Button>
       </div>
     </section>
   )
