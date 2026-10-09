@@ -56,7 +56,7 @@ const ShiftCard = React.forwardRef<HTMLDivElement, ShiftCardProps>(
         }}
         {...props}
       >
-        <div className="relative flex w-full flex-col">
+        <div className="flex w-full flex-col">
           {topContent}
           <AnimatePresence>{open ? topAnimateContent : null}</AnimatePresence>
         </div>

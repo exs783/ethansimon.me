@@ -92,7 +92,7 @@ function Card({ item }: { item: Item }) {
       topAnimateContent={
         <motion.span
           aria-hidden="true"
-          className="absolute right-0 top-0 text-[18px] font-extrabold text-[var(--color-accent-700)]"
+          className="absolute right-4 top-4 text-[18px] font-extrabold text-[var(--color-accent-700)]"
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -10 }}
