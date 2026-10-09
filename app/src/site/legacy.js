@@ -723,7 +723,7 @@ const FLY_TRAJ = {"teacher":[[0.1,-0.1],[0.11,-0.1],[0.11,-0.1],[0.12,-0.09],[0.
     if (fn) el.appendChild(fn());
     el.querySelectorAll("svg").forEach(svg => {
       // Project-frame thumbnails are decorative and too small for labels, so they carry none.
-      if (el.closest(".frame")) { svg.setAttribute("aria-hidden", "true"); svg.querySelectorAll("text").forEach(t => t.remove()); return; }
+      if (el.closest(".frame, .rc-media")) { svg.setAttribute("aria-hidden", "true"); svg.querySelectorAll("text").forEach(t => t.remove()); return; }
       // Charts get a text alternative from their card's title and caption.
       const card = el.closest(".figure-card");
       const t = card && card.querySelector(".figure-title"), c = card && card.querySelector(".figure-caption");
@@ -817,7 +817,7 @@ const FLY_TRAJ = {"teacher":[[0.1,-0.1],[0.11,-0.1],[0.11,-0.1],[0.12,-0.09],[0.
   }
   // Each write-up gets a spec strip copied from its reel card (the card stays the single source) and a link to the next project.
   (function buildProjectExtras(){
-    const links = [...document.querySelectorAll("#reel a[href^='#']")];
+    const links = [...document.querySelectorAll("#reel-src a[href^='#']")];
     links.forEach((a, i) => {
       const sec = document.getElementById(a.getAttribute("href").slice(1));
       if (!sec || !sec.classList.contains("project-section")) return;

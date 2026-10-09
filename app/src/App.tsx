@@ -1,9 +1,11 @@
 import { useEffect } from 'react'
 import './site/site.css'
+import './site/extra.css'
+import { Projects } from './components/Projects'
+import { Reel } from './components/Reel'
 import { Contact, Footer, Hero, Html, Nav } from './components/Shell'
 import { initLegacy } from './site/legacy.js'
 import about from './site/parts/about.html?raw'
-import projects from './site/parts/projects.html?raw'
 import reel from './site/parts/reel.html?raw'
 
 let started = false
@@ -30,8 +32,9 @@ export default function App() {
       <Nav />
       <main id="main" tabIndex={-1}>
         <Hero />
+        <Reel />
         <Html html={reel} />
-        <Html html={projects} />
+        <Projects />
         <Html html={about} />
         <Contact />
       </main>

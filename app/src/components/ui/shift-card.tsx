@@ -3,6 +3,11 @@ import { AnimatePresence, motion, type MotionProps } from "motion/react"
 
 import { cn } from "@/lib/utils"
 
+/*
+ * cult-ui shift-card, restyled for ethansimon.me (flat, zero radius, ruled edges).
+ * At rest it shows topContent and middleContent. On hover or keyboard focus the middle fades
+ * out, topAnimateContent slides in, and bottomContent grows from its first row to full height.
+ */
 interface ShiftCardProps
   extends Omit<MotionProps, "onAnimationStart" | "onAnimationComplete"> {
   className?: string
@@ -10,46 +15,11 @@ interface ShiftCardProps
   middleContent?: React.ReactNode
   topAnimateContent?: React.ReactNode
   bottomContent?: React.ReactNode
+  /** Height of the bottom region before it opens. */
+  collapsedHeight?: number
 }
 
-const ShiftCardHeader = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ children, ...props }, ref) => (
-  <div ref={ref} {...props}>
-    {children}
-  </div>
-))
-ShiftCardHeader.displayName = "ShiftCardHeader"
-
-interface ShiftCardContentProps extends React.HTMLAttributes<HTMLDivElement> {
-  isHovered: boolean
-}
-const ShiftCardContent = React.forwardRef<
-  HTMLDivElement,
-  ShiftCardContentProps
->(({ isHovered, children, ...divProps }, ref) => {
-  // Explicitly define motion props to avoid passing incompatible HTML attributes
-  const motionProps: MotionProps = {
-    initial: { opacity: 0, height: 0 },
-    animate: isHovered
-      ? { opacity: 1, height: 194 }
-      : { opacity: 1, height: 38 },
-    transition: { duration: 0.3, delay: 0.1, ease: "circIn" },
-  }
-
-  return (
-    <motion.div
-      key="shift-card-content"
-      ref={ref}
-      {...motionProps}
-      className={divProps.className}
-    >
-      {children}
-    </motion.div>
-  )
-})
-ShiftCardContent.displayName = "ShiftCardContent"
+const ease = [0.22, 1, 0.36, 1] as const
 
 const ShiftCard = React.forwardRef<HTMLDivElement, ShiftCardProps>(
   (
@@ -59,75 +29,67 @@ const ShiftCard = React.forwardRef<HTMLDivElement, ShiftCardProps>(
       topAnimateContent,
       middleContent,
       bottomContent,
+      collapsedHeight = 40,
       ...props
     },
     ref
   ) => {
-    const [isHovered, setHovered] = React.useState(false)
-    const handleMouseEnter = () => setHovered(true)
-    const handleMouseLeave = () => setHovered(false)
-    const handleTapStart = () => setHovered(true)
-    const handleTapCancel = () => setHovered(false)
-    const handleTap = () => setHovered(false)
+    const [open, setOpen] = React.useState(false)
 
     return (
       <motion.div
         ref={ref}
+        data-open={open}
         className={cn(
-          "min-h-[300px] w-[280px] md:w-[300px]",
-          "group relative flex flex-col items-center justify-between overflow-hidden rounded-xl p-3 text-sm",
-          "bg-card hover:cursor-pointer",
-          "shadow-[0px_1px_1px_0px_rgba(0,0,0,0.05),0px_1px_1px_0px_rgba(255,252,240,0.5)_inset,0px_0px_0px_1px_hsla(0,0%,100%,0.1)_inset,0px_0px_1px_0px_rgba(28,27,26,0.5)]",
-          /*
-          Applies a multi-layer shadow effect in dark mode:
-          1. Two subtle white inset shadows: one horizontal at 1px height, and one around the entire border at 1px width, both with a very light opacity of 0.03, creating a slight inner glow.
-          2. A series of black shadows:
-              - A basic 1px black border shadow with 10% opacity to subtly outline the element.
-              - Three progressively larger diffuse shadows at 2px, 4px, and 8px, each with 10% opacity, creating a depth effect that enhances the element's visual separation from the background.
-          */
-          "dark:shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset,0_0_0_1px_rgba(255,255,255,0.03)_inset,0_0_0_1px_rgba(0,0,0,0.1),0_2px_2px_0_rgba(0,0,0,0.1),0_4px_4px_0_rgba(0,0,0,0.1),0_8px_8px_0_rgba(0,0,0,0.1)]",
+          "group relative flex min-h-[410px] w-full flex-col overflow-hidden bg-[var(--color-bg)] p-4 text-sm",
           className
         )}
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        whileHover={{ scale: 1.02 }}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onClick={handleTapStart}
-        onTapCancel={handleTapCancel}
-        onTap={handleTap}
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-40px" }}
+        transition={{ duration: 0.5, ease }}
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        onFocus={() => setOpen(true)}
+        onBlur={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setOpen(false)
+        }}
         {...props}
       >
-        <ShiftCardHeader className="text-primary-foreground relative flex h-[46px] w-full flex-col">
-          <div className="w-full">
-            {topContent}
+        <div className="relative flex w-full flex-col">
+          {topContent}
+          <AnimatePresence>{open ? topAnimateContent : null}</AnimatePresence>
+        </div>
 
-            <AnimatePresence>
-              {isHovered ? <>{topAnimateContent}</> : null}
-            </AnimatePresence>
-          </div>
-        </ShiftCardHeader>
-
-        <div className="pb-12">
-          <AnimatePresence>
-            {!isHovered ? <>{middleContent}</> : null}
+        <div className="relative mt-3 flex-1">
+          <AnimatePresence initial={false}>
+            {!open ? (
+              <motion.div
+                key="middle"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                {middleContent}
+              </motion.div>
+            ) : null}
           </AnimatePresence>
         </div>
 
-        <ShiftCardContent
-          isHovered={isHovered}
-          className="absolute right-0 -bottom-1.5 left-0 flex flex-col gap-4 rounded-xl"
+        <motion.div
+          className="absolute inset-x-0 bottom-0 overflow-hidden bg-[var(--color-bg)] px-4"
+          initial={false}
+          animate={{ height: open ? "auto" : collapsedHeight }}
+          transition={{ duration: 0.35, ease }}
         >
-          <motion.div className="flex w-full flex-col gap-1">
-            {bottomContent}
-          </motion.div>
-        </ShiftCardContent>
+          {bottomContent}
+        </motion.div>
       </motion.div>
     )
   }
 )
-
 ShiftCard.displayName = "ShiftCard"
 
-export { ShiftCard, ShiftCardHeader, ShiftCardContent }
+export { ShiftCard }
 export default ShiftCard

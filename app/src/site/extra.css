@@ -1,0 +1,14 @@
+/* Styles for the React components (Reel, Projects, hero). site.css is generated from index.html; this file is not. */
+.rc-title{margin:0 0 4px;font-size:clamp(17px,1.8vw,20px);padding-right:28px}
+.rc-link{color:inherit;text-decoration:none}
+.rc-link::after{content:"";position:absolute;inset:0;z-index:5}
+.rc-link:focus-visible{outline:none}
+.rc-link:focus-visible::after{outline:2px solid var(--color-accent);outline-offset:-5px}
+.rc-media{border:1px solid var(--color-divider)}
+.rc-fig{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--color-neutral-100)}
+.rc-fig svg{width:100%;height:100%}
+.rc-fig img{width:100%;height:100%;object-fit:cover;display:block}
+.rc-view{font:600 14px var(--font-heading);height:40px;display:flex;align-items:center;gap:6px;color:var(--color-neutral-900)}
+.rc-desc{margin:0 0 12px;font-size:14px;color:var(--color-neutral-800)}
+.sheet .frame-tb{margin-top:0}
+.sheet > div{min-width:0}

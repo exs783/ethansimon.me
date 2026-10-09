@@ -1,4 +1,12 @@
 import type { ReactNode } from 'react'
+import {
+  CutoutCard,
+  CutoutCardAction,
+  CutoutCardImage,
+  CutoutCardInsetLabel,
+  CutoutCardMedia,
+  CutoutCorner,
+} from '@/components/ui/cutout-card'
 
 const Ext = () => (
   <>
@@ -51,20 +59,36 @@ export function Hero() {
         </div>
       </div>
       <a className="hero-figure" href="/demos/compdrone-explode.html">
-        <img
-          src="/assets/compdrone2025-render.webp"
-          alt="Render of the CompDrone2025 hexacopter"
-          width={1350}
-          height={1080}
-          fetchPriority="high"
-        />
-        <div className="frame-tb">
-          <div><span className="tb-label">Assembly</span><span className="tb-value">CompDrone2025</span></div>
-          <div><span className="tb-label">My part</span><span className="tb-value">Frame and mounts</span></div>
-          <div className="tb-wide tb-cta">
-            <span className="tb-value">Check out this project <span aria-hidden="true">→</span></span>
-          </div>
-        </div>
+        <CutoutCard className="group/cutout relative block overflow-hidden bg-[var(--color-neutral-100)]">
+          <CutoutCardMedia className="aspect-[5/4] w-full">
+            <CutoutCardImage
+              src="/assets/compdrone2025-render.webp"
+              alt="Render of the CompDrone2025 hexacopter"
+              width={1350}
+              height={1080}
+              fetchPriority="high"
+              className="object-contain"
+            />
+          </CutoutCardMedia>
+          <CutoutCardInsetLabel className="bottom-0 left-0 flex bg-[var(--color-bg)]">
+            <CutoutCorner size={14} className="absolute bottom-full left-0 rotate-90 text-[var(--color-bg)]" />
+            <CutoutCorner size={14} className="absolute bottom-0 left-full rotate-90 text-[var(--color-bg)]" />
+            <div className="px-4 py-3">
+              <span className="tb-label">Assembly</span>
+              <span className="tb-value">CompDrone2025</span>
+            </div>
+            <div className="border-l border-[var(--color-divider)] py-3 pl-4 pr-6">
+              <span className="tb-label">My part</span>
+              <span className="tb-value">Frame and mounts</span>
+            </div>
+          </CutoutCardInsetLabel>
+          <CutoutCardAction
+            revealOnHover={false}
+            className="bottom-0 right-0 bg-[var(--color-neutral-900)] px-4 py-3 text-[14px] font-extrabold text-[var(--color-bg)]"
+          >
+            Check out this project <span aria-hidden="true">→</span>
+          </CutoutCardAction>
+        </CutoutCard>
       </a>
     </section>
   )
