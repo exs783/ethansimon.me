@@ -660,7 +660,7 @@ const FLY_TRAJ = {"teacher":[[0.1,-0.1],[0.11,-0.1],[0.11,-0.1],[0.12,-0.09],[0.
       ["Reservoir", "500 units, fixed"],
       ["Ridge decoder", "steer · speed · confidence"],
       ["Arbiter", "brain leads"],
-      ["PX4 setpoint", "20 Hz velocity"],
+      ["Autopilot setpoint", "20 Hz velocity"],
     ];
     const box = (x, y, w, label, sub, dashed) => {
       root.appendChild(svg("rect", {x, y, width:w, height:bh, fill:PAPER, stroke:INK, "stroke-width":1.5, "stroke-dasharray":dashed ? "4,3" : "none"}));
