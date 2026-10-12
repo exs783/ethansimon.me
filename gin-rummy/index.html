@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gin Rummy</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* Tokens match ../DESIGN.md and ../solitaire: warm off-white ground, one red accent, zero radius, 2px rules. */
+:root{
+  --bg:#f3f2f2; --surface:#eae9e9; --ink:#201e1d; --muted:#605d5d;
+  --accent:#ec3013; --accent-text:#ae1800;
+  --divider:color-mix(in srgb,#201e1d 40%,transparent);
+  --card:#fbfbfa; --font:'Archivo',system-ui,sans-serif;
+  --pad:clamp(16px,4vw,48px); --cw:clamp(48px,13vw,84px);
+}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5;caret-color:var(--accent)}
+::selection{background:color-mix(in srgb,var(--accent) 25%,transparent)}
+a{color:inherit}
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1{font-weight:800;line-height:1.1;letter-spacing:-.01em;margin:0;font-size:clamp(24px,3vw,36px)}
+h2{font-weight:800;margin:0 0 4px;font-size:20px}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+[hidden]{display:none !important}
+
+.nav{display:flex;align-items:center;gap:20px;padding:8px var(--pad);border-bottom:2px solid var(--divider)}
+.nav-brand{font-weight:800;font-size:17px;margin-right:auto;text-decoration:none;white-space:nowrap}
+.nav a:not(.nav-brand){font-size:14px;text-decoration:none;min-height:44px;display:inline-flex;align-items:center}
+.nav a:hover{color:var(--accent-text)}
+
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;padding:14px var(--pad)}
+.bar h1{margin-right:auto}
+.stats{display:flex;gap:20px;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.stats b{color:var(--ink);font-weight:800}
+.btn{font:600 14px var(--font);display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border:1px solid var(--ink);text-decoration:none;cursor:pointer;background:none;color:var(--ink)}
+.btn:hover:not(:disabled){background:var(--surface)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn-primary{background:var(--ink);color:var(--bg)}
+.btn-primary:hover:not(:disabled){background:#000}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+
+.lobby{padding:8px var(--pad) 24px;max-width:70ch}
+.lobby p{margin:0 0 14px;color:var(--muted)}
+.link{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 8px}
+.link input{flex:1 1 260px;min-height:44px;padding:0 12px;border:1px solid var(--ink);background:var(--card);font:14px var(--font);color:var(--ink)}
+
+/* ---- table ---- */
+.table{border-top:2px solid var(--divider);border-bottom:2px solid var(--divider);padding:14px var(--pad) 18px;display:grid;gap:16px}
+.status{font-weight:600;min-height:1.5em;margin:0}
+.status.err{color:var(--accent-text)}
+.row{display:flex;flex-wrap:wrap;align-items:flex-start;gap:12px 28px}
+.lab{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 6px;font-variant-numeric:tabular-nums}
+.piles{display:flex;gap:16px}
+.pile{background:none;border:0;padding:0;font:inherit;color:inherit;text-align:left;cursor:default}
+.pile:not(:disabled){cursor:pointer}
+.pile:not(:disabled) .pc{outline:2px solid var(--accent);outline-offset:2px}
+.pile .slot{width:var(--cw);aspect-ratio:5/7;border:2px solid var(--divider)}
+
+.pc{position:relative;flex:none;width:var(--cw);aspect-ratio:5/7;font-size:calc(var(--cw) / 14);background:var(--card);border:2px solid var(--ink);color:var(--ink);box-shadow:0 1px 2px rgba(32,30,29,.08),0 3px 8px rgba(32,30,29,.1);display:block}
+.pc.red{color:var(--accent-text)}
+.pc .ix{position:absolute;top:.55em;left:.6em;display:flex;flex-direction:column;align-items:center;gap:.2em;line-height:1}
+.pc .ix b{font-weight:800;font-size:1.6em;letter-spacing:-.04em}
+.pc .ix svg{width:1.1em;height:1.1em;fill:currentColor}
+.pc .big{position:absolute;right:12%;bottom:10%;width:46%;height:auto;fill:currentColor}
+.pc.back{background:var(--ink);overflow:hidden}
+.pc.back::before{content:"";position:absolute;inset:.5em;border:1px solid rgba(243,242,242,.45);
+  background:repeating-linear-gradient(45deg,rgba(243,242,242,.12) 0 1px,transparent 1px 7px),repeating-linear-gradient(-45deg,rgba(243,242,242,.12) 0 1px,transparent 1px 7px)}
+.pc.small{--cw:clamp(40px,10vw,56px)}
+button.pc{padding:0;font-family:inherit;cursor:default;transition:transform .15s}
+button.pc.pick{cursor:pointer}
+button.pc.pick:hover{transform:translateY(-4px)}
+button.pc.sel{transform:translateY(-14px);outline:2px solid var(--accent);outline-offset:2px}
+.pc.taken::after{content:"";position:absolute;left:0;right:0;bottom:0;height:.45em;background:var(--accent)}
+
+.hand,.opp{display:flex;flex-wrap:wrap;gap:6px 14px;padding-top:16px}
+.grp{display:flex}
+.grp.meld{border-bottom:4px solid var(--accent);padding-bottom:6px}
+.grp .pc + .pc{margin-left:calc(var(--cw) * -.3)}
+.opp{padding-top:0}
+@media (min-width:900px){.grp .pc + .pc{margin-left:6px}.grp.tight .pc + .pc{margin-left:calc(var(--cw) * -.3)}}
+
+.over{border:2px solid var(--ink);background:var(--surface);padding:14px 16px;display:grid;gap:12px}
+.over p{margin:0}
+.over .sub{color:var(--muted);font-variant-numeric:tabular-nums}
+.foot{padding:14px var(--pad) 32px;color:var(--muted);font-size:14px}
+.foot p{margin:0 0 8px;max-width:78ch}
+
+@media (prefers-reduced-motion:reduce){button.pc{transition:none}}
+</style>
+</head>
+<body>
+<header class="nav">
+  <a class="nav-brand" href="../index.html">ETHAN SIMON</a>
+  <a href="../index.html">Current site</a>
+</header>
+
+<main>
+  <div class="bar">
+    <h1>Gin Rummy</h1>
+    <div class="stats" id="stats" hidden><span>You <b id="s0">0</b></span><span>Opponent <b id="s1">0</b></span><span>First to 100</span></div>
+  </div>
+
+  <section class="lobby" id="lobby">
+    <p>Two players, two browsers. One of you creates a game and sends the link, and the other opens it. Moves go straight between your browsers, and nothing is stored on a server.</p>
+    <button class="btn btn-primary" id="create" type="button">Create game</button>
+    <div id="share" hidden>
+      <div class="link"><input id="url" readonly aria-label="Game link"><button class="btn" id="copy" type="button">Copy link</button></div>
+      <p>Send this link to your opponent. The game starts when they open it.</p>
+    </div>
+    <p id="note" role="status"></p>
+  </section>
+
+  <section class="table" id="table" hidden aria-label="Gin rummy table">
+    <p class="status" id="status" aria-live="polite"></p>
+    <div class="row">
+      <div><p class="lab" id="oppLab">Opponent</p><div class="opp" id="opp"></div></div>
+    </div>
+    <div class="row">
+      <div class="piles">
+        <div><p class="lab" id="stockLab">Stock</p><button class="pile" id="stock" type="button"></button></div>
+        <div><p class="lab">Discard</p><button class="pile" id="disc" type="button"></button></div>
+      </div>
+      <div class="btns" id="btns"></div>
+    </div>
+    <div><p class="lab" id="handLab">Your hand</p><div class="hand" id="hand"></div></div>
+    <div class="over" id="over" hidden></div>
+  </section>
+
+  <div class="foot">
+    <p>Ten cards each. On your turn, draw from the stock or take the top discard, then discard one card. Melds are three or four of a kind, or three or more in a row of one suit (aces low). Knock when your unmatched cards, the deadwood, total 10 or less, counting aces as 1 and face cards as 10. Gin is zero deadwood and scores 25 plus the other player's deadwood. After a knock the other player lays off cards onto your melds. If they end with as much deadwood or less, they undercut you and score the difference plus 25. A hand ends with no score if the stock runs down to two cards.</p>
+    <p>The game lives in the creator's browser tab. If they close it the game ends, and if the other player reloads the link they rejoin where they were. A few strict networks block direct connections.</p>
+  </div>
+</main>
+
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" integrity="sha384-nlUQ8ZqCbvStErob+biJNzSgltf6urV3VGqhfIfzhmg9RXmpeRm76ELw0pYnKlTR" crossorigin="anonymous"></script>
+<script src="gin.js"></script>
+<script>
+const RANK = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+const NAME = ["ace","two","three","four","five","six","seven","eight","nine","ten","jack","queen","king"];
+const SUIT = ["spades","hearts","clubs","diamonds"];
+const PATH = {
+  clubs: "M12 2a4.1 4.1 0 0 0-4.1 4.1c0 .93.31 1.79.83 2.48a4.1 4.1 0 1 0 2.9 7.33c-.28 2.2-1.02 3.72-2.43 5.09h5.6c-1.41-1.37-2.15-2.89-2.43-5.09a4.1 4.1 0 1 0 2.9-7.33c.52-.69.83-1.55.83-2.48A4.1 4.1 0 0 0 12 2Z",
+  diamonds: "M12 1.5 19.3 12 12 22.5 4.7 12Z",
+  hearts: "M12 21.4C6.1 15.9 2.6 12.4 2.6 8.6a4.85 4.85 0 0 1 4.85-4.85c1.8 0 3.5.87 4.55 2.33a5.63 5.63 0 0 1 4.55-2.33A4.85 4.85 0 0 1 21.4 8.6c0 3.8-3.5 7.3-9.4 12.8Z",
+  spades: "M12 1.8C6.9 7.2 3.6 10.3 3.6 13.6a4.35 4.35 0 0 0 7.1 3.36c-.3 1.9-1 3.26-2.35 4.54h7.3c-1.35-1.28-2.05-2.64-2.35-4.54a4.35 4.35 0 0 0 7.1-3.36c0-3.3-3.3-6.4-8.4-11.8Z"
+};
+const $ = id => document.getElementById(id);
+const svg = (s, cls = "") => `<svg ${cls ? `class="${cls}" ` : ""}aria-hidden="true" viewBox="0 0 24 24"><path d="${PATH[SUIT[s]]}"/></svg>`;
+const label = c => `${NAME[Gin.rank(c) - 1]} of ${SUIT[Gin.suit(c)]}`;
+const red = c => Gin.suit(c) === 1 || Gin.suit(c) === 3;
+const faceInner = c => `<span class="ix"><b>${RANK[Gin.rank(c) - 1]}</b>${svg(Gin.suit(c))}</span>${svg(Gin.suit(c), "big")}`;
+const face = (c, cls = "") => `<span class="pc${red(c) ? " red" : ""} ${cls}" role="img" aria-label="${label(c)}">${faceInner(c)}</span>`;
+const back = (cls = "") => `<span class="pc back ${cls}" aria-hidden="true"></span>`;
+
+let isHost = false, peer, conn, state, v, sel = null, flashTimer;
+
+// ---- networking: the host's browser holds the game, the guest only ever receives its own view ----
+const code = () => Array.from(crypto.getRandomValues(new Uint8Array(6)), b => (b % 36).toString(36)).join("");
+const note = (t, bad) => { $("note").textContent = t; $("note").style.color = bad ? "var(--accent-text)" : ""; };
+
+function startHost() {
+  isHost = true; $("create").disabled = true;
+  const id = "gin-" + code();
+  peer = new Peer(id);
+  peer.on("open", () => {
+    $("url").value = location.origin + location.pathname + "#" + id;
+    $("share").hidden = false; note("Waiting for your opponent…");
+  });
+  peer.on("error", e => e.type === "unavailable-id" ? (peer.destroy(), startHost()) : note("Connection problem: " + e.type, true));
+  peer.on("connection", c => {
+    if (conn) conn.close(); // a reload rejoins; the newest connection takes the seat
+    conn = c;
+    c.on("open", () => { state = state || newGame(); push(); });
+    c.on("data", m => {
+      if (!m || m.t !== "act" || !m.a || typeof m.a.t !== "string") return;
+      const err = Gin.act(state, 1, m.a);
+      err ? c.send({ t: "err", m: err }) : push();
+    });
+    c.on("close", () => { if (conn === c) say("Your opponent disconnected. If they reload the link, they rejoin here.", true, true); });
+  });
+}
+const newGame = () => Gin.deal([0, 0], 0);
+
+function join(hostId) {
+  $("create").hidden = true; note("Connecting…");
+  peer = new Peer();
+  const timeout = setTimeout(() => note("Could not connect. The link may be old, or the network blocks direct connections.", true), 15000);
+  peer.on("error", e => { clearTimeout(timeout); note(e.type === "peer-unavailable" ? "That game was not found. Ask for a new link." : "Connection problem: " + e.type, true); });
+  peer.on("open", () => {
+    conn = peer.connect(hostId, { reliable: true });
+    conn.on("open", () => { clearTimeout(timeout); note("Connected. Waiting for the deal…"); });
+    conn.on("data", m => {
+      if (m.t === "view") render(m.v);
+      else if (m.t === "err") say(m.m, true);
+    });
+    conn.on("close", () => say("The host left. Reload to try rejoining.", true, true));
+  });
+}
+
+function push() {
+  render(Gin.view(state, 0));
+  if (conn && conn.open) conn.send({ t: "view", v: Gin.view(state, 1) });
+}
+function send(a) {
+  if (isHost) { const err = Gin.act(state, 0, a); err ? say(err, true) : push(); }
+  else if (conn && conn.open) conn.send({ t: "act", a });
+}
+
+// ---- rendering ----
+function say(t, bad, sticky) {
+  const el = $("status"); el.textContent = t; el.classList.toggle("err", !!bad);
+  clearTimeout(flashTimer); if (bad && !sticky && v) flashTimer = setTimeout(() => render(v), 3500);
+}
+
+function statusText() {
+  const mine = v.turn === v.you;
+  if (v.phase === "first") return mine ? "Take the upcard, or pass." : "Your opponent is deciding on the upcard.";
+  if (v.phase === "draw") return mine ? (v.stockOnly ? "Both passed. Draw from the stock." : "Your turn. Draw from the stock or take the discard.") : "Your opponent is drawing.";
+  if (v.phase === "discard") return mine ? "Pick a card to discard" + (canKnockAny() ? ", or to knock." : ".") : "Your opponent is choosing a discard.";
+  return "";
+}
+const without = c => v.hand.filter(x => x !== c);
+const canKnockAny = () => v.hand.some(c => c !== v.taken && Gin.best(without(c)).dw <= 10);
+
+function render(view) {
+  v = view;
+  $("lobby").hidden = true; $("table").hidden = false; $("stats").hidden = false;
+  $("s0").textContent = v.scores[v.you]; $("s1").textContent = v.scores[1 - v.you];
+  if (!v.hand.includes(sel)) sel = null;
+  if (v.phase !== "discard" || v.turn !== v.you) sel = null;
+
+  const mine = v.turn === v.you && v.phase !== "over";
+  const over = v.phase === "over";
+  $("status").classList.remove("err");
+  $("status").textContent = over ? "" : statusText();
+
+  $("oppLab").textContent = "Opponent" + (v.dealer === 1 - v.you ? " (dealer)" : "") + ` · ${v.oppCount} cards`;
+  $("opp").innerHTML = `<div class="grp tight">${Array.from({ length: v.oppCount }, () => back("small")).join("")}</div>`;
+  $("stockLab").textContent = `Stock · ${v.stock}`;
+  const canStock = mine && v.phase === "draw", canDisc = mine && (v.phase === "first" || (v.phase === "draw" && !v.stockOnly));
+  $("stock").disabled = !canStock; $("stock").setAttribute("aria-label", `Stock, ${v.stock} cards. Draw`);
+  $("stock").innerHTML = back();
+  $("disc").disabled = !canDisc;
+  $("disc").setAttribute("aria-label", v.top == null ? "Discard pile, empty" : `Discard pile, top card ${label(v.top)}. ${v.phase === "first" ? "Take it" : "Take"}`);
+  $("disc").innerHTML = v.top == null ? `<span class="slot pc"></span>` : face(v.top);
+
+  renderHand();
+  renderButtons(mine);
+  renderOver();
+  $("hand").hidden = false;
+  $("handLab").textContent = "Your hand" + (v.dealer === v.you ? " (dealer)" : "") + (over ? "" : ` · deadwood ${Gin.best(v.hand).dw}`);
+}
+
+function renderHand() {
+  const over = v.phase === "over" && v.result;
+  const b = Gin.best(v.hand);
+  const picking = v.phase === "discard" && v.turn === v.you;
+  const groups = [...b.melds.map(m => m.slice().sort((p, q) => Gin.rank(p) - Gin.rank(q) || p - q)), ...b.dead.map(c => [c])];
+  $("hand").innerHTML = groups.map(g => `<div class="grp${g.length > 2 ? " meld" : ""}">${g.map(c =>
+    `<button class="pc${red(c) ? " red" : ""}${picking && c !== v.taken ? " pick" : ""}${c === sel ? " sel" : ""}${c === v.taken ? " taken" : ""}" type="button" data-c="${c}" aria-pressed="${c === sel}" aria-label="${label(c)}${c === v.taken ? ", just taken" : ""}"${picking && c !== v.taken ? "" : " tabindex=\"-1\""}>${faceInner(c)}</button>`).join("")}</div>`).join("");
+}
+
+function renderButtons(mine) {
+  const el = $("btns"), btn = (id, text, cls, dis) => `<button class="btn ${cls}" id="${id}" type="button"${dis ? " disabled" : ""}>${text}</button>`;
+  let h = "";
+  if (mine && v.phase === "first") h = btn("take", "Take upcard", "btn-primary") + btn("pass", "Pass", "");
+  else if (mine && v.phase === "draw") h = btn("dstock", "Draw from stock", "btn-primary") + btn("ddisc", "Take discard", "", v.stockOnly);
+  else if (mine && v.phase === "discard") {
+    const ok = sel != null, dw = ok ? Gin.best(without(sel)).dw : null;
+    h = btn("discard", "Discard", "btn-primary", !ok) + btn("knock", dw === 0 ? "Gin" : "Knock", "", !ok || dw > 10)
+      + (ok ? `<span class="lab" style="align-self:center;margin:0">Deadwood after: ${dw}</span>` : "");
+  }
+  el.innerHTML = h;
+}
+
+function renderOver() {
+  const o = $("over"), r = v.result;
+  if (v.phase !== "over") { o.hidden = true; return; }
+  o.hidden = false;
+  const done = r.gameWinner != null;
+  let head, sub = "";
+  if (r.draw) head = "Draw. The stock ran down to two cards.";
+  else {
+    const who = r.knocker === v.you ? "You" : "Your opponent";
+    const kind = r.gin ? "went gin" : "knocked";
+    head = r.undercut ? `${who} ${kind} and got undercut.` : `${who} ${kind}.`;
+    const winner = r.winner === v.you ? "You score" : "Your opponent scores";
+    sub = `${winner} ${r.pts}${r.undercut ? " (the difference plus a 25 point bonus)" : r.gin ? " (25 plus their deadwood)" : ""}. Deadwood: you ${r.dw[0]}, opponent ${r.dw[1]}.`;
+  }
+  const hand = (m, d) => `<div class="hand" style="padding-top:0">${[...(m || []), ...d.map(c => [c])].map(g => `<div class="grp${g.length > 2 ? " meld" : ""}">${g.map(c => face(c, "small")).join("")}</div>`).join("")}</div>`;
+  const yours = r.draw ? null : hand(r.melds[0], r.dead[0]), theirs = r.draw ? null : hand(r.melds[1], r.dead[1]);
+  const winnerLine = done ? `<p><b>${r.gameWinner === v.you ? "You win the game" : "Your opponent wins the game"}, ${v.scores[v.you]} to ${v.scores[1 - v.you]}.</b></p>` : "";
+  o.innerHTML = `<p><b>${head}</b></p>${sub ? `<p class="sub">${sub}</p>` : ""}${winnerLine}`
+    + (yours ? `<div><p class="lab">Your hand</p>${yours}</div><div><p class="lab">Opponent's hand</p>${theirs}</div>` : "")
+    + `<div class="btns"><button class="btn btn-primary" id="next" type="button">${done ? "New game" : "Next hand"}</button></div>`;
+}
+
+// ---- input ----
+document.addEventListener("click", e => {
+  const t = e.target.closest("button"); if (!t || !v) return;
+  if (t.dataset.c != null && t.classList.contains("pick")) {
+    const c = +t.dataset.c; sel = sel === c ? null : c; return render(v);
+  }
+  const id = t.id;
+  if (id === "take" || (id === "disc" && v.phase === "first")) send({ t: "take" });
+  else if (id === "pass") send({ t: "pass" });
+  else if (id === "dstock" || id === "stock") send({ t: "draw", from: "stock" });
+  else if (id === "ddisc" || id === "disc") send({ t: "draw", from: "discard" });
+  else if (id === "discard" && sel != null) send({ t: "discard", card: sel });
+  else if (id === "knock" && sel != null) send({ t: "knock", card: sel });
+  else if (id === "next") send({ t: "next" });
+});
+$("create").addEventListener("click", startHost);
+$("copy").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText($("url").value); $("copy").textContent = "Copied"; }
+  catch { $("url").select(); }
+  setTimeout(() => $("copy").textContent = "Copy link", 1500);
+});
+$("url").addEventListener("focus", e => e.target.select());
+if (location.hash.length > 1) join(location.hash.slice(1));
+</script>
+</body>
+</html>
