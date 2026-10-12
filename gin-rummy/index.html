@@ -107,7 +107,7 @@ button.pc.sel{transform:translateY(-14px);outline:2px solid var(--accent);outlin
   </div>
 
   <section class="lobby" id="lobby">
-    <p>Two players, two browsers. One of you creates a game and sends the link, and the other opens it. Moves go straight between your browsers, and nothing is stored on a server.</p>
+    <p>Two players, two browsers. One of you creates a game and sends the link, and the other opens it. Moves pass through a small relay that keeps nothing, and the game itself lives in the creator's browser.</p>
     <button class="btn btn-primary" id="create" type="button">Create game</button>
     <div id="share" hidden>
       <div class="link"><input id="url" readonly aria-label="Game link"><button class="btn" id="copy" type="button">Copy link</button></div>
@@ -134,11 +134,10 @@ button.pc.sel{transform:translateY(-14px);outline:2px solid var(--accent);outlin
 
   <div class="foot">
     <p>Ten cards each. On your turn, draw from the stock or take the top discard, then discard one card. Melds are three or four of a kind, or three or more in a row of one suit (aces low). Knock when your unmatched cards, the deadwood, total 10 or less, counting aces as 1 and face cards as 10. Gin is zero deadwood and scores 25 plus the other player's deadwood. After a knock the other player lays off cards onto your melds. If they end with as much deadwood or less, they undercut you and score the difference plus 25. A hand ends with no score if the stock runs down to two cards.</p>
-    <p>The game lives in the creator's browser tab. If they close it the game ends, and if the other player reloads the link they rejoin where they were. A few strict networks block direct connections.</p>
+    <p>The game lives in the creator's browser tab. If they close it the game ends, and if the other player reloads the link they rejoin where they were.</p>
   </div>
 </main>
 
-<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" integrity="sha384-nlUQ8ZqCbvStErob+biJNzSgltf6urV3VGqhfIfzhmg9RXmpeRm76ELw0pYnKlTR" crossorigin="anonymous"></script>
 <script src="gin.js"></script>
 <script>
 const RANK = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
@@ -158,58 +157,69 @@ const faceInner = c => `<span class="ix"><b>${RANK[Gin.rank(c) - 1]}</b>${svg(Gi
 const face = (c, cls = "") => `<span class="pc${red(c) ? " red" : ""} ${cls}" role="img" aria-label="${label(c)}">${faceInner(c)}</span>`;
 const back = (cls = "") => `<span class="pc back ${cls}" aria-hidden="true"></span>`;
 
-let isHost = false, peer, conn, state, v, sel = null, flashTimer;
+let isHost = false, tx, state, v, sel = null, flashTimer;
 
-// ---- networking: the host's browser holds the game, the guest only ever receives its own view ----
-const code = () => Array.from(crypto.getRandomValues(new Uint8Array(6)), b => (b % 36).toString(36)).join("");
+// ---- networking: a Cloudflare Worker relays strings between the two browsers and keeps nothing.
+// The host's browser holds the game; the guest only ever receives its own view. ----
+const RELAY = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? "ws://localhost:8787" : "wss://gin-rummy-relay.exs783.workers.dev";
+const code = n => Array.from(crypto.getRandomValues(new Uint8Array(n)), b => (b % 36).toString(36)).join("");
 const note = (t, bad) => { $("note").textContent = t; $("note").style.color = bad ? "var(--accent-text)" : ""; };
+
+// Keeps one socket to the room alive, reconnecting after drops (phones sleep, networks change).
+function open(room, query, onMsg, onUp) {
+  let ws, ping, tries = 0;
+  const go = () => {
+    ws = new WebSocket(`${RELAY}/room/${room}?${query}`);
+    ws.onopen = () => { tries = 0; clearInterval(ping); ping = setInterval(() => ws.readyState === 1 && ws.send("ping"), 25000); };
+    ws.onmessage = e => {
+      let m; try { m = JSON.parse(e.data); } catch { return; }
+      m.t === "peer" ? onUp(m.up) : onMsg(m);
+    };
+    ws.onclose = e => {
+      clearInterval(ping); onUp(null);
+      if (e.code === 1000 && e.reason === "replaced") return note("This game was opened in another tab.", true);
+      setTimeout(go, Math.min(1000 * ++tries, 5000));
+    };
+  };
+  go();
+  return m => ws && ws.readyState === 1 && ws.send(JSON.stringify(m));
+}
 
 function startHost() {
   isHost = true; $("create").disabled = true;
-  const id = "gin-" + code();
-  peer = new Peer(id);
-  peer.on("open", () => {
-    $("url").value = location.origin + location.pathname + "#" + id;
-    $("share").hidden = false; note("Waiting for your opponent…");
-  });
-  peer.on("error", e => e.type === "unavailable-id" ? (peer.destroy(), startHost()) : note("Connection problem: " + e.type, true));
-  peer.on("connection", c => {
-    if (conn) conn.close(); // a reload rejoins; the newest connection takes the seat
-    conn = c;
-    c.on("open", () => { state = state || newGame(); push(); });
-    c.on("data", m => {
-      if (!m || m.t !== "act" || !m.a || typeof m.a.t !== "string") return;
-      const err = Gin.act(state, 1, m.a);
-      err ? c.send({ t: "err", m: err }) : push();
-    });
-    c.on("close", () => { if (conn === c) say("Your opponent disconnected. If they reload the link, they rejoin here.", true, true); });
+  const id = code(8), token = code(16);
+  $("url").value = location.origin + location.pathname + "#" + id;
+  $("share").hidden = false; note("Waiting for your opponent…");
+  tx = open(id, `role=host&token=${token}`, m => {
+    if (m.t !== "act" || !m.a || typeof m.a.t !== "string") return;
+    const err = Gin.act(state, 1, m.a);
+    err ? tx({ t: "err", m: err }) : push();
+  }, up => {
+    if (up === true) { state = state || Gin.deal([0, 0], 0); push(); }
+    else if (up === false && v) say("Your opponent disconnected. If they reload the link, they rejoin here.", true, true);
+    else if (up === null && !v) note("Connecting to the game server…");
   });
 }
-const newGame = () => Gin.deal([0, 0], 0);
 
-function join(hostId) {
+function join(room) {
   $("create").hidden = true; note("Connecting…");
-  peer = new Peer();
-  const timeout = setTimeout(() => note("Could not connect. The link may be old, or the network blocks direct connections.", true), 15000);
-  peer.on("error", e => { clearTimeout(timeout); note(e.type === "peer-unavailable" ? "That game was not found. Ask for a new link." : "Connection problem: " + e.type, true); });
-  peer.on("open", () => {
-    conn = peer.connect(hostId, { reliable: true });
-    conn.on("open", () => { clearTimeout(timeout); note("Connected. Waiting for the deal…"); });
-    conn.on("data", m => {
-      if (m.t === "view") render(m.v);
-      else if (m.t === "err") say(m.m, true);
-    });
-    conn.on("close", () => say("The host left. Reload to try rejoining.", true, true));
+  tx = open(room, "role=guest", m => {
+    if (m.t === "view") render(m.v);
+    else if (m.t === "err") say(m.m, true);
+  }, up => {
+    if (up === true) note("Connected. Waiting for the deal…");
+    else if (up === false) v ? say("The host left. Keep this page open and the game resumes if they return.", true, true) : note("Waiting for the host to open the game…");
+    else if (!v) note("Connecting…");
   });
 }
 
 function push() {
   render(Gin.view(state, 0));
-  if (conn && conn.open) conn.send({ t: "view", v: Gin.view(state, 1) });
+  tx({ t: "view", v: Gin.view(state, 1) });
 }
 function send(a) {
   if (isHost) { const err = Gin.act(state, 0, a); err ? say(err, true) : push(); }
-  else if (conn && conn.open) conn.send({ t: "act", a });
+  else tx({ t: "act", a });
 }
 
 // ---- rendering ----
