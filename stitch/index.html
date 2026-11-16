@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Stitch</title>
+<meta name="description" content="Stitch: onboard LiDAR SLAM drone swarm mapping, edge only.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Inter:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#c4bba8;--accent:#c86448;--text:#1c1915;--muted:#8a7f70;--pill:#111;
+--serif:'Libre Baskerville',Georgia,serif;--sans:'Inter',system-ui,sans-serif;--mono:'Space Mono','Courier New',monospace}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-weight:300;overflow-x:hidden}
+.label{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+.pill{font:600 12px var(--sans);letter-spacing:.08em;text-transform:uppercase;background:var(--pill);color:#fff;border-radius:999px;padding:10px 22px;text-decoration:none;transition:opacity .2s}
+.pill:hover{opacity:.7}
+nav{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:18px 40px 18px 90px}
+.logo{font:500 18px var(--sans);color:var(--text);text-decoration:none;letter-spacing:-.01em}
+.logo i{color:var(--accent);font-style:normal}
+.rail-l{position:fixed;left:0;top:0;bottom:0;width:50px;background:var(--pill);z-index:21;display:flex;align-items:center;justify-content:center}
+.rail-l span{color:#fff;font:11px var(--mono);letter-spacing:.2em;text-transform:uppercase;writing-mode:vertical-rl;transform:rotate(180deg)}
+.rail-r{position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:20;display:flex;flex-direction:column;gap:14px}
+.rail-r a{width:2px;height:22px;background:var(--muted);opacity:.5;transition:.3s}
+.rail-r a.on{background:var(--accent);opacity:1;height:36px}
+#counter{position:fixed;left:70px;bottom:22px;z-index:20}
+.sec{position:relative;height:300vh}
+.frame{position:sticky;top:0;height:100vh;overflow:hidden}
+.hero .frame{display:flex;flex-direction:column;justify-content:flex-end;padding:0 0 60px 90px}
+.meta{position:absolute;left:90px;top:90px;display:grid;gap:6px}
+.meta li{list-style:none}.meta li:before{content:"• ";color:var(--accent)}
+.wordmark{font:700 clamp(80px,15vw,180px)/1 var(--serif);letter-spacing:-.02em;-webkit-text-stroke:2px var(--accent);color:transparent;white-space:nowrap;margin-left:-.04em;position:relative;z-index:1}
+.tag{font:400 clamp(18px,2.2vw,28px)/1.3 var(--serif);max-width:520px;margin:26px 0 18px;position:relative;z-index:3}
+.tag b{color:var(--accent);font-weight:400}
+#drone{position:fixed;left:50%;top:50%;width:min(62vh,70vw);margin:-31vh 0 0 -31vh;z-index:2;will-change:transform;pointer-events:none}
+#drone svg{width:100%;overflow:visible}
+.cloud circle{fill:var(--text);opacity:0;transition:opacity .6s}
+.cloud.on circle{opacity:.55}
+.cols{position:absolute;inset:0;display:grid;grid-template-columns:35% 35% 30%;padding:110px 60px 60px 90px;pointer-events:none}
+.left h2,.panel h3{font-family:var(--serif)}
+.left h2{font-size:clamp(32px,4.4vw,56px);line-height:1.1;margin:14px 0 28px}
+.left h2 em{color:var(--accent);font-style:normal;display:block}
+.left li{list-style:none;font-size:15px;font-weight:400;padding:5px 0}
+.left li span{color:var(--accent);opacity:.7;font:11px var(--mono);margin-right:12px}
+.panel{grid-column:3;text-align:right;display:flex;flex-direction:column;justify-content:center;align-items:flex-end;opacity:0;transform:translateY(24px);transition:.7s}
+.sec.vis .panel{opacity:1;transform:none}
+.panel h3{font-size:24px;margin:8px 0 14px}
+.item{max-width:290px;padding:16px 0;border-top:1px solid rgba(0,0,0,.08)}
+.item h4{font:400 15px var(--serif);margin-bottom:6px}
+.item p{font-size:14px;line-height:1.6;color:var(--muted)}
+.end .frame{display:flex;flex-direction:column;justify-content:center;padding-left:90px;gap:20px}
+.end h2{font:700 clamp(36px,6vw,80px)/1.05 var(--serif);position:relative;z-index:3}.end h2 em{color:var(--accent);font-style:normal;display:block}
+.end p{max-width:440px;color:var(--muted);line-height:1.7;position:relative;z-index:3}
+.end .pill{position:relative;z-index:3}
+@media(max-width:800px){nav{padding:14px 16px 14px 66px}.cols{grid-template-columns:1fr;padding:80px 24px 24px 66px}.panel{grid-column:1;align-items:flex-start;text-align:left;justify-content:flex-end}.left li{display:none}.rail-r{display:none}.hero .frame,.end .frame{padding-left:66px}.meta{left:66px}#counter{left:62px}}
+</style>
+</head>
+<body>
+<div class="rail-l"><span>Edge only · No cloud</span></div>
+<nav><a class="logo" href="#top">stitch<i>.</i></a><a class="pill" href="/">ethansimon.me</a></nav>
+<div class="rail-r" id="dots"></div>
+<div class="label" id="counter"></div>
+
+<main id="top">
+<section class="sec hero" data-label="Intro" data-cloud="0"><div class="frame">
+  <ul class="meta label"><li>Onboard LiDAR SLAM</li><li>Multi-drone map merge</li><li>ROS 2 · Jetson</li></ul>
+  <div class="wordmark">stitch</div>
+  <p class="tag">Many drones, one map. <b>Nothing leaves the edge.</b></p>
+  <span class="label">↓ Scroll to map</span>
+</div></section>
+
+<section class="sec" data-label="Onboard SLAM" data-cloud="1"><div class="frame"><div class="cols">
+  <div class="left"><div class="label">01 · Onboard SLAM</div>
+    <h2>Every drone<em>navigates itself.</em></h2>
+    <ul><li><span>01</span>FAST-LIO2</li><li><span>02</span>GLIM</li><li><span>03</span>DLIO</li><li><span>04</span>KISS-ICP</li></ul></div>
+  <div></div>
+  <div class="panel"><div class="label">01 / 03</div><h3>LiDAR-inertial odometry</h3>
+    <div class="item"><h4>Why onboard</h4><p>SLAM runs entirely on the Jetson Orin NX 16GB. If the radio drops, the drone still knows where it is, so flight never depends on the ground station.</p></div>
+    <div class="item"><h4>Why LiDAR-inertial</h4><p>The IMU carries the pose between scans and the scan matcher corrects its drift. Four candidates are on the list; I haven't picked one yet.</p></div>
+  </div></div></div></section>
+
+<section class="sec" data-label="Sensors" data-cloud="2"><div class="frame"><div class="cols">
+  <div class="left"><div class="label">02 · Sensors</div>
+    <h2>Heavy eyes,<em>careful budget.</em></h2>
+    <ul><li><span>01</span>Hesai Pandar40P</li><li><span>02</span>MicroStrain 3DM-GX5-25</li><li><span>03</span>Orin NX 16GB</li></ul></div>
+  <div></div>
+  <div class="panel"><div class="label">02 / 03</div><h3>Sensors and compute</h3>
+    <div class="item"><h4>Pandar40P</h4><p>40 channels, about 200 m range, about 910 g. The airframe and battery have to be sized around that mass.</p></div>
+    <div class="item"><h4>Two LiDARs on one Orin NX</h4><p>At the edge of feasible. I'll benchmark it before committing to the second unit.</p></div>
+    <div class="item"><h4>Extrinsics first</h4><p>LiDAR-to-IMU extrinsics get calibrated before any SLAM run. A bad transform here shows up later as a smeared map.</p></div>
+  </div></div></div></section>
+
+<section class="sec" data-label="Swarm" data-cloud="3"><div class="frame"><div class="cols">
+  <div class="left"><div class="label">03 · Swarm</div>
+    <h2>Fragments in,<em>one map out.</em></h2>
+    <ul><li><span>01</span>/slam/odometry</li><li><span>02</span>/slam/map</li><li><span>03</span>/swarm/map_fragment</li><li><span>04</span>/ground/merged_map</li></ul></div>
+  <div></div>
+  <div class="panel"><div class="label">03 / 03</div><h3>Stitching</h3>
+    <div class="item"><h4>Frontier exploration</h4><p>Each drone heads for the edge of what is already mapped, so the swarm covers new ground instead of retracing it.</p></div>
+    <div class="item"><h4>Compressed fragments over mesh radio</h4><p>Drones send map fragments to the ground station. It merges them for display only; no drone waits on it.</p></div>
+    <div class="item"><h4>Outputs</h4><p>LAS/LAZ point cloud, 3D mesh, occupancy grid, PDF report.</p></div>
+  </div></div></div></section>
+
+<section class="sec end" data-label="Status" data-cloud="3"><div class="frame">
+  <div class="label" style="position:relative;z-index:3">04 · Status</div>
+  <h2>Still on<em>the drawing board.</em></h2>
+  <p>This is the plan, not a result. First step is to run each SLAM candidate on a rosbag at the desk, then deploy to the Jetson. No numbers here until I have measured ones.</p>
+  <a class="pill" href="/" style="align-self:flex-start">Back to ethansimon.me</a>
+</div></section>
+</main>
+
+<div id="drone"><svg viewBox="0 0 400 400" fill="none" stroke="#1c1915" stroke-width="2">
+  <g class="cloud" id="cloud"></g>
+  <g stroke-linecap="round">
+    <path d="M200 200L90 90M200 200L310 90M200 200L90 310M200 200L310 310"/>
+    <rect x="178" y="178" width="44" height="44" rx="8" fill="#c4bba8"/>
+    <circle cx="200" cy="200" r="6" stroke="#c86448"/>
+    <g stroke="#c86448"><circle cx="90" cy="90" r="42"/><circle cx="310" cy="90" r="42"/><circle cx="90" cy="310" r="42"/><circle cx="310" cy="310" r="42"/></g>
+  </g></svg></div>
+
+<script>
+const secs=[...document.querySelectorAll('.sec')],dots=document.getElementById('dots'),
+counter=document.getElementById('counter'),drone=document.getElementById('drone'),cloud=document.getElementById('cloud');
+// deterministic scatter so the point cloud is identical on every load
+let s=7;const r=()=>(s=s*16807%2147483647)/2147483647;
+for(let i=0;i<160;i++){const a=r()*6.283,d=70+r()*170;
+  cloud.insertAdjacentHTML('beforeend',`<circle cx="${200+Math.cos(a)*d}" cy="${200+Math.sin(a)*d}" r="${1+r()*1.6}" style="transition-delay:${i*8}ms"/>`)}
+secs.forEach((e,i)=>dots.insertAdjacentHTML('beforeend',`<a href="#" data-i="${i}"></a>`));
+dots.onclick=e=>{const i=e.target.dataset.i;if(i){e.preventDefault();secs[i].scrollIntoView()}};
+function tick(){
+  const vh=innerHeight;let cur=0;
+  secs.forEach((e,i)=>{const b=e.getBoundingClientRect();
+    if(b.top<=vh*.5&&b.bottom>vh*.5)cur=i;
+    e.classList.toggle('vis',b.top<vh*.3&&b.bottom>vh*.7)});
+  [...dots.children].forEach((d,i)=>d.classList.toggle('on',i===cur));
+  counter.textContent=`SECTION ${String(cur).padStart(2,'0')} — ${secs[cur].dataset.label}`;
+  cloud.classList.toggle('on',+secs[cur].dataset.cloud>0);
+  const p=scrollY/(document.body.scrollHeight-vh);
+  // drone slides left and spins as the story advances so the right-hand text column stays clear
+  drone.style.transform=`translateX(${p*-14}vw) rotate(${p*220}deg) scale(${1-p*.25})`;
+}
+addEventListener('scroll',tick,{passive:true});addEventListener('resize',tick);tick();
+</script>
+</body>
+</html>
